@@ -22,8 +22,13 @@ A premium, contractor-facing bid intelligence SaaS prototype (tagline: "Research
 - Global mode context (Standalone / ContractorConnect Add-On): `artifacts/bid-intelligence-os/src/lib/context.tsx`
 - Seed data (bids, analytics series, defaults): `artifacts/bid-intelligence-os/src/lib/data.ts`
 - Client-facing bid package seed data (3 sample proposals: HVAC, Roofing, Multi-location): `artifacts/bid-intelligence-os/src/lib/bid-packages.ts`
-- Screens: `artifacts/bid-intelligence-os/src/pages/` (dashboard, company-profile, bid-library, new-bid, scope-analyzer, cost-inputs, bid-fit, strategy-memo, package-builder, monitoring, analytics, addon, settings)
-- Theme tokens: `artifacts/bid-intelligence-os/src/index.css`
+- Primary navigation (IA, matches the approved Cockpit mockup): Cockpit (`/`), Bids (`/bids`), Projects (`/projects`), Leads (`/leads`), Competitors (`/competitors`), Insights (`/insights`), Documents (`/documents`), Reports (`/reports`), Settings (`/settings`) — defined in `src/components/layout.tsx`
+- Cockpit (front page) screen: `artifacts/bid-intelligence-os/src/pages/dashboard.tsx` (mounted at `/`; recreates the attached mockup)
+- Other nav screens: `bids.tsx`, `projects.tsx`, `leads.tsx`, `competitors.tsx`, `insights.tsx`, `documents.tsx`, `reports.tsx`, `settings.tsx`
+- Deep analysis-workspace screens (intentionally NOT in the main nav, reachable by route/links): `new-bid.tsx`, `scope-analyzer.tsx`, `cost-inputs.tsx`, `bid-fit.tsx`, `strategy-memo.tsx`, `package-builder.tsx` (the package builder is reached from Documents)
+- Brand crest (inline SVG, not the PNG): `artifacts/bid-intelligence-os/src/components/cca-crest.tsx`
+- Legacy screens kept on disk but no longer routed: `bid-library.tsx`, `monitoring.tsx`, `analytics.tsx`, `company-profile.tsx`, `addon.tsx` (their content was folded into Bids / Insights / Settings)
+- Theme tokens: `artifacts/bid-intelligence-os/src/index.css` (dark navy `#0A0E1A`, panels `#0F1830`/`#111A2E`, electric cyan accent `#38BDF8`, Won `#22C55E`, Lost `#EF4444`)
 
 ## Architecture decisions
 

@@ -6,7 +6,7 @@ export interface Bid {
   location: string;
   amount: number;
   date: string;
-  status: "Draft" | "Submitted" | "Follow-Up Due" | "Shortlisted" | "Clarification Requested" | "Won" | "Lost" | "Withdrawn" | "No Decision";
+  status: "Draft" | "Submitted" | "Follow-Up Due" | "Shortlisted" | "Clarification Requested" | "Won" | "Lost" | "Withdrawn" | "No Decision" | "In Progress" | "Review";
   outcome?: "Won" | "Lost" | "No Decision";
   reason?: string;
   margin?: number;
@@ -16,128 +16,102 @@ export interface Bid {
   clarificationRequested?: boolean;
   lastTouch?: string;
   nextAction?: string;
+  nextActionDate?: string;
   confidence?: number;
+  fit?: number;
   riskScore?: number;
+  publicPrivate?: "Public" | "Private";
+  daysRemaining?: number;
 }
 
 export const seedBids: Bid[] = [
   {
     id: "1",
-    name: "Commercial HVAC Retrofit - Downtown Tower",
-    recipient: "Regional Property Manager",
+    name: "Commercial HVAC Retrofit",
+    recipient: "Metro Facilities Group",
+    publicPrivate: "Private",
     type: "HVAC",
-    location: "Seattle, WA",
-    amount: 145000,
-    date: "2023-10-15",
-    status: "Won",
-    outcome: "Won",
-    reason: "Competitive pricing and timeline",
-    margin: 22,
-    notes: "Client appreciated our detailed scope breakdown.",
-    expectedDecisionDate: "2023-11-01",
-    contactPerson: "Jane Smith",
-    clarificationRequested: false,
-    lastTouch: "2023-10-25",
-    nextAction: "Project Kickoff",
-    confidence: 95,
-    riskScore: 20
+    location: "Nashville, TN",
+    amount: 4210000,
+    date: "2025-05-28",
+    daysRemaining: 8,
+    status: "In Progress",
+    fit: 92,
+    confidence: 85,
+    nextAction: "Submit clarifications",
+    nextActionDate: "May 22",
   },
   {
     id: "2",
-    name: "Roofing Replacement Phase 2",
-    recipient: "Commercial Building Owner",
+    name: "Roofing Replacement",
+    recipient: "Atlanta Public Schools",
+    publicPrivate: "Public",
     type: "Roofing",
-    location: "Bellevue, WA",
-    amount: 85000,
-    date: "2023-09-02",
-    status: "Lost",
-    outcome: "Lost",
-    reason: "Price too high",
-    margin: 18,
-    notes: "Competitor came in 15% lower.",
-    expectedDecisionDate: "2023-09-20",
-    contactPerson: "Robert Jones",
-    clarificationRequested: false,
-    lastTouch: "2023-09-18",
-    nextAction: "Post-Loss Review",
-    confidence: 40,
-    riskScore: 60
+    location: "Atlanta, GA",
+    amount: 2870000,
+    date: "2025-05-30",
+    daysRemaining: 10,
+    status: "In Progress",
+    fit: 88,
+    confidence: 72,
+    nextAction: "Site visit follow-up",
+    nextActionDate: "May 21",
   },
   {
     id: "3",
-    name: "Electrical Tenant Improvement - Tech Office",
-    recipient: "General Contractor",
-    type: "Electrical",
-    location: "Redmond, WA",
-    amount: 210000,
-    date: "2023-11-20",
-    status: "Submitted",
-    notes: "Awaiting GC feedback.",
-    expectedDecisionDate: "2023-12-15",
-    contactPerson: "Alice Wong",
-    clarificationRequested: false,
-    lastTouch: "2023-11-28",
-    nextAction: "Follow up on pricing",
-    confidence: 75,
-    riskScore: 35
+    name: "Concrete Repair",
+    recipient: "Orange County BOCC",
+    publicPrivate: "Public",
+    type: "Concrete",
+    location: "Orlando, FL",
+    amount: 1980000,
+    date: "2025-06-05",
+    daysRemaining: 16,
+    status: "Review",
+    fit: 76,
+    confidence: 60,
+    nextAction: "Confirm scope",
+    nextActionDate: "May 23",
   },
   {
     id: "4",
-    name: "Multi-location Maintenance Contract",
-    recipient: "Franchise Operator",
+    name: "Multi-Location Maintenance",
+    recipient: "National Retail Corp.",
+    publicPrivate: "Private",
     type: "Facilities Maintenance",
-    location: "WA & OR",
-    amount: 450000,
-    date: "2023-12-05",
-    status: "Shortlisted",
-    notes: "Final presentation next week.",
-    expectedDecisionDate: "2023-12-20",
-    contactPerson: "Mark Davis",
-    clarificationRequested: true,
-    lastTouch: "2023-12-10",
-    nextAction: "Prepare presentation",
-    confidence: 85,
-    riskScore: 45
-  },
-  {
-    id: "5",
-    name: "Concrete Repair - City Plaza",
-    recipient: "Municipal Facilities Office",
-    type: "Concrete",
-    location: "Tacoma, WA",
-    amount: 65000,
-    date: "2023-08-10",
-    status: "Won",
-    outcome: "Won",
-    reason: "Prior relationship and compliance",
-    margin: 25,
-    notes: "City required specific bonding which we had.",
-    expectedDecisionDate: "2023-09-01",
-    contactPerson: "Sarah Johnson",
-    clarificationRequested: false,
-    lastTouch: "2023-08-25",
-    nextAction: "Execute Contract",
-    confidence: 90,
-    riskScore: 15
-  },
-  {
-    id: "6",
-    name: "Terminal B Plumbing Upgrade",
-    recipient: "Port Authority",
-    type: "Plumbing",
-    location: "SeaTac, WA",
-    amount: 320000,
-    date: "2023-12-08",
-    status: "Follow-Up Due",
-    notes: "Waiting on spec clarification.",
-    expectedDecisionDate: "2024-01-15",
-    contactPerson: "Tom Wilson",
-    clarificationRequested: true,
-    lastTouch: "2023-12-12",
-    nextAction: "Submit RFI #2",
-    confidence: 60,
-    riskScore: 55
+    location: "Southeast Region",
+    amount: 9680000,
+    date: "2025-06-10",
+    daysRemaining: 21,
+    status: "In Progress",
+    fit: 84,
+    confidence: 78,
+    nextAction: "Pricing strategy",
+    nextActionDate: "May 26",
   }
+];
+
+export const followUpQueue = [
+  { id: "1", client: "Metro Facilities Group", action: "Clarifications", priority: "High", date: "May 22" },
+  { id: "2", client: "Atlanta Public Schools", action: "Site Visit Follow-Up", priority: "High", date: "May 21" },
+  { id: "3", client: "Orange County BOCC", action: "Scope Confirmation", priority: "Medium", date: "May 23" },
+  { id: "4", client: "National Retail Corp.", action: "Pricing Discussion", priority: "Medium", date: "May 26" }
+];
+
+export const competitorSignals = [
+  { id: "1", name: "ABC Mechanical", activity: "Active in 3 bids", threat: "High", trend: "up" },
+  { id: "2", name: "Titan Builders", activity: "Active in 2 bids", threat: "Medium", trend: "flat" },
+  { id: "3", name: "Summit Roofing", activity: "Submitted 1 bid", threat: "High", trend: "up" },
+  { id: "4", name: "ProConcrete Co.", activity: "Active in 1 bid", threat: "Low", trend: "down" }
+];
+
+export const documentReadiness = [
+  { id: "1", name: "Bid Form", status: "complete" },
+  { id: "2", name: "Insurance (ACORD)", status: "complete" },
+  { id: "3", name: "Bonding", status: "complete" },
+  { id: "4", name: "Safety Program", status: "complete" },
+  { id: "5", name: "Financials", status: "complete" },
+  { id: "6", name: "W-9", status: "warning" },
 ];
 
 export const analyticsData = {
@@ -154,6 +128,28 @@ export const analyticsData = {
     { month: "Oct", rate: 48 },
     { month: "Nov", rate: 52 },
     { month: "Dec", rate: 55 }
+  ],
+  bidOutcomeTimeline: [
+    { month: "Jun", won: 1.2, lost: 0.5, noDecision: 0.2 },
+    { month: "Jul", won: 1.5, lost: 0.8, noDecision: 0.1 },
+    { month: "Aug", won: 0.9, lost: 0.4, noDecision: 0.3 },
+    { month: "Sep", won: 1.8, lost: 0.6, noDecision: 0.2 },
+    { month: "Oct", won: 1.1, lost: 0.7, noDecision: 0.1 },
+    { month: "Nov", won: 2.0, lost: 0.9, noDecision: 0.4 },
+    { month: "Dec", won: 2.4, lost: 1.1, noDecision: 0.3 },
+    { month: "Jan", won: 1.7, lost: 0.5, noDecision: 0.2 },
+    { month: "Feb", won: 1.3, lost: 0.8, noDecision: 0.1 },
+    { month: "Mar", won: 1.6, lost: 0.4, noDecision: 0.2 },
+    { month: "Apr", won: 2.1, lost: 0.6, noDecision: 0.3 },
+    { month: "May", won: 2.8, lost: 0.5, noDecision: 0.1 }
+  ],
+  marginTrend: [
+    { month: "Jan", margin: 15.2 },
+    { month: "Feb", margin: 15.8 },
+    { month: "Mar", margin: 16.1 },
+    { month: "Apr", margin: 16.5 },
+    { month: "May", margin: 17.2 },
+    { month: "Jun", margin: 18.6 }
   ],
   projectTypes: [
     { type: "HVAC", won: 12, lost: 4 },
