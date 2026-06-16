@@ -52,85 +52,85 @@
 }
 
 :root {
-  --background: 210 11% 15%; /* Charcoal / Steel */
-  --foreground: 210 20% 98%;
-  --border: 210 14% 25%;
-  --input: 210 14% 20%;
-  --ring: 180 100% 35%; /* Teal Accent */
+  --background: 222 47% 7%; /* Deep navy/graphite */
+  --foreground: 210 20% 98%; /* White text */
+  --border: 215 28% 17%;
+  --input: 215 28% 17%;
+  --ring: 173 80% 40%; /* Teal */
 
-  --card: 210 13% 18%;
+  --card: 222 47% 11%;
   --card-foreground: 210 20% 98%;
-  --card-border: 210 14% 25%;
+  --card-border: 215 28% 17%;
 
-  --popover: 210 13% 18%;
+  --popover: 222 47% 11%;
   --popover-foreground: 210 20% 98%;
-  --popover-border: 210 14% 25%;
+  --popover-border: 215 28% 17%;
 
-  --primary: 180 100% 35%; /* Teal Accent */
+  --primary: 173 80% 40%; /* Teal 600 */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 210 14% 25%;
+  --secondary: 215 28% 17%; /* Slate 800 */
   --secondary-foreground: 210 20% 98%;
 
-  --muted: 210 14% 22%;
-  --muted-foreground: 210 15% 70%;
+  --muted: 215 28% 17%; /* Slate 800 */
+  --muted-foreground: 215 20% 65%; /* Slate 400 */
 
-  --accent: 150 60% 40%; /* Green Accent */
-  --accent-foreground: 0 0% 100%;
+  --accent: 171 77% 64%; /* Teal 400 / Electric Blue accent */
+  --accent-foreground: 222 47% 11%;
 
   --destructive: 0 62.8% 50%;
   --destructive-foreground: 210 20% 98%;
 
-  --sidebar: 210 15% 12%;
+  --sidebar: 222 47% 9%;
   --sidebar-foreground: 210 20% 98%;
-  --sidebar-border: 210 14% 20%;
-  --sidebar-primary: 180 100% 35%;
+  --sidebar-border: 215 28% 15%;
+  --sidebar-primary: 173 80% 40%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 210 14% 20%;
+  --sidebar-accent: 215 28% 17%;
   --sidebar-accent-foreground: 210 20% 98%;
-  --sidebar-ring: 180 100% 35%;
+  --sidebar-ring: 173 80% 40%;
 
   --radius: 0.5rem;
 }
 
 .dark {
-  --background: 210 11% 15%; /* Charcoal / Steel */
+  --background: 222 47% 7%;
   --foreground: 210 20% 98%;
-  --border: 210 14% 25%;
-  --input: 210 14% 20%;
-  --ring: 180 100% 35%; /* Teal Accent */
+  --border: 215 28% 17%;
+  --input: 215 28% 17%;
+  --ring: 173 80% 40%;
 
-  --card: 210 13% 18%;
+  --card: 222 47% 11%;
   --card-foreground: 210 20% 98%;
-  --card-border: 210 14% 25%;
+  --card-border: 215 28% 17%;
 
-  --popover: 210 13% 18%;
+  --popover: 222 47% 11%;
   --popover-foreground: 210 20% 98%;
-  --popover-border: 210 14% 25%;
+  --popover-border: 215 28% 17%;
 
-  --primary: 180 100% 35%; /* Teal Accent */
+  --primary: 173 80% 40%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 210 14% 25%;
+  --secondary: 215 28% 17%;
   --secondary-foreground: 210 20% 98%;
 
-  --muted: 210 14% 22%;
-  --muted-foreground: 210 15% 70%;
+  --muted: 215 28% 17%;
+  --muted-foreground: 215 20% 65%;
 
-  --accent: 150 60% 40%; /* Green Accent */
-  --accent-foreground: 0 0% 100%;
+  --accent: 171 77% 64%;
+  --accent-foreground: 222 47% 11%;
 
   --destructive: 0 62.8% 50%;
   --destructive-foreground: 210 20% 98%;
 
-  --sidebar: 210 15% 12%;
+  --sidebar: 222 47% 9%;
   --sidebar-foreground: 210 20% 98%;
-  --sidebar-border: 210 14% 20%;
-  --sidebar-primary: 180 100% 35%;
+  --sidebar-border: 215 28% 15%;
+  --sidebar-primary: 173 80% 40%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 210 14% 20%;
+  --sidebar-accent: 215 28% 17%;
   --sidebar-accent-foreground: 210 20% 98%;
-  --sidebar-ring: 180 100% 35%;
+  --sidebar-ring: 173 80% 40%;
 }
 
 @layer base {

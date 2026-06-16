@@ -1,89 +1,164 @@
 import { Layout } from "@/components/layout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, Info, CheckCircle2, ArrowRight } from "lucide-react";
+import { AlertTriangle, Info, ArrowRight, Search, FileText, CheckSquare } from "lucide-react";
 import { Link } from "wouter";
 
 export default function ScopeAnalyzer() {
   return (
     <Layout>
-      <div className="space-y-6 max-w-5xl mx-auto">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Scope Analyzer</h2>
-          <p className="text-muted-foreground">AI-assisted extraction and risk analysis of your opportunity's scope.</p>
+      <div className="space-y-8 max-w-6xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+               <Search className="h-8 w-8 text-teal-500" />
+               Scope Analyzer
+            </h2>
+            <p className="text-slate-400 mt-2 text-lg">AI-assisted extraction and risk analysis of your opportunity's scope.</p>
+          </div>
+          <div className="hidden md:flex items-center gap-2 bg-slate-900/80 px-4 py-2 rounded-full border border-slate-800">
+             <span className="relative flex h-2.5 w-2.5">
+               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-500"></span>
+             </span>
+             <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Analysis Complete</span>
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Extracted Scope Summary</CardTitle>
-                <CardDescription>Synthesized from 4 uploaded specification documents.</CardDescription>
+            <Card className="bg-slate-900/80 border-slate-800 shadow-xl overflow-hidden">
+              <div className="h-1 w-full bg-teal-500"></div>
+              <CardHeader className="border-b border-slate-800 pb-4 bg-slate-900/50">
+                <CardTitle className="text-lg text-white flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-slate-400" />
+                  Extracted Scope Summary
+                </CardTitle>
+                <CardDescription className="text-slate-400">Synthesized from 4 uploaded specification documents.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 text-sm">
-                <p>
-                  <strong>Project:</strong> Terminal B HVAC Retrofit & Piping Upgrade<br />
-                  <strong>Core Deliverables:</strong> Replacement of 3 rooftop RTUs, modification of existing ductwork to support new layout, integration into existing Building Management System (BMS), and replacement of associated chilled water piping.
-                </p>
-                <p>
-                  <strong>Timeline:</strong> Phased delivery over 8 weeks, strictly restricted to night shifts (10 PM - 5 AM) due to airport operations.
-                </p>
-                <div className="p-3 bg-muted/30 rounded-md border border-border">
-                  <div className="flex gap-2 items-start">
-                    <Info className="h-4 w-4 text-primary mt-0.5" />
+              <CardContent className="space-y-5 pt-6 text-sm">
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Project</span>
+                  <p className="text-slate-200 font-medium text-base">Terminal B HVAC Retrofit & Piping Upgrade</p>
+                </div>
+                
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Core Deliverables</span>
+                  <p className="text-slate-300 leading-relaxed">
+                    Replacement of 3 rooftop RTUs, modification of existing ductwork to support new layout, integration into existing Building Management System (BMS), and replacement of associated chilled water piping.
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Timeline / Phasing</span>
+                  <p className="text-slate-300 leading-relaxed">
+                    Phased delivery over 8 weeks, strictly restricted to night shifts (10 PM - 5 AM) due to airport operations.
+                  </p>
+                </div>
+
+                <div className="mt-6 p-4 bg-blue-950/20 rounded-lg border border-blue-900/30">
+                  <div className="flex gap-3 items-start">
+                    <Info className="h-5 w-5 text-blue-400 shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-semibold text-primary">Key Complexity Indicator</span>
-                      <p className="text-muted-foreground mt-1">Requires specialized rigging for rooftop units and strict adherence to TSA security protocols for all site personnel.</p>
+                      <span className="font-semibold text-blue-400">Key Complexity Indicator</span>
+                      <p className="text-slate-300 mt-1 leading-relaxed">Requires specialized rigging for rooftop units and strict adherence to TSA security protocols for all site personnel.</p>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Required Clarification Questions (RFIs)</CardTitle>
-                <CardDescription>Items missing or ambiguous in the provided scope.</CardDescription>
+            <Card className="bg-slate-900/80 border-slate-800 shadow-md">
+              <CardHeader className="border-b border-slate-800 pb-4">
+                <CardTitle className="text-lg text-white">Required Clarifications (RFIs)</CardTitle>
+                <CardDescription className="text-slate-400">Items missing or ambiguous in the provided documents.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-6">
                 <div className="space-y-3">
-                  <div className="flex gap-3">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500 mt-1" />
+                  <div className="flex gap-4 p-3 rounded-md hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-700/50">
+                    <AlertTriangle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">BMS Integration Specs</p>
-                      <p className="text-xs text-muted-foreground">Is the existing BMS BACnet compatible, or will gateways be required? (Missing from Sec 23 09 00)</p>
+                      <p className="text-sm font-semibold text-slate-200">BMS Integration Specs</p>
+                      <p className="text-sm text-slate-400 mt-1 leading-relaxed">Is the existing BMS BACnet compatible, or will gateways be required? <span className="text-slate-500 text-xs ml-1">(Missing from Sec 23 09 00)</span></p>
                     </div>
                   </div>
-                  <div className="flex gap-3">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500 mt-1" />
+                  <div className="flex gap-4 p-3 rounded-md hover:bg-slate-800/50 transition-colors border border-transparent hover:border-slate-700/50">
+                    <AlertTriangle className="h-5 w-5 text-yellow-500 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium">Staging Area</p>
-                      <p className="text-xs text-muted-foreground">No defined staging area for crane rigging and equipment delivery in the logistics plan.</p>
+                      <p className="text-sm font-semibold text-slate-200">Staging Area Logistics</p>
+                      <p className="text-sm text-slate-400 mt-1 leading-relaxed">No defined staging area for crane rigging and equipment delivery in the logistics plan.</p>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Required Document Checklist</CardTitle>
-                <CardDescription>Ensure all forms are completed before export.</CardDescription>
+          </div>
+
+          <div className="space-y-6">
+            <Card className="bg-slate-900/90 border-red-900/30 shadow-xl overflow-hidden relative">
+              <div className="absolute top-0 right-0 p-4 opacity-5">
+                <AlertTriangle className="h-32 w-32 text-red-500" />
+              </div>
+              <CardHeader className="bg-red-950/20 pb-4 border-b border-red-900/30 relative z-10">
+                <CardTitle className="text-red-400 text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Risk Assessment
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6 space-y-6 relative z-10">
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Overall Risk Level</span>
+                    <span className="text-xs text-red-400 font-bold uppercase tracking-wider">HIGH</span>
+                  </div>
+                  <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden shadow-inner">
+                    <div className="h-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" style={{ width: '85%' }} />
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Badge variant="outline" className="w-full justify-start bg-red-950/30 text-red-400 border-red-900/50 font-semibold py-1">Deadline Risk: High</Badge>
+                    <p className="text-xs text-slate-400 pl-1 font-medium">Bids due in 3 days. Submittals missing.</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Badge variant="outline" className="w-full justify-start bg-yellow-950/30 text-yellow-500 border-yellow-900/50 font-semibold py-1">Schedule Risk: Moderate</Badge>
+                    <p className="text-xs text-slate-400 pl-1 font-medium">Night shift only operations.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-slate-900/80 border-slate-800 shadow-md">
+              <CardHeader className="pb-3 border-b border-slate-800">
+                <CardTitle className="text-sm font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4" />
+                  Required Forms
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
                 <div className="space-y-3">
                   {[
                     "Bid Form 00410",
                     "List of Proposed Subcontractors",
                     "Non-Collusion Affidavit",
                     "Bid Bond (5%)",
-                    "Safety Record / EMR Documentation"
+                    "Safety Record / EMR"
                   ].map((item, i) => (
-                    <div key={i} className="flex items-center space-x-2">
-                      <Checkbox id={`doc-${i}`} defaultChecked={i < 2} />
-                      <label htmlFor={`doc-${i}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    <div key={i} className="flex items-center space-x-3 group">
+                      <Checkbox 
+                        id={`doc-${i}`} 
+                        defaultChecked={i < 2} 
+                        className="border-slate-600 data-[state=checked]:bg-teal-500 data-[state=checked]:border-teal-500" 
+                      />
+                      <label 
+                        htmlFor={`doc-${i}`} 
+                        className="text-sm font-medium text-slate-300 group-hover:text-white cursor-pointer transition-colors leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
                         {item}
                       </label>
                     </div>
@@ -91,59 +166,14 @@ export default function ScopeAnalyzer() {
                 </div>
               </CardContent>
             </Card>
-          </div>
-
-          <div className="space-y-6">
-            <Card className="border-destructive/50">
-              <CardHeader className="bg-destructive/5 pb-4">
-                <CardTitle className="text-destructive text-sm flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Risk Assessment
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-4 space-y-4">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-xs font-medium">Overall Risk Level</span>
-                    <span className="text-xs text-destructive font-bold">HIGH</span>
-                  </div>
-                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-destructive" style={{ width: '85%' }} />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Badge variant="destructive" className="w-full justify-start">Deadline Risk: High</Badge>
-                  <p className="text-xs text-muted-foreground pl-1">Bids due in 3 days. Submittals missing.</p>
-                  
-                  <Badge variant="secondary" className="w-full justify-start text-yellow-500 border-yellow-500/30">Schedule Risk: Moderate</Badge>
-                  <p className="text-xs text-muted-foreground pl-1">Night shift only operations.</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Scope Complexity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2">
-                  <div className="h-2 flex-1 rounded bg-destructive" />
-                  <div className="h-2 flex-1 rounded bg-yellow-500" />
-                  <div className="h-2 flex-1 rounded bg-muted" />
-                  <div className="h-2 flex-1 rounded bg-muted" />
-                </div>
-                <p className="text-xs mt-3 text-muted-foreground">Moderate-High. Specialized rigging and phasing coordination required.</p>
-              </CardContent>
-            </Card>
             
-            <div className="p-4 bg-muted/20 border border-border rounded-lg space-y-4">
-              <p className="text-xs text-muted-foreground text-center">
-                Review extracted data carefully. Decision-support guidance only.
+            <div className="p-5 bg-slate-900/50 border border-slate-800 rounded-xl space-y-5 shadow-sm">
+              <p className="text-xs text-slate-500 text-center font-medium uppercase tracking-widest">
+                Review data carefully. Guidance only.
               </p>
               <Link href="/cost-inputs">
-                <Button className="w-full">
-                  Proceed to Cost Inputs <ArrowRight className="ml-2 h-4 w-4" />
+                <Button className="w-full bg-teal-600 hover:bg-teal-500 text-white font-semibold shadow-lg h-12 text-md">
+                  Proceed to Cost Inputs <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
             </div>

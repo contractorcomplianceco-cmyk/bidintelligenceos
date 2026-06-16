@@ -1,9 +1,8 @@
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, AlertTriangle, ArrowRight, Activity, ShieldCheck, Target } from "lucide-react";
+import { CheckCircle2, ArrowRight, Target, ShieldCheck, Activity } from "lucide-react";
 import { Link } from "wouter";
 
 export default function BidFit() {
@@ -22,32 +21,32 @@ export default function BidFit() {
     const isGood = invert ? score < 50 : score >= 70;
     const isWarning = invert ? score >= 50 && score < 75 : score >= 50 && score < 70;
     
-    if (isGood) return "bg-accent";
+    if (isGood) return "bg-teal-500";
     if (isWarning) return "bg-yellow-500";
-    return "bg-destructive";
+    return "bg-red-500";
   };
 
   const getScoreTextClass = (score: number, invert = false) => {
     const isGood = invert ? score < 50 : score >= 70;
     const isWarning = invert ? score >= 50 && score < 75 : score >= 50 && score < 70;
     
-    if (isGood) return "text-accent";
+    if (isGood) return "text-teal-400";
     if (isWarning) return "text-yellow-500";
-    return "text-destructive";
+    return "text-red-400";
   };
 
   const MetricBar = ({ label, score, invert = false, description }: { label: string, score: number, invert?: boolean, description?: string }) => (
-    <div className="space-y-2">
+    <div className="space-y-2 group">
       <div className="flex justify-between items-end">
         <div>
-          <span className="text-sm font-medium">{label}</span>
-          {description && <p className="text-xs text-muted-foreground">{description}</p>}
+          <span className="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">{label}</span>
+          {description && <p className="text-xs text-slate-500 mt-0.5">{description}</p>}
         </div>
-        <span className={`text-sm font-bold ${getScoreTextClass(score, invert)}`}>{score}/100</span>
+        <span className={`text-sm font-bold font-mono ${getScoreTextClass(score, invert)}`}>{score}/100</span>
       </div>
-      <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+      <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden shadow-inner">
         <div 
-          className={`h-full ${getScoreColor(score, invert)}`} 
+          className={`h-full ${getScoreColor(score, invert)} shadow-[0_0_8px_currentColor] opacity-90`} 
           style={{ width: `${score}%` }} 
         />
       </div>
@@ -56,46 +55,51 @@ export default function BidFit() {
 
   return (
     <Layout>
-      <div className="space-y-6 max-w-5xl mx-auto">
+      <div className="space-y-8 max-w-5xl mx-auto">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Bid Fit Analysis</h2>
-          <p className="text-muted-foreground">Data-driven scoring based on your profile, historical success, and extracted scope.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+             <Target className="h-8 w-8 text-teal-500" />
+             Bid Fit Analysis
+          </h2>
+          <p className="text-slate-400 mt-2 text-lg">Data-driven scoring based on your profile, historical success, and extracted scope.</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
           {/* Main Score Card */}
-          <Card className="md:col-span-1 border-primary/30 bg-card relative overflow-hidden flex flex-col justify-between">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-              <Target className="h-32 w-32" />
+          <Card className="md:col-span-1 bg-slate-900/90 border-slate-700 shadow-xl relative overflow-hidden flex flex-col justify-between">
+            <div className="absolute inset-0 bg-gradient-to-b from-teal-500/5 to-transparent pointer-events-none"></div>
+            <div className="absolute top-0 right-0 p-6 opacity-[0.03]">
+              <Target className="h-40 w-40" />
             </div>
-            <CardHeader className="relative z-10 pb-0">
-              <CardTitle>Bid Fit Score</CardTitle>
-              <CardDescription>Overall match for your business</CardDescription>
+            <CardHeader className="relative z-10 pb-0 border-b border-slate-800/50 bg-slate-950/30">
+              <CardTitle className="text-lg text-white font-semibold">Bid Fit Score</CardTitle>
+              <CardDescription className="text-slate-400">Overall match for your business</CardDescription>
             </CardHeader>
-            <CardContent className="relative z-10 flex flex-col items-center justify-center py-8">
-              <div className="relative flex items-center justify-center h-40 w-40">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="80" cy="80" r="70" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-muted" />
+            <CardContent className="relative z-10 flex flex-col items-center justify-center py-12">
+              <div className="relative flex items-center justify-center h-48 w-48">
+                <svg className="w-full h-full transform -rotate-90 filter drop-shadow-lg">
+                  <circle cx="96" cy="96" r="84" stroke="currentColor" strokeWidth="12" fill="transparent" className="text-slate-800" />
                   <circle 
-                    cx="80" cy="80" r="70" 
+                    cx="96" cy="96" r="84" 
                     stroke="currentColor" 
                     strokeWidth="12" 
                     fill="transparent" 
-                    strokeDasharray={440} 
-                    strokeDashoffset={440 - (440 * scores.overall) / 100}
-                    className="text-primary transition-all duration-1000 ease-in-out" 
+                    strokeDasharray={528} 
+                    strokeDashoffset={528 - (528 * scores.overall) / 100}
+                    className="text-teal-500 transition-all duration-1000 ease-in-out" 
+                    strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute flex flex-col items-center justify-center">
-                  <span className="text-4xl font-bold text-primary">{scores.overall}</span>
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider mt-1">Strong Fit</span>
+                  <span className="text-6xl font-black text-white tracking-tighter">{scores.overall}</span>
+                  <span className="text-xs text-teal-400 font-bold uppercase tracking-widest mt-2 bg-teal-950/50 px-2 py-1 rounded-full border border-teal-900/50">Strong Fit</span>
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="relative z-10 bg-muted/20 border-t border-border mt-auto">
-              <div className="w-full space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recommended Action</p>
-                <Badge className="w-full justify-center py-1.5 text-sm bg-primary hover:bg-primary">
+            <CardFooter className="relative z-10 bg-slate-950 border-t border-slate-800 mt-auto p-6">
+              <div className="w-full space-y-3 text-center">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">System Recommendation</p>
+                <Badge className="w-full justify-center py-2.5 text-sm bg-teal-600 hover:bg-teal-500 text-white border-transparent shadow-lg font-semibold tracking-wide">
                   Proceed to Bid
                 </Badge>
               </div>
@@ -103,19 +107,22 @@ export default function BidFit() {
           </Card>
 
           {/* Detailed Metrics */}
-          <Card className="md:col-span-2">
-            <CardHeader>
-              <CardTitle>Decision Drivers</CardTitle>
-              <CardDescription>Key factors influencing the fit score.</CardDescription>
+          <Card className="md:col-span-2 bg-slate-900/80 border-slate-800 shadow-md">
+            <CardHeader className="border-b border-slate-800 pb-4">
+              <CardTitle className="text-lg text-white flex items-center gap-2">
+                 <Activity className="w-5 h-5 text-slate-400" />
+                 Decision Drivers
+              </CardTitle>
+              <CardDescription className="text-slate-400">Key factors influencing the mathematical fit score.</CardDescription>
             </CardHeader>
-            <CardContent className="grid sm:grid-cols-2 gap-x-8 gap-y-6">
+            <CardContent className="grid sm:grid-cols-2 gap-x-10 gap-y-8 pt-8">
               <MetricBar 
-                label="Bid Confidence Estimate" 
+                label="Win Probability Estimate" 
                 score={scores.confidence} 
-                description="Probability of winning based on history"
+                description="Based on historical trade success"
               />
               <MetricBar 
-                label="Risk Score" 
+                label="Risk Profile" 
                 score={scores.risk} 
                 invert 
                 description="Aggregated deadline and scope risks"
@@ -123,7 +130,7 @@ export default function BidFit() {
               <MetricBar 
                 label="Relationship Strength" 
                 score={scores.relationship} 
-                description="Historical engagement with Port Authority"
+                description="Historical engagement with Client"
               />
               <MetricBar 
                 label="Margin Pressure" 
@@ -132,7 +139,7 @@ export default function BidFit() {
                 description="Competitiveness required to win"
               />
               <MetricBar 
-                label="Capacity Fit" 
+                label="Capacity Alignment" 
                 score={scores.capacityFit} 
                 description="Alignment with current crew availability"
               />
@@ -144,35 +151,37 @@ export default function BidFit() {
             </CardContent>
           </Card>
 
-          <Card className="md:col-span-3">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-sm">
-                <ShieldCheck className="h-4 w-4 text-accent" />
-                Compliance & Document Readiness
+          <Card className="md:col-span-3 bg-slate-900/80 border-slate-800 shadow-md">
+            <CardHeader className="pb-4 border-b border-slate-800">
+              <CardTitle className="flex items-center gap-2 text-lg text-white">
+                <ShieldCheck className="h-5 w-5 text-teal-500" />
+                Compliance & Readiness Check
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-4 p-4 rounded-lg border border-border bg-muted/10">
-                <div className="h-12 w-12 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-                  <CheckCircle2 className="h-6 w-6 text-accent" />
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6 p-5 rounded-xl border border-slate-700 bg-slate-950/50 shadow-inner">
+                <div className="h-14 w-14 rounded-full bg-teal-900/30 flex items-center justify-center flex-shrink-0 border border-teal-800/50 shadow-[0_0_15px_rgba(20,184,166,0.15)]">
+                  <CheckCircle2 className="h-7 w-7 text-teal-400" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-sm">100% Document Readiness</p>
-                  <p className="text-xs text-muted-foreground mt-1">Your company profile has all required bonding, insurance, and licensing on file for this specific client.</p>
+                  <p className="font-semibold text-lg text-slate-200">100% Document Readiness</p>
+                  <p className="text-sm text-slate-400 mt-1 leading-relaxed">Your company profile has all required bonding, insurance, and licensing verified and on file for this specific client and jurisdiction.</p>
                 </div>
-                <Link href="/strategy-memo">
-                  <Button variant="secondary">
-                    Build Strategy Memo <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                <div className="w-full md:w-auto shrink-0 mt-2 md:mt-0">
+                  <Link href="/strategy-memo">
+                    <Button className="w-full md:w-auto bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 shadow-sm h-11 px-6">
+                      Build Strategy Memo <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="text-center">
-          <p className="text-xs text-muted-foreground max-w-2xl mx-auto">
-            Confidence estimates and fit scores are decision-support guidance only and do not guarantee bid outcomes. Review all factors independently before finalizing your posture.
+        <div className="text-center pt-4">
+          <p className="text-xs text-slate-500 max-w-2xl mx-auto font-medium uppercase tracking-widest leading-relaxed">
+            Confidence estimates and fit scores are decision-support guidance only and do not guarantee bid outcomes.
           </p>
         </div>
       </div>

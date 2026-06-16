@@ -44,7 +44,7 @@ export const samplePackages: BidPackageData[] = [
         type: "Executive Summary",
         title: "Executive Summary",
         required: true,
-        content: "Apex Mechanical Services is pleased to submit this proposal for the Downtown Tower HVAC Retrofit. Leveraging our extensive experience in secure facility environments and complex high-rise logistics, we guarantee minimal operational disruption to current tenants while delivering premium mechanical upgrades. This proposal outlines our approach to replacing the aging rooftop units with high-efficiency systems."
+        content: "Apex Mechanical Services is pleased to submit this proposal for the Downtown Tower HVAC Retrofit. Leveraging our extensive experience in secure facility environments and complex high-rise logistics, we are committed to minimizing operational disruption to current tenants while delivering premium mechanical upgrades. This proposal outlines our approach to replacing the aging rooftop units with high-efficiency systems."
       },
       {
         id: "s1-scope",
