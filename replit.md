@@ -17,7 +17,7 @@ A premium, contractor-facing bid intelligence SaaS prototype (tagline: "Research
 
 ## Where things live
 
-- App entry/routing: `artifacts/bid-intelligence-os/src/App.tsx`
+- App entry/routing: `artifacts/bid-intelligence-os/src/App.tsx` (the app sits behind a demo landing gate: `pages/demo-landing.tsx` shows first; "Launch Live Demo" sets a `cca-demo-entered` sessionStorage flag and renders the app router)
 - Layout (sidebar + topbar, responsive): `artifacts/bid-intelligence-os/src/components/layout.tsx`
 - Global mode context (Standalone / ContractorConnect Add-On): `artifacts/bid-intelligence-os/src/lib/context.tsx`
 - Seed data (bids, analytics series, defaults): `artifacts/bid-intelligence-os/src/lib/data.ts`

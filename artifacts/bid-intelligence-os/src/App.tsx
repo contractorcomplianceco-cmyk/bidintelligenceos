@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/lib/context";
 
+import DemoLanding from "@/pages/demo-landing";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Bids from "@/pages/bids";
@@ -51,13 +53,26 @@ function Router() {
 }
 
 function App() {
+  const [entered, setEntered] = useState(
+    () => sessionStorage.getItem("cca-demo-entered") === "1"
+  );
+
+  const handleEnter = () => {
+    sessionStorage.setItem("cca-demo-entered", "1");
+    setEntered(true);
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
         <TooltipProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
+          {entered ? (
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+          ) : (
+            <DemoLanding onEnter={handleEnter} />
+          )}
           <Toaster />
         </TooltipProvider>
       </AppProvider>
