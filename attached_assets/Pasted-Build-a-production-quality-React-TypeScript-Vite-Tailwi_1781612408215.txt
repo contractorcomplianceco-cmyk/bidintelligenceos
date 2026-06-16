@@ -1,0 +1,361 @@
+Build a production-quality React + TypeScript + Vite + Tailwind prototype for:
+
+CCA BidIntelligenceOS
+Tagline: Research Less, Win More
+
+PRODUCT TYPE
+This is an external contractor-facing product that contractors buy and use to win more bids. It is NOT a CCA internal tool, NOT CCA’s internal pricing formula model, and NOT a CCA sales/proposal tool.
+
+ARCHITECTURE FLEXIBILITY
+Build the prototype so it can work in either of these future paths:
+
+1. Standalone System:
+   - BidIntelligenceOS operates as its own SaaS-style contractor workspace.
+   - Contractors log in, manage bid opportunities, upload bid history, generate strategy, build bid packages, and monitor outcomes.
+
+2. ContractorConnect Add-On:
+   - BidIntelligenceOS can also be positioned as an add-on module inside ContractorConnect.
+   - In this mode, it should feel like a premium “Bid Intelligence” workspace connected to a contractor’s existing ContractorConnect profile, compliance readiness, documents, and contractor growth tools.
+
+For the prototype, include a visible toggle or product context selector:
+- Standalone Mode
+- ContractorConnect Add-On Mode
+
+The UI should adapt labels slightly based on the selected mode, but the core workflow should remain the same.
+
+NON-NEGOTIABLE BOUNDARIES
+- Do not expose or reference CCA’s internal Pricing Formula Model.
+- Do not build this as an internal CCA tool.
+- Do not promise guaranteed bid wins.
+- Do not say the AI can guarantee pricing accuracy, agency outcomes, legal compliance, bonding approval, licensing approval, procurement awards, or bid awards.
+- Do not expose internal cost/margin notes in the vendor-facing bid package unless the user intentionally includes them.
+- Keep internal bid strategy separate from vendor-facing bid package output.
+- All AI output must require user review before export.
+
+VISUAL STYLE
+Build a premium construction-tech SaaS interface.
+
+Style direction:
+- Professional, modern, high-value, contractor-growth platform
+- Dark charcoal / steel / white interface with clean blue, teal, and green accents
+- No yellow-heavy branding
+- No playful colors
+- No generic dashboard template
+- No marketing landing page as the first screen
+- First screen must be the actual contractor dashboard
+- Dense but clean operational dashboard
+- Clear sidebar navigation
+- Polished cards, tables, charts, and workflow panels
+- Responsive desktop-first layout
+- Works on mobile without overlap
+
+FIRST SCREEN
+The first screen should be the BidIntelligenceOS dashboard.
+
+Dashboard should show:
+- Product name: CCA BidIntelligenceOS
+- Tagline: Research Less, Win More
+- Mode selector: Standalone Mode / ContractorConnect Add-On Mode
+- KPI cards:
+  - Active Bids
+  - Bid Confidence Avg
+  - Follow-Ups Due
+  - Win Rate
+  - Open Bid Value
+  - Missing Info Alerts
+- Main workflow cards:
+  - Start New Bid Analysis
+  - Import Bid History
+  - Build Bid Package
+  - Monitor Submitted Bids
+- Active bid table
+- Recent win/loss insights
+- Follow-up reminders
+- Risk alerts
+- Internal strategy panel
+
+SIDEBAR NAVIGATION
+Include these nav items:
+- Dashboard
+- Company Profile
+- Bid Library
+- New Bid Analysis
+- Scope Analyzer
+- Cost Inputs
+- Bid Fit
+- Strategy Memo
+- Bid Package Builder
+- Bid Monitoring
+- Win/Loss Analytics
+- ContractorConnect Add-On
+- Settings
+
+CORE SCREENS TO BUILD
+
+1. Dashboard
+Show overview, active bids, KPIs, follow-up reminders, risk alerts, and recent bid insights.
+
+2. Company Profile
+Let the contractor enter:
+- Company name
+- Contractor type
+- Trades/services
+- Service areas
+- Preferred job size
+- Crew capacity
+- Target margin range
+- Overhead assumptions
+- Typical subcontractor usage
+- Bonding/insurance notes
+- License/compliance readiness notes
+
+If ContractorConnect Add-On Mode is selected, show a small connected panel:
+“Connected ContractorConnect Profile”
+Include mock fields:
+- Compliance readiness
+- Documents on file
+- Service areas
+- License status placeholder
+- Insurance/bonding placeholder
+
+3. Bid Library
+Show past bids table with:
+- Bid name
+- Recipient/vendor/client
+- Project type
+- Location
+- Submitted amount
+- Date
+- Status
+- Won/Lost/No Decision
+- Reason won/lost
+- Margin outcome
+- Notes
+
+Include:
+- Add Past Bid button
+- Import CSV button
+- Filter by won/lost, project type, recipient, date range
+
+4. New Bid Analysis
+Create a guided form:
+- Opportunity name
+- Bid recipient/vendor/client
+- Project type
+- Location
+- Due date
+- Submission method
+- Scope summary
+- Upload/spec placeholder
+- Required documents
+- Site visit date
+- Pre-bid meeting date
+- Known decision factors
+
+Button:
+Analyze Scope
+
+5. Scope Analyzer
+Use seeded/demo AI output to show:
+- Scope summary
+- Missing information
+- Required clarification questions
+- Deadline risk
+- Required document checklist
+- Scope complexity
+- Risk level
+
+6. Cost Inputs
+Create cost input sections:
+- Materials
+- Internal labor
+- Subcontractor labor
+- Equipment
+- Mobilization
+- Insurance/bonding impact
+- Overhead
+- Contingency
+- Target margin
+- Alternates/options
+
+Show calculated demo outputs:
+- Estimated total cost
+- Target bid range
+- Margin pressure
+- Missing-cost warnings
+- Suggested pricing posture:
+  - Aggressive
+  - Balanced
+  - Premium
+  - No-bid review
+
+Important: These are contractor-entered calculations and demo guidance only. Do not reference CCA internal formulas.
+
+7. Bid Fit
+Show:
+- Bid Fit Score
+- Bid Confidence Estimate
+- Risk Score
+- Margin Pressure
+- Relationship Strength
+- Scope Clarity
+- Capacity Fit
+- Compliance/Document Readiness
+
+Include clear disclaimer:
+“Confidence estimates are decision-support guidance only and do not guarantee bid outcomes.”
+
+Recommended action examples:
+- Bid
+- Bid with caution
+- Request clarification
+- Partner/sub out
+- No-bid review
+
+8. Strategy Memo
+Generate an internal-only strategy memo with:
+- Recommended bid posture
+- Pricing strategy notes
+- Differentiators
+- Negotiation points
+- Follow-up questions
+- Risk items
+- Internal notes
+
+Clearly mark:
+“Internal Strategy - Hidden From Vendor-Facing Export”
+
+9. Bid Package Builder
+Create a polished package builder with editable sections:
+- Cover page
+- Executive summary
+- Scope of work
+- Pricing structure
+- Assumptions
+- Exclusions
+- Schedule/timeline
+- Qualifications
+- Required attachments
+- Next steps
+
+Include preview mode.
+
+Include warning:
+“Internal strategy notes are excluded from vendor-facing package.”
+
+10. Export Preview
+Show a polished vendor-facing bid package preview.
+
+Include buttons:
+- Mark Reviewed
+- Export PDF
+- Export DOCX
+- Save Draft
+
+Buttons can be prototype-only and show toast notifications.
+
+11. Bid Monitoring
+Track submitted bids:
+- Submitted date
+- Follow-up date
+- Expected decision date
+- Status
+- Contact person
+- Clarification requested
+- Last touch
+- Next action
+
+Statuses:
+- Draft
+- Submitted
+- Follow-Up Due
+- Shortlisted
+- Clarification Requested
+- Won
+- Lost
+- Withdrawn
+- No Decision
+
+12. Win/Loss Analytics
+Show charts and insights:
+- Win rate over time
+- Average bid value
+- Best-performing project types
+- Common loss reasons
+- Relationship impact
+- Margin trends
+- Follow-up impact
+- Recommended improvements
+
+13. ContractorConnect Add-On Screen
+Show how BidIntelligenceOS could live inside ContractorConnect:
+- Connected contractor profile
+- Compliance readiness signal
+- Document readiness signal
+- Bid package attachment checklist
+- Growth opportunities
+- Bid readiness alerts
+- Upgrade/activate add-on panel
+
+This screen should make it clear that BidIntelligenceOS can be standalone OR integrated as an add-on.
+
+INTERACTIONS
+Make the prototype feel real:
+- Use seeded realistic contractor data
+- Allow mode switching
+- Allow selecting rows in tables
+- Allow creating a new bid from the dashboard
+- Show form state changes
+- Show generated demo analysis after clicking Analyze Scope
+- Show toast confirmations for save/export actions
+- Use tabs or stepper navigation for guided bid analysis
+- Make cards and tables interactive
+- No broken buttons
+- No empty screens
+
+SAMPLE SEEDED DATA
+Use realistic sample data for:
+- Commercial HVAC retrofit bid
+- Roofing replacement bid
+- Electrical tenant improvement bid
+- Multi-location maintenance contract
+- Concrete repair bid
+
+Use sample recipients like:
+- Regional property manager
+- General contractor
+- Franchise operator
+- Municipal facilities office
+- Commercial building owner
+
+GUARDRAIL COPY
+Include concise guardrail copy in appropriate places:
+- “Decision-support guidance only.”
+- “Review before export.”
+- “No guaranteed bid outcomes.”
+- “Internal notes hidden from vendor-facing package.”
+- “Use only lawful, public, or contractor-provided competitor information.”
+
+TECHNICAL REQUIREMENTS
+- React
+- TypeScript
+- Vite
+- Tailwind
+- Use lucide-react icons
+- Use local seeded data
+- No backend required
+- No fake login backend
+- No external API calls
+- Componentized structure
+- Responsive layout
+- Clean state management
+- Use accessible form controls
+- Use polished empty/loading/success states where relevant
+
+QUALITY BAR
+The result should feel like a real premium SaaS product prototype that Rose could show to Carmen or use as the first product direction mockup.
+
+Do not make a marketing website.
+Do not make a generic AI dashboard.
+Do not make this look like a simple form app.
+Build the actual usable product interface.
