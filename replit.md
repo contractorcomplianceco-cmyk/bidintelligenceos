@@ -21,6 +21,7 @@ A premium, contractor-facing bid intelligence SaaS prototype (tagline: "Research
 - Layout (sidebar + topbar, responsive): `artifacts/bid-intelligence-os/src/components/layout.tsx`
 - Global mode context (Standalone / ContractorConnect Add-On): `artifacts/bid-intelligence-os/src/lib/context.tsx`
 - Seed data (bids, analytics series, defaults): `artifacts/bid-intelligence-os/src/lib/data.ts`
+- Client-facing bid package seed data (3 sample proposals: HVAC, Roofing, Multi-location): `artifacts/bid-intelligence-os/src/lib/bid-packages.ts`
 - Screens: `artifacts/bid-intelligence-os/src/pages/` (dashboard, company-profile, bid-library, new-bid, scope-analyzer, cost-inputs, bid-fit, strategy-memo, package-builder, monitoring, analytics, addon, settings)
 - Theme tokens: `artifacts/bid-intelligence-os/src/index.css`
 
