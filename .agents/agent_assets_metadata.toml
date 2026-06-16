@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "GXceVx8_EUWYrfFxUxWxh"
+uri = "file://attached_assets/stock_images/hero_construction.jpg"
+type = "image"
+title = "commercial construction site skyscraper cranes city skyline"

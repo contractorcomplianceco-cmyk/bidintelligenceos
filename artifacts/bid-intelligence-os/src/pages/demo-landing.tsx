@@ -1,43 +1,38 @@
+import { useState } from "react";
 import { CCACrest } from "@/components/cca-crest";
-import {
-  ArrowRight,
-  LayoutDashboard,
-  Target,
-  FileText,
-  LineChart,
-  ShieldCheck,
-} from "lucide-react";
-
-const highlights = [
-  {
-    icon: LayoutDashboard,
-    title: "Cockpit Intelligence",
-    desc: "A single command deck for active bids, follow-ups, and pipeline value.",
-  },
-  {
-    icon: Target,
-    title: "Guided Bid Analysis",
-    desc: "Scope, cost inputs, and bid-fit scoring that focus your estimating effort.",
-  },
-  {
-    icon: FileText,
-    title: "Vendor-Ready Packages",
-    desc: "Assemble polished, client-facing proposals — review-required before export.",
-  },
-  {
-    icon: LineChart,
-    title: "Win / Loss Insights",
-    desc: "Learn what wins work and where margin slips, outcome by outcome.",
-  },
-];
+import { ArrowRight, Lock, Mail, ShieldCheck } from "lucide-react";
+import heroImage from "@/assets/hero-construction.jpg";
 
 export default function DemoLanding({ onEnter }: { onEnter: () => void }) {
+  const [email, setEmail] = useState("jordan.p@contractorconnect.com");
+  const [password, setPassword] = useState("demo");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onEnter();
+  };
+
   return (
     <div className="min-h-[100dvh] bg-[#0A0E1A] text-slate-200 font-sans relative overflow-hidden flex flex-col">
-      {/* Ambient background */}
-      <div className="absolute inset-0 blueprint-texture opacity-40 pointer-events-none" />
-      <div className="absolute -top-40 -right-40 w-[36rem] h-[36rem] rounded-full bg-[#38BDF8]/10 blur-[120px] pointer-events-none" />
-      <div className="absolute -bottom-48 -left-40 w-[36rem] h-[36rem] rounded-full bg-[#22C55E]/5 blur-[120px] pointer-events-none" />
+      {/* Live background photo */}
+      <div className="absolute inset-0" aria-hidden="true">
+        <img
+          src={heroImage}
+          alt="Commercial construction site"
+          className="w-full h-full object-cover scale-105 animate-in fade-in duration-[1500ms] fill-mode-both"
+        />
+        {/* Vignette + tint layers */}
+        <div className="absolute inset-0 bg-[#0A0E1A]/55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0A0E1A] via-[#0A0E1A]/70 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E1A] via-transparent to-[#0A0E1A]/60" />
+        <div
+          className="absolute inset-0"
+          style={{
+            boxShadow: "inset 0 0 320px 80px rgba(5,8,16,0.9)",
+          }}
+        />
+        <div className="absolute inset-0 blueprint-texture opacity-20" />
+      </div>
 
       {/* Top bar */}
       <header className="relative z-10 flex items-center justify-between px-6 lg:px-12 py-6">
@@ -47,7 +42,7 @@ export default function DemoLanding({ onEnter }: { onEnter: () => void }) {
             <span className="text-[#38BDF8]">CCA</span> BidIntelligenceOS
           </h1>
         </div>
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#1C253B] bg-[#0F1830] text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-[10px] font-bold uppercase tracking-widest text-[#cbd5e1]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
           Interactive Demo
         </div>
@@ -55,62 +50,99 @@ export default function DemoLanding({ onEnter }: { onEnter: () => void }) {
 
       {/* Hero */}
       <main className="relative z-10 flex-1 flex items-center px-6 lg:px-12 py-10">
-        <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Copy */}
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#38BDF8]/20 bg-[#38BDF8]/10 text-[#38BDF8] text-xs font-semibold tracking-wide mb-6">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#38BDF8]/30 bg-[#38BDF8]/10 backdrop-blur-sm text-[#7dd3fc] text-xs font-semibold tracking-wide mb-6">
               <ShieldCheck className="w-3.5 h-3.5" />
               A product of Contractor Connect
             </div>
-            <h2 className="text-4xl lg:text-6xl font-bold text-white tracking-tight leading-[1.05]">
+            <h2 className="text-4xl lg:text-6xl font-bold text-white tracking-tight leading-[1.05] drop-shadow-[0_2px_20px_rgba(0,0,0,0.6)]">
               Research Less,
               <br />
               <span className="text-[#38BDF8]">Win More.</span>
             </h2>
-            <p className="mt-6 text-base lg:text-lg text-[#8A96B0] leading-relaxed max-w-md">
+            <p className="mt-6 text-base lg:text-lg text-[#cbd5e1] leading-relaxed max-w-md drop-shadow-[0_1px_10px_rgba(0,0,0,0.6)]">
               The bid intelligence cockpit for commercial trade contractors —
               analyze opportunities, structure pricing, build vendor-ready
               packages, and track outcomes in one workspace.
             </p>
-
-            <div className="mt-9 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <button
-                onClick={onEnter}
-                className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#38BDF8] text-[#0A0E1A] font-semibold text-sm tracking-wide hover:bg-[#5cc6fb] transition-all shadow-[0_0_30px_rgba(56,189,248,0.35)] hover:shadow-[0_0_40px_rgba(56,189,248,0.5)]"
-              >
-                Launch Live Demo
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-              </button>
-              <span className="text-xs text-[#8A96B0]">
-                No sign-in required · Sample data
-              </span>
-            </div>
           </div>
 
-          {/* Highlights */}
-          <div className="grid sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-both">
-            {highlights.map((h) => {
-              const Icon = h.icon;
-              return (
-                <div
-                  key={h.title}
-                  className="rounded-xl border border-[#1C253B] bg-[#0F1830]/80 backdrop-blur-sm p-5 hover:border-[#2A3756] transition-colors"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-[#38BDF8]/10 border border-[#38BDF8]/20 flex items-center justify-center mb-3">
-                    <Icon className="w-4.5 h-4.5 text-[#38BDF8]" />
+          {/* Login card */}
+          <div className="w-full max-w-md lg:justify-self-end animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-both">
+            <div className="rounded-2xl border border-white/10 bg-[#0F1830]/80 backdrop-blur-xl p-7 lg:p-8 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)]">
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-white">Sign in</h3>
+                <p className="text-sm text-[#8A96B0] mt-1">
+                  Access your bid intelligence cockpit.
+                </p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="demo-email" className="block text-xs font-semibold text-[#8A96B0] uppercase tracking-widest mb-2">
+                    Work Email
+                  </label>
+                  <div className="relative">
+                    <Mail aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A96B0]" />
+                    <input
+                      id="demo-email"
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full rounded-lg bg-[#0A0E1A]/80 border border-[#1C253B] pl-10 pr-3 py-2.5 text-sm text-white placeholder:text-[#5b6680] focus:outline-none focus:border-[#38BDF8]/60 focus:ring-1 focus:ring-[#38BDF8]/40 transition-colors"
+                      placeholder="you@company.com"
+                    />
                   </div>
-                  <h3 className="text-sm font-semibold text-white">{h.title}</h3>
-                  <p className="mt-1.5 text-xs text-[#8A96B0] leading-relaxed">
-                    {h.desc}
-                  </p>
                 </div>
-              );
-            })}
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label htmlFor="demo-password" className="block text-xs font-semibold text-[#8A96B0] uppercase tracking-widest">
+                      Password
+                    </label>
+                    <button
+                      type="button"
+                      className="text-[11px] text-[#38BDF8] hover:text-white transition-colors"
+                    >
+                      Forgot?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Lock aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A96B0]" />
+                    <input
+                      id="demo-password"
+                      type="password"
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full rounded-lg bg-[#0A0E1A]/80 border border-[#1C253B] pl-10 pr-3 py-2.5 text-sm text-white placeholder:text-[#5b6680] focus:outline-none focus:border-[#38BDF8]/60 focus:ring-1 focus:ring-[#38BDF8]/40 transition-colors"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="group w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#38BDF8] text-[#0A0E1A] font-semibold text-sm tracking-wide hover:bg-[#5cc6fb] transition-all shadow-[0_0_30px_rgba(56,189,248,0.35)] hover:shadow-[0_0_40px_rgba(56,189,248,0.55)]"
+                >
+                  Sign in to Demo
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                </button>
+              </form>
+
+              <p className="mt-5 text-center text-[11px] text-[#8A96B0]">
+                Interactive prototype · sample data · any credentials work
+              </p>
+            </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-[#1C253B] px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[#8A96B0] text-xs">
+      <footer className="relative z-10 border-t border-white/10 px-6 lg:px-12 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[#8A96B0] text-xs">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-3.5 h-3.5 text-[#38BDF8]" />
           <span>
