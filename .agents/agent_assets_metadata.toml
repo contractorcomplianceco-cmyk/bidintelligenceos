@@ -42,3 +42,39 @@ id = "HIgQWhjL3Rb1pYE7WQWkc"
 uri = "file://attached_assets/VoiceConnecttm_1782477050182.png"
 type = "image"
 title = "Original VoiceConnect brand mockup (reference)"
+
+[[outputs]]
+id = "egLyunG-05mjiktYkmDDq"
+uri = "file://artifacts/promo-video/public/audio/vo_voice.mp3"
+type = "audio"
+title = "voice voiceover"
+
+[[outputs]]
+id = "tSrAT204rtuYcCGNRAyTG"
+uri = "file://artifacts/promo-video/public/audio/vo_intro.mp3"
+type = "audio"
+title = "intro voiceover"
+
+[[outputs]]
+id = "F4Yv0biLQMae7rx4tjVIR"
+uri = "file://artifacts/promo-video/public/audio/vo_flow.mp3"
+type = "audio"
+title = "flow voiceover"
+
+[[outputs]]
+id = "K6rCyxCWd1sxv0Zbl_SC7"
+uri = "file://artifacts/promo-video/public/audio/vo_bid.mp3"
+type = "audio"
+title = "bid voiceover"
+
+[[outputs]]
+id = "T-PAmsa1B5EaGKAsZWCMM"
+uri = "file://artifacts/promo-video/public/audio/vo_outro.mp3"
+type = "audio"
+title = "outro voiceover"
+
+[[outputs]]
+id = "UVokzSyxJTnSr9knFR5zv"
+uri = "file://artifacts/promo-video/public/audio/bg_music.mp3"
+type = "audio"
+title = "background music"
