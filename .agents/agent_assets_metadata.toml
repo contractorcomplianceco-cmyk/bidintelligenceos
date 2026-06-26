@@ -36,3 +36,9 @@ id = "UZ3dvhBve-KvrozubrnpL"
 uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene5.mp3"
 type = "audio"
 title = "scene5"
+
+[[outputs]]
+id = "HIgQWhjL3Rb1pYE7WQWkc"
+uri = "file://attached_assets/VoiceConnecttm_1782477050182.png"
+type = "image"
+title = "Original VoiceConnect brand mockup (reference)"

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { CCACrest } from "@/components/cca-crest";
 import { WalkthroughPlayer } from "@/components/walkthrough/walkthrough-player";
+import { VoiceConnectMarketingSection } from "@/components/voice-connect/marketing-section";
 import heroImage from "@/assets/hero-construction.jpg";
 
 const FEATURES = [
@@ -148,8 +149,11 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
         </div>
       </section>
 
+      {/* VoiceConnect add-on */}
+      <VoiceConnectMarketingSection onLaunchDemo={onLaunchDemo} />
+
       {/* Closing CTA */}
-      <section className="max-w-6xl mx-auto px-6 lg:px-8 pb-16">
+      <section className="max-w-6xl mx-auto px-6 lg:px-8 pb-16 pt-16">
         <div className="relative overflow-hidden rounded-2xl border border-[#38BDF8]/20 bg-gradient-to-br from-[#0F1830] to-[#111A2E] p-10 lg:p-14 text-center">
           <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
           <div className="relative">

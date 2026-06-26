@@ -14,7 +14,8 @@ import {
   ShieldCheck,
   Bell,
   HelpCircle,
-  ChevronDown
+  ChevronDown,
+  AudioLines
 } from "lucide-react";
 import { CCACrest } from "./cca-crest";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -26,6 +27,7 @@ const navItems = [
   { href: "/leads", label: "Leads", icon: Target },
   { href: "/competitors", label: "Competitors", icon: Users },
   { href: "/insights", label: "Insights", icon: LineChart },
+  { href: "/voice-connect", label: "VoiceConnect", icon: AudioLines },
   { href: "/documents", label: "Documents", icon: Files },
   { href: "/reports", label: "Reports", icon: FileBarChart },
   { href: "/settings", label: "Settings", icon: Settings },

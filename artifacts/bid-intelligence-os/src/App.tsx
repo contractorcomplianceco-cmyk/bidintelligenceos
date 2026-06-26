@@ -14,6 +14,7 @@ import Projects from "@/pages/projects";
 import Leads from "@/pages/leads";
 import Competitors from "@/pages/competitors";
 import Insights from "@/pages/insights";
+import VoiceConnect from "@/pages/voice-connect";
 import Documents from "@/pages/documents";
 import Reports from "@/pages/reports";
 import Settings from "@/pages/settings";
@@ -36,6 +37,7 @@ function Router() {
       <Route path="/leads" component={Leads} />
       <Route path="/competitors" component={Competitors} />
       <Route path="/insights" component={Insights} />
+      <Route path="/voice-connect" component={VoiceConnect} />
       <Route path="/documents" component={Documents} />
       <Route path="/reports" component={Reports} />
       <Route path="/settings" component={Settings} />
