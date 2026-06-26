@@ -1,6 +1,7 @@
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { seedBids, followUpQueue, competitorSignals, documentReadiness, analyticsData } from "@/lib/data";
+import { activateOnKey } from "@/lib/a11y";
 import { 
   FolderKanban, 
   AlertTriangle, 
@@ -14,13 +15,14 @@ import {
   CheckCircle2,
   Clock
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { 
   AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid,
   PieChart, Pie, Cell, LineChart, Line
 } from "recharts";
 
 export default function Dashboard() {
+  const [, navigate] = useLocation();
   const activeBids = seedBids.filter(b => b.status === "In Progress" || b.status === "Review");
 
   return (
@@ -126,7 +128,7 @@ export default function Dashboard() {
                 </thead>
                 <tbody className="divide-y divide-[#1C253B]">
                   {activeBids.map(bid => (
-                    <tr key={bid.id} className="hover:bg-[#151D2E] transition-colors cursor-pointer">
+                    <tr key={bid.id} onClick={() => navigate(`/bids/${bid.id}`)} onKeyDown={activateOnKey(() => navigate(`/bids/${bid.id}`))} role="button" tabIndex={0} aria-label={`Open bid ${bid.name} details`} className="hover:bg-[#151D2E] transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#38BDF8]">
                       <td className="px-2.5 py-3">
                         <div className="font-semibold text-white text-xs">{bid.name}</div>
                         <div className="text-[10px] text-[#8A96B0] mt-0.5">{bid.location}</div>
@@ -194,7 +196,7 @@ export default function Dashboard() {
             <CardContent className="p-0 flex-1 flex flex-col">
               <div className="divide-y divide-[#1C253B] flex-1 overflow-y-auto">
                 {followUpQueue.map(item => (
-                  <div key={item.id} className="p-4 hover:bg-[#151D2E] transition-colors cursor-pointer group">
+                  <div key={item.id} onClick={() => navigate("/leads")} onKeyDown={activateOnKey(() => navigate("/leads"))} role="button" tabIndex={0} aria-label={`Open follow-up for ${item.client}`} className="p-4 hover:bg-[#151D2E] transition-colors cursor-pointer group focus:outline-none focus-visible:ring-1 focus-visible:ring-[#38BDF8]">
                     <div className="flex justify-between items-start mb-2">
                       <div className="font-semibold text-white text-xs group-hover:text-[#38BDF8] transition-colors">{item.client}</div>
                       <div className="bg-[#1C253B] text-[#8A96B0] text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1 uppercase tracking-widest">
@@ -272,7 +274,7 @@ export default function Dashboard() {
             <CardContent className="p-0 flex-1 flex flex-col">
               <div className="divide-y divide-[#1C253B]">
                 {competitorSignals.map(signal => (
-                  <div key={signal.id} className="p-4 flex items-center justify-between hover:bg-[#151D2E] transition-colors cursor-pointer">
+                  <div key={signal.id} onClick={() => navigate("/competitors")} onKeyDown={activateOnKey(() => navigate("/competitors"))} role="button" tabIndex={0} aria-label={`View competitor ${signal.name}`} className="p-4 flex items-center justify-between hover:bg-[#151D2E] transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#38BDF8]">
                     <div>
                       <div className="font-semibold text-white text-xs">{signal.name}</div>
                       <div className="text-[11px] text-[#8A96B0] mt-0.5">{signal.activity}</div>

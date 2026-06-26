@@ -1,4 +1,7 @@
 import { Layout } from "@/components/layout";
+import { useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
+import { activateOnKey } from "@/lib/a11y";
 import {
   ArrowRight,
   ClipboardList,
@@ -66,6 +69,8 @@ const REPORT_STATS = [
 ];
 
 export default function VoiceConnect() {
+  const [, navigate] = useLocation();
+  const { toast } = useToast();
   const readiness = 68;
   const R = 52;
   const C = 2 * Math.PI * R;
@@ -129,10 +134,20 @@ export default function VoiceConnect() {
               <h3 className="text-sm font-semibold text-white">Recent Field Captures</h3>
               <Sparkles className="w-4 h-4" style={{ color: TEAL }} />
             </div>
-            {CAPTURES.map((c) => (
+            {CAPTURES.map((c) => {
+              const openCapture = () =>
+                c.done
+                  ? navigate("/bids/1")
+                  : toast({ title: "Capture processing", description: "This capture is still being transcribed and tagged." });
+              return (
               <div
                 key={c.title}
-                className="flex items-center gap-3 px-5 py-3.5 border-b border-[#151D2E] last:border-0 hover:bg-[#151D2E]/50 transition-colors"
+                onClick={openCapture}
+                onKeyDown={activateOnKey(openCapture)}
+                role="button"
+                tabIndex={0}
+                aria-label={c.done ? `Open captured bid ${c.title}` : `Capture ${c.title} is still processing`}
+                className="flex items-center gap-3 px-5 py-3.5 border-b border-[#151D2E] last:border-0 hover:bg-[#151D2E]/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#0BA3A8]"
               >
                 <div className="w-9 h-9 rounded-lg bg-[#0BA3A8]/10 border border-[#0BA3A8]/20 flex items-center justify-center shrink-0">
                   <c.icon className="w-4 h-4" style={{ color: TEAL }} />
@@ -154,7 +169,8 @@ export default function VoiceConnect() {
                   {c.status}
                 </span>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Featured draft report */}
@@ -207,7 +223,14 @@ export default function VoiceConnect() {
             </div>
 
             <button
-              className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-colors"
+              onClick={() => {
+                toast({
+                  title: "Draft bid profile created",
+                  description: "Capture sent to BidIntelligenceOS. Review required before use.",
+                });
+                navigate("/bids/1");
+              }}
+              className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold transition-colors hover:brightness-110"
               style={{ background: TEAL, color: "#06080B" }}
             >
               Create Draft Bid Profile

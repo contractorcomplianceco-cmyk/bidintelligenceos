@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { CCACrest } from "./cca-crest";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useToast } from "@/hooks/use-toast";
 
 const navItems = [
   { href: "/", label: "Cockpit", icon: LayoutDashboard },
@@ -37,6 +38,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const [location] = useLocation();
   const { mode, setMode } = useAppContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     document.documentElement.classList.add('dark');
@@ -138,16 +140,26 @@ export function Layout({ children }: { children: ReactNode }) {
 
           <div className="flex items-center gap-6 relative z-10">
             <div className="flex items-center gap-4 text-[#8A96B0]">
-              <div className="relative cursor-pointer hover:text-white transition-colors">
+              <button
+                onClick={() => toast({ title: "Notifications", description: "12 updates: 3 bids due today, 5 follow-ups, 4 competitor signals." })}
+                className="relative cursor-pointer hover:text-white transition-colors"
+                aria-label="Notifications"
+              >
                 <Bell className="w-5 h-5" />
                 <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#38BDF8] text-[#0A0E1A] text-[9px] font-bold rounded-full flex items-center justify-center">12</span>
-              </div>
-              <HelpCircle className="w-5 h-5 cursor-pointer hover:text-white transition-colors" />
+              </button>
+              <button
+                onClick={() => toast({ title: "Help & support", description: "Browse guides or reach the BidIntelligenceOS team for assistance." })}
+                className="cursor-pointer hover:text-white transition-colors"
+                aria-label="Help"
+              >
+                <HelpCircle className="w-5 h-5" />
+              </button>
             </div>
             
             <div className="h-8 w-px bg-[#1C253B]"></div>
 
-            <div className="flex flex-col items-end cursor-pointer group">
+            <Link href="/settings" className="flex flex-col items-end cursor-pointer group">
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8 rounded-md border border-[#1C253B]">
                   <AvatarFallback className="bg-[#0F1830] text-[#38BDF8] text-xs font-bold rounded-md">JP</AvatarFallback>
@@ -158,7 +170,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 </div>
               </div>
               <span className="text-[10px] text-[#8A96B0] mt-0.5 tracking-wider">Data as of May 20, 2025 9:41 AM</span>
-            </div>
+            </Link>
           </div>
         </header>
 

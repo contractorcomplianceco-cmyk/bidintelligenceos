@@ -1,15 +1,20 @@
+import { useMemo, useState } from "react";
+import { useLocation } from "wouter";
 import { Layout } from "@/components/layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { seedBids } from "@/lib/data";
-import { Search, Plus, UploadCloud, FolderKanban } from "lucide-react";
+import { activateOnKey } from "@/lib/a11y";
+import { Search, Plus, UploadCloud, FolderKanban, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Bids() {
   const { toast } = useToast();
+  const [, navigate] = useLocation();
+  const [query, setQuery] = useState("");
 
   const handleImport = () => {
     toast({
@@ -17,6 +22,25 @@ export default function Bids() {
       description: "Processing CSV data into your bids database.",
     });
   };
+
+  const handleAdd = () => {
+    toast({
+      title: "New bid record",
+      description: "Opening the guided new-bid analysis.",
+    });
+    navigate("/new-bid");
+  };
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return seedBids;
+    return seedBids.filter((b) =>
+      [b.name, b.recipient, b.type, b.location, b.status]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
+    );
+  }, [query]);
 
   return (
     <Layout>
@@ -34,7 +58,7 @@ export default function Bids() {
               <UploadCloud className="w-4 h-4 mr-2" />
               Import CSV
             </Button>
-            <Button className="bg-teal-600 hover:bg-teal-500 text-white shadow-lg h-10 px-5 font-semibold">
+            <Button onClick={handleAdd} className="bg-teal-600 hover:bg-teal-500 text-white shadow-lg h-10 px-5 font-semibold">
               <Plus className="w-4 h-4 mr-2" />
               Add Bid Record
             </Button>
@@ -45,9 +69,11 @@ export default function Bids() {
           <CardHeader className="p-5 bg-slate-900 border-b border-slate-800 flex flex-row items-center justify-between sticky top-0 z-10">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
-              <Input 
-                placeholder="Search bids, clients, or tags..." 
-                className="pl-9 bg-slate-950 border-slate-700 text-slate-200 focus-visible:ring-teal-500 h-10" 
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search bids, clients, or tags..."
+                className="pl-9 bg-slate-950 border-slate-700 text-slate-200 focus-visible:ring-teal-500 h-10"
               />
             </div>
           </CardHeader>
@@ -61,16 +87,25 @@ export default function Bids() {
                     <TableHead className="text-slate-400 font-semibold uppercase tracking-wider text-xs h-12 text-right">Value</TableHead>
                     <TableHead className="text-slate-400 font-semibold uppercase tracking-wider text-xs h-12">Status</TableHead>
                     <TableHead className="text-slate-400 font-semibold uppercase tracking-wider text-xs h-12">Next Action</TableHead>
+                    <TableHead className="text-slate-400 font-semibold uppercase tracking-wider text-xs h-12 w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {seedBids.map((bid) => (
-                    <TableRow key={bid.id} className="cursor-pointer hover:bg-slate-800/60 border-slate-800/50 transition-colors group">
-                      <TableCell className="font-semibold text-slate-200 py-4">{bid.name}</TableCell>
+                  {filtered.map((bid) => (
+                    <TableRow
+                      key={bid.id}
+                      onClick={() => navigate(`/bids/${bid.id}`)}
+                      onKeyDown={activateOnKey(() => navigate(`/bids/${bid.id}`))}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Open bid ${bid.name} details`}
+                      className="cursor-pointer hover:bg-slate-800/60 border-slate-800/50 transition-colors group focus:outline-none focus-visible:ring-1 focus-visible:ring-[#38BDF8]"
+                    >
+                      <TableCell className="font-semibold text-slate-200 py-4 group-hover:text-teal-400 transition-colors">{bid.name}</TableCell>
                       <TableCell className="text-slate-400">{bid.recipient}</TableCell>
                       <TableCell className="text-right font-medium text-slate-300">${bid.amount.toLocaleString()}</TableCell>
                       <TableCell>
-                        <Badge 
+                        <Badge
                           variant="outline"
                           className={`
                             px-2.5 py-0.5 font-medium
@@ -86,8 +121,18 @@ export default function Bids() {
                       <TableCell className="text-slate-400 text-sm">
                         {bid.nextAction || "-"}
                       </TableCell>
+                      <TableCell className="text-right">
+                        <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-teal-400 transition-colors" />
+                      </TableCell>
                     </TableRow>
                   ))}
+                  {filtered.length === 0 && (
+                    <TableRow className="hover:bg-transparent border-slate-800/50">
+                      <TableCell colSpan={6} className="text-center text-slate-500 py-12">
+                        No bids match "{query}".
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>

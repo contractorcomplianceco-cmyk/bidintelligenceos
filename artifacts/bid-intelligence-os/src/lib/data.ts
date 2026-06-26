@@ -166,3 +166,114 @@ export const analyticsData = {
     { reason: "Incumbent preferred", count: 8 }
   ]
 };
+
+export interface BidDetailContent {
+  summary: string;
+  scopeItems: string[];
+  milestones: { label: string; date: string; status: "done" | "active" | "upcoming" }[];
+  risks: { label: string; level: "Low" | "Medium" | "High" }[];
+  contact: { name: string; role: string; org: string };
+}
+
+export const bidDetails: Record<string, BidDetailContent> = {
+  "1": {
+    summary:
+      "Full mechanical retrofit across a six-building commercial campus: replacement of aging rooftop units, new VAV distribution, and building-automation controls integration with phased cutover to maintain tenant operations.",
+    scopeItems: [
+      "Remove and replace 14 rooftop packaged units (15-25 ton)",
+      "New VAV boxes and ductwork modifications across floors 2-6",
+      "Building automation system (BAS) controls integration and commissioning",
+      "Hydronic loop upgrades and pump replacement in central plant",
+      "After-hours phased cutover to maintain tenant operations",
+      "Test, balance, and commission all new equipment",
+    ],
+    milestones: [
+      { label: "Pre-bid site walkthrough", date: "May 14", status: "done" },
+      { label: "Scope & specification analysis", date: "May 18", status: "done" },
+      { label: "Cost inputs & pricing review", date: "May 21", status: "active" },
+      { label: "Clarifications submitted", date: "May 22", status: "upcoming" },
+      { label: "Bid due", date: "May 28", status: "upcoming" },
+    ],
+    risks: [
+      { label: "Phased cutover schedule risk", level: "Medium" },
+      { label: "Long-lead equipment availability", level: "High" },
+      { label: "Prevailing wage compliance", level: "Low" },
+    ],
+    contact: { name: "Dana Whitfield", role: "Facilities Director", org: "Metro Facilities Group" },
+  },
+  "2": {
+    summary:
+      "Tear-off and replacement of roughly 120,000 sq ft of low-slope roofing across three school facilities, scheduled within the summer-break window to avoid disruption to operations.",
+    scopeItems: [
+      "Full tear-off of existing built-up roofing (~120,000 sq ft)",
+      "New TPO membrane system with tapered insulation",
+      "Roof drain and flashing replacement",
+      "Structural deck repair allowance",
+      "Summer-break schedule to avoid occupied-building work",
+      "Manufacturer warranty registration and closeout",
+    ],
+    milestones: [
+      { label: "Pre-bid site walkthrough", date: "May 15", status: "done" },
+      { label: "Scope & specification analysis", date: "May 19", status: "done" },
+      { label: "Cost inputs & pricing review", date: "May 21", status: "active" },
+      { label: "Site visit follow-up", date: "May 21", status: "upcoming" },
+      { label: "Bid due", date: "May 30", status: "upcoming" },
+    ],
+    risks: [
+      { label: "Compressed summer schedule", level: "High" },
+      { label: "Hidden deck deterioration", level: "Medium" },
+      { label: "Public bonding requirements", level: "Low" },
+    ],
+    contact: { name: "Marcus Lee", role: "Procurement Officer", org: "Atlanta Public Schools" },
+  },
+  "3": {
+    summary:
+      "Structural concrete repair and spall remediation across a parking structure and loading areas, including expansion-joint sealant replacement and a traffic-bearing waterproof coating.",
+    scopeItems: [
+      "Spall and delamination repair across parking deck levels 1-3",
+      "Expansion joint sealant replacement",
+      "Traffic-bearing waterproof coating application",
+      "Corrosion treatment of exposed reinforcement",
+      "Crack injection and surface restoration",
+      "Phased lane closures to maintain access",
+    ],
+    milestones: [
+      { label: "Pre-bid site walkthrough", date: "May 16", status: "done" },
+      { label: "Scope & specification analysis", date: "May 20", status: "active" },
+      { label: "Confirm scope with owner", date: "May 23", status: "upcoming" },
+      { label: "Cost inputs & pricing review", date: "May 27", status: "upcoming" },
+      { label: "Bid due", date: "Jun 05", status: "upcoming" },
+    ],
+    risks: [
+      { label: "Unknown extent of subsurface damage", level: "High" },
+      { label: "Public access during work", level: "Medium" },
+      { label: "Material cure-time weather dependency", level: "Medium" },
+    ],
+    contact: { name: "Priya Nandakumar", role: "Capital Projects Manager", org: "Orange County BOCC" },
+  },
+  "4": {
+    summary:
+      "Multi-site facilities maintenance program covering HVAC, electrical, and general repairs across 42 retail locations in the Southeast, with SLA-based response tiers and consolidated reporting.",
+    scopeItems: [
+      "Preventive maintenance program across 42 retail sites",
+      "HVAC, electrical, and general repair coverage",
+      "Tiered SLA response (emergency / urgent / routine)",
+      "Consolidated monthly reporting and analytics",
+      "Regional technician dispatch and on-call coverage",
+      "Asset inventory and lifecycle tracking",
+    ],
+    milestones: [
+      { label: "Program scoping workshop", date: "May 17", status: "done" },
+      { label: "Scope & specification analysis", date: "May 20", status: "done" },
+      { label: "Cost inputs & pricing review", date: "May 26", status: "active" },
+      { label: "Pricing strategy review", date: "May 26", status: "upcoming" },
+      { label: "Bid due", date: "Jun 10", status: "upcoming" },
+    ],
+    risks: [
+      { label: "Geographic dispatch coverage", level: "Medium" },
+      { label: "SLA penalty exposure", level: "Medium" },
+      { label: "Subcontractor consistency across sites", level: "High" },
+    ],
+    contact: { name: "Robert Hayes", role: "Director of Facilities", org: "National Retail Corp." },
+  },
+};

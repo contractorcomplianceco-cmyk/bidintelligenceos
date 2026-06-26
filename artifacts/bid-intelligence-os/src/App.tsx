@@ -10,6 +10,7 @@ import DemoLanding from "@/pages/demo-landing";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Bids from "@/pages/bids";
+import BidDetail from "@/pages/bid-detail";
 import Projects from "@/pages/projects";
 import Leads from "@/pages/leads";
 import Competitors from "@/pages/competitors";
@@ -33,6 +34,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/bids" component={Bids} />
+      <Route path="/bids/:id" component={BidDetail} />
       <Route path="/projects" component={Projects} />
       <Route path="/leads" component={Leads} />
       <Route path="/competitors" component={Competitors} />
