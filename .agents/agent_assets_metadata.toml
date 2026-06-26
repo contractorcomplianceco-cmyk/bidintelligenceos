@@ -6,3 +6,33 @@ id = "GXceVx8_EUWYrfFxUxWxh"
 uri = "file://attached_assets/stock_images/hero_construction.jpg"
 type = "image"
 title = "commercial construction site skyscraper cranes city skyline"
+
+[[outputs]]
+id = "zkVxTmq-5DyTZOBjIceCo"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene1.mp3"
+type = "audio"
+title = "scene1"
+
+[[outputs]]
+id = "Gm17bpKjveVlSnbhTo9bl"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene2.mp3"
+type = "audio"
+title = "scene2"
+
+[[outputs]]
+id = "ele8kcNwyt0PfOjIE8Gtj"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene3.mp3"
+type = "audio"
+title = "scene3"
+
+[[outputs]]
+id = "5VziTGM0xMrs2amQy817x"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene4.mp3"
+type = "audio"
+title = "scene4"
+
+[[outputs]]
+id = "UZ3dvhBve-KvrozubrnpL"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene5.mp3"
+type = "audio"
+title = "scene5"

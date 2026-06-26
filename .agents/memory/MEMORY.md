@@ -1,1 +1,2 @@
 - [BidIntelligenceOS navigation IA](bid-intelligence-os-ia.md) — front page is the Cockpit mockup; several page files are intentional off-nav analysis-workspace routes, not dead code.
+- [BidIntelligenceOS entry flow & walkthrough](bid-intelligence-os-entry-flow.md) — 3-stage sessionStorage gate (marketing → sign-in → app); in-page narrated player chosen over video-js skill.

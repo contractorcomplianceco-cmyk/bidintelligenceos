@@ -1,9 +1,15 @@
 import { useState } from "react";
 import { CCACrest } from "@/components/cca-crest";
-import { ArrowRight, Lock, Mail, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, Mail, ShieldCheck } from "lucide-react";
 import heroImage from "@/assets/hero-construction.jpg";
 
-export default function DemoLanding({ onEnter }: { onEnter: () => void }) {
+export default function DemoLanding({
+  onEnter,
+  onBack,
+}: {
+  onEnter: () => void;
+  onBack?: () => void;
+}) {
   const [email, setEmail] = useState("jordan.p@contractorconnect.com");
   const [password, setPassword] = useState("demo");
 
@@ -36,11 +42,23 @@ export default function DemoLanding({ onEnter }: { onEnter: () => void }) {
 
       {/* Top bar */}
       <header className="relative z-10 flex items-center justify-between px-6 lg:px-12 py-6">
-        <div className="flex items-center gap-3">
-          <CCACrest className="w-8 h-8 text-[#38BDF8]" />
-          <h1 className="font-bold text-base text-white tracking-tight leading-none">
-            <span className="text-[#38BDF8]">CCA</span> BidIntelligenceOS
-          </h1>
+        <div className="flex items-center gap-4">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="flex items-center gap-1.5 text-xs font-medium text-[#cbd5e1] hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Back</span>
+            </button>
+          )}
+          <div className="flex items-center gap-3">
+            <CCACrest className="w-8 h-8 text-[#38BDF8]" />
+            <h1 className="font-bold text-base text-white tracking-tight leading-none">
+              <span className="text-[#38BDF8]">CCA</span> BidIntelligenceOS
+            </h1>
+          </div>
         </div>
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-[10px] font-bold uppercase tracking-widest text-[#cbd5e1]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
