@@ -11,7 +11,7 @@ export function VoiceConnectMarketingSection({
   onLaunchDemo: () => void;
 }) {
   return (
-    <section className="relative overflow-hidden border-y border-[#0BA3A8]/15 bg-gradient-to-b from-[#0A0E1A] via-[#0B1418] to-[#0A0E1A]">
+    <section id="voiceconnect" className="relative overflow-hidden border-y border-[#0BA3A8]/15 bg-gradient-to-b from-[#0A0E1A] via-[#0B1418] to-[#0A0E1A] scroll-mt-16">
       <div
         className="absolute inset-0 opacity-[0.07]"
         aria-hidden="true"

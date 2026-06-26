@@ -54,6 +54,12 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <a
+              href="#voiceconnect"
+              className="hidden sm:inline text-sm font-medium text-[#5eead4] hover:text-[#99f6e4] transition-colors"
+            >
+              VoiceConnect
+            </a>
             <button
               onClick={onLaunchDemo}
               className="hidden sm:inline text-sm text-[#cbd5e1] hover:text-white transition-colors"
