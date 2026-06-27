@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/lib/context";
 
 import Marketing from "@/pages/marketing";
-import DemoLanding from "@/pages/demo-landing";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/dashboard";
 import Bids from "@/pages/bids";
@@ -61,23 +60,10 @@ function App() {
   const [entered, setEntered] = useState(
     () => sessionStorage.getItem("cca-demo-entered") === "1"
   );
-  const [launched, setLaunched] = useState(
-    () => sessionStorage.getItem("cca-demo-launched") === "1"
-  );
 
   const handleLaunch = () => {
-    sessionStorage.setItem("cca-demo-launched", "1");
-    setLaunched(true);
-  };
-
-  const handleEnter = () => {
     sessionStorage.setItem("cca-demo-entered", "1");
     setEntered(true);
-  };
-
-  const handleBack = () => {
-    sessionStorage.removeItem("cca-demo-launched");
-    setLaunched(false);
   };
 
   return (
@@ -88,8 +74,6 @@ function App() {
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
               <Router />
             </WouterRouter>
-          ) : launched ? (
-            <DemoLanding onEnter={handleEnter} onBack={handleBack} />
           ) : (
             <Marketing onLaunchDemo={handleLaunch} />
           )}
