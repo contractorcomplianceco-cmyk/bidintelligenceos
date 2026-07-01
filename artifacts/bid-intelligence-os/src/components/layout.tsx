@@ -146,7 +146,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-[#0A0E1A] border-r border-[#1C253B]">
       <div className="px-5 py-5 border-b border-[#1C253B]">
-        <img src={logo} alt="BidIntelligenceOS" className="h-9 w-auto object-contain" />
+        <img src={logo} alt="BidIntelligenceOS" className="h-14 w-auto object-contain" />
         <p className="text-[10px] text-[#8A96B0] tracking-wider mt-2 pl-0.5">
           A product of Contractor Connect
         </p>

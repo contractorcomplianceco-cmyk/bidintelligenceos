@@ -52,7 +52,7 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             <img
               src={logoLockup}
               alt="CCA BidIntelligenceOS"
-              className="h-12 w-auto"
+              className="h-14 w-auto"
             />
           </div>
           <div className="flex items-center gap-3">
