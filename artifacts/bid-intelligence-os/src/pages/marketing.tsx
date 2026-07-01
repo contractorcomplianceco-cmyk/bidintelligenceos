@@ -38,7 +38,7 @@ import { AI_FEATURES } from "@/lib/ai-features";
 import heroImage from "@/assets/hero-construction.jpg";
 import logoLockup from "@/assets/bidintelligence-logo.png";
 import brandShield from "@assets/fb4ec440-dcea-41fe-a7df-55dc918ca915_1782948470565.png";
-import brandLockup from "@assets/30acea14-0810-40ab-a7c5-897243b7acd5_1782948605017.png";
+import brandLockup from "@assets/040e7b5b-8d27-4e9e-ac7f-e4e713cb8c13_1782949340051.png";
 
 const INDUSTRY_ICONS: Record<IndustryIconKey, LucideIcon> = {
   roofing: Home,
@@ -209,9 +209,9 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
 
       {/* Nav */}
       <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0A0E1A]/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 h-24 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center">
-            <img src={brandLockup} alt="CCA BidIntelligenceOS" className="h-20 w-auto" />
+            <img src={brandLockup} alt="CCA BidIntelligenceOS" className="h-12 w-auto" />
           </div>
           <nav className="hidden lg:flex items-center gap-7 text-sm text-[#cbd5e1]">
             <a href="#platform" className="hover:text-white transition-colors">
