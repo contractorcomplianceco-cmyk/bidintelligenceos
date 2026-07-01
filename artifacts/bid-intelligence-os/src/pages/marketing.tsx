@@ -209,9 +209,9 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
 
       {/* Nav */}
       <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0A0E1A]/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 h-24 flex items-center justify-between">
           <div className="flex items-center">
-            <img src={brandLockup} alt="CCA BidIntelligenceOS" className="h-14 w-auto" />
+            <img src={brandLockup} alt="CCA BidIntelligenceOS" className="h-20 w-auto" />
           </div>
           <nav className="hidden lg:flex items-center gap-7 text-sm text-[#cbd5e1]">
             <a href="#platform" className="hover:text-white transition-colors">
