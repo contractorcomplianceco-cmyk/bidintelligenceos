@@ -38,7 +38,7 @@ import { AI_FEATURES } from "@/lib/ai-features";
 import heroImage from "@/assets/hero-construction.jpg";
 import logoLockup from "@/assets/bidintelligence-logo.png";
 import brandShield from "@assets/fb4ec440-dcea-41fe-a7df-55dc918ca915_1782948470565.png";
-import brandLockup from "@assets/replit_1782948182836.png";
+import brandLockup from "@assets/30acea14-0810-40ab-a7c5-897243b7acd5_1782948605017.png";
 
 const INDUSTRY_ICONS: Record<IndustryIconKey, LucideIcon> = {
   roofing: Home,
