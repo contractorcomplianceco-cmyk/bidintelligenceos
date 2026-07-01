@@ -12,6 +12,7 @@ import { CCACrest } from "@/components/cca-crest";
 import { WalkthroughPlayer } from "@/components/walkthrough/walkthrough-player";
 import { VoiceConnectMarketingSection } from "@/components/voice-connect/marketing-section";
 import heroImage from "@/assets/hero-construction.jpg";
+import logoLockup from "@/assets/cca-logo-lockup.png";
 
 const FEATURES = [
   {
@@ -47,11 +48,12 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
       {/* Nav */}
       <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0A0E1A]/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <CCACrest className="w-7 h-7 text-[#38BDF8]" />
-            <span className="font-bold text-sm text-white tracking-tight">
-              <span className="text-[#38BDF8]">CCA</span> BidIntelligenceOS
-            </span>
+          <div className="flex items-center">
+            <img
+              src={logoLockup}
+              alt="CCA BidIntelligenceOS"
+              className="h-12 w-auto"
+            />
           </div>
           <div className="flex items-center gap-3">
             <a
