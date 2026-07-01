@@ -12,7 +12,7 @@ import { CCACrest } from "@/components/cca-crest";
 import { WalkthroughPlayer } from "@/components/walkthrough/walkthrough-player";
 import { VoiceConnectMarketingSection } from "@/components/voice-connect/marketing-section";
 import heroImage from "@/assets/hero-construction.jpg";
-import logoLockup from "@/assets/cca-logo-lockup.png";
+import logoLockup from "@/assets/bidintelligence-logo.png";
 
 const FEATURES = [
   {

@@ -8,11 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings as SettingsIcon, User, Bell, DownloadCloud, Building2, MapPin, Wrench, Save, FileCheck, Blocks, Network, ArrowRight } from "lucide-react";
+import { Settings as SettingsIcon, User, Bell, DownloadCloud, Building2, MapPin, Wrench, Save, FileCheck, Blocks, Network, ArrowRight, Check } from "lucide-react";
 import { useAppContext } from "@/lib/context";
+import { VERTICALS } from "@/lib/verticals";
 
 export default function Settings() {
-  const { mode, setMode } = useAppContext();
+  const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
 
   return (
     <Layout>
@@ -36,6 +37,44 @@ export default function Settings() {
           <TabsContent value="profile" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-3">
               <div className="md:col-span-2 space-y-6">
+                <Card className="bg-[#0F1830] border-[#1C253B] shadow-sm">
+                  <CardHeader className="border-b border-[#1C253B] pb-4">
+                    <CardTitle className="text-lg text-white flex items-center gap-2">
+                      <Building2 className="w-5 h-5 text-[#38BDF8]" />
+                      Business Type
+                    </CardTitle>
+                    <CardDescription className="text-slate-400">
+                      Sets the active vertical across BidIntelligenceOS — phases, cost
+                      categories, permit needs, and labels adapt to your trade. Currently:{" "}
+                      <span className="text-[#38BDF8] font-semibold">{verticalConfig.name}</span>.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-6">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                      {VERTICALS.map((v) => {
+                        const active = v.id === vertical;
+                        return (
+                          <button
+                            key={v.id}
+                            onClick={() => setVertical(v.id)}
+                            className={`text-left rounded-xl border p-3 transition-all ${
+                              active
+                                ? "border-[#38BDF8] bg-[#38BDF8]/10 shadow-[0_0_18px_rgba(56,189,248,0.15)]"
+                                : "border-[#1C253B] bg-[#151D2E] hover:border-[#2A3756]"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-semibold text-white">{v.name}</span>
+                              {active && <Check className="w-4 h-4 text-[#38BDF8]" />}
+                            </div>
+                            <p className="text-[11px] text-[#8A96B0] mt-1 leading-tight">{v.tagline}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+
                 <Card className="bg-[#0F1830] border-[#1C253B] shadow-sm">
                   <CardHeader className="border-b border-[#1C253B] pb-4">
                     <CardTitle className="text-lg text-white">Core Details</CardTitle>

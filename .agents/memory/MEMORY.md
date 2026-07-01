@@ -1,1 +1,2 @@
-- [video-js post-build](video-js-audio-and-typecheck.md) — TTS lines overrun scene durations (fit per scene + regen music); scaffold tsc "fails" on DOM globals by design, gate is validate-recording.sh.
+- [Bid Intelligence OS conventions](bid-intelligence-os.md) — frontend-only prototype: demo gate, shared data-contract pattern, and how to visually verify gated pages.
+- [Extending an existing design system with subagents](consistency-subagents.md) — use GENERAL subagents + shared data contract + style-reference files (not DESIGN) when the goal is matching an established look, not inventing one.

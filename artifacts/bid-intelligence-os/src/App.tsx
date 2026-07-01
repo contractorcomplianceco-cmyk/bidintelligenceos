@@ -7,49 +7,89 @@ import { AppProvider } from "@/lib/context";
 
 import Marketing from "@/pages/marketing";
 import NotFound from "@/pages/not-found";
-import Dashboard from "@/pages/dashboard";
+
+// Primary navigation
+import CommandCenter from "@/pages/command-center";
+import Briefings from "@/pages/briefings";
+import Alerts from "@/pages/alerts";
 import Bids from "@/pages/bids";
 import BidDetail from "@/pages/bid-detail";
-import Projects from "@/pages/projects";
-import Leads from "@/pages/leads";
-import Competitors from "@/pages/competitors";
-import Insights from "@/pages/insights";
+import PackageBuilder from "@/pages/package-builder";
+import WonJobs from "@/pages/won-jobs";
+import Deployment from "@/pages/deployment";
+import Scheduling from "@/pages/scheduling";
+import Labor from "@/pages/labor";
+import Permits from "@/pages/permits";
+import Weather from "@/pages/weather";
+import CostRoi from "@/pages/cost-roi";
 import VoiceConnect from "@/pages/voice-connect";
-import Documents from "@/pages/documents";
-import Reports from "@/pages/reports";
+import Analytics from "@/pages/analytics";
+import BusinessProfile from "@/pages/business-profile";
 import Settings from "@/pages/settings";
 
+// Deep bid workflows (reached by link, not in main nav)
 import NewBid from "@/pages/new-bid";
 import ScopeAnalyzer from "@/pages/scope-analyzer";
 import CostInputs from "@/pages/cost-inputs";
 import BidFit from "@/pages/bid-fit";
 import StrategyMemo from "@/pages/strategy-memo";
-import PackageBuilder from "@/pages/package-builder";
+
+// Legacy screens (kept reachable by route, folded out of the main nav)
+import Dashboard from "@/pages/dashboard";
+import Projects from "@/pages/projects";
+import Leads from "@/pages/leads";
+import Competitors from "@/pages/competitors";
+import Insights from "@/pages/insights";
+import Documents from "@/pages/documents";
+import Reports from "@/pages/reports";
 
 const queryClient = new QueryClient();
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      {/* Operations */}
+      <Route path="/" component={CommandCenter} />
+      <Route path="/briefings" component={Briefings} />
+      <Route path="/alerts" component={Alerts} />
+
+      {/* Bid lifecycle */}
       <Route path="/bids" component={Bids} />
       <Route path="/bids/:id" component={BidDetail} />
-      <Route path="/projects" component={Projects} />
-      <Route path="/leads" component={Leads} />
-      <Route path="/competitors" component={Competitors} />
-      <Route path="/insights" component={Insights} />
+      <Route path="/package-builder" component={PackageBuilder} />
+      <Route path="/won-jobs" component={WonJobs} />
+
+      {/* Job execution */}
+      <Route path="/deployment" component={Deployment} />
+      <Route path="/scheduling" component={Scheduling} />
+      <Route path="/labor" component={Labor} />
+      <Route path="/permits" component={Permits} />
+      <Route path="/weather" component={Weather} />
+      <Route path="/cost-roi" component={CostRoi} />
+
+      {/* Intelligence */}
       <Route path="/voice-connect" component={VoiceConnect} />
-      <Route path="/documents" component={Documents} />
-      <Route path="/reports" component={Reports} />
+      <Route path="/analytics" component={Analytics} />
+
+      {/* Account */}
+      <Route path="/business-profile" component={BusinessProfile} />
       <Route path="/settings" component={Settings} />
 
-      {/* Deep Workflows */}
+      {/* Deep bid workflows */}
       <Route path="/new-bid" component={NewBid} />
       <Route path="/scope-analyzer" component={ScopeAnalyzer} />
       <Route path="/cost-inputs" component={CostInputs} />
       <Route path="/bid-fit" component={BidFit} />
       <Route path="/strategy-memo" component={StrategyMemo} />
-      <Route path="/package-builder" component={PackageBuilder} />
+
+      {/* Legacy routes (not in main nav) */}
+      <Route path="/cockpit" component={Dashboard} />
+      <Route path="/projects" component={Projects} />
+      <Route path="/leads" component={Leads} />
+      <Route path="/competitors" component={Competitors} />
+      <Route path="/insights" component={Insights} />
+      <Route path="/documents" component={Documents} />
+      <Route path="/reports" component={Reports} />
 
       <Route component={NotFound} />
     </Switch>
