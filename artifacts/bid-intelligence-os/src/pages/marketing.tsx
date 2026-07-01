@@ -37,7 +37,7 @@ import { COMPETITORWATCH } from "@/lib/competitorwatch";
 import { AI_FEATURES } from "@/lib/ai-features";
 import heroImage from "@/assets/hero-construction.jpg";
 import logoLockup from "@/assets/bidintelligence-logo.png";
-import brandShield from "@assets/Firefly_shield_only_610849_(1)_1782948090598.png";
+import brandShield from "@assets/fb4ec440-dcea-41fe-a7df-55dc918ca915_1782948470565.png";
 import brandLockup from "@assets/replit_1782948182836.png";
 
 const INDUSTRY_ICONS: Record<IndustryIconKey, LucideIcon> = {
