@@ -38,6 +38,7 @@ import { AI_FEATURES } from "@/lib/ai-features";
 import heroImage from "@/assets/hero-construction.jpg";
 import logoLockup from "@/assets/bidintelligence-logo.png";
 import brandShield from "@assets/Firefly_shield_only_610849_(1)_1782948090598.png";
+import brandLockup from "@assets/replit_1782948182836.png";
 
 const INDUSTRY_ICONS: Record<IndustryIconKey, LucideIcon> = {
   roofing: Home,
@@ -210,7 +211,7 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
       <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0A0E1A]/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center">
-            <img src={logoLockup} alt="CCA BidIntelligenceOS" className="h-14 w-auto" />
+            <img src={brandLockup} alt="CCA BidIntelligenceOS" className="h-14 w-auto" />
           </div>
           <nav className="hidden lg:flex items-center gap-7 text-sm text-[#cbd5e1]">
             <a href="#platform" className="hover:text-white transition-colors">
@@ -727,7 +728,7 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             <img
               src={brandShield}
               alt="BidIntelligenceOS"
-              className="w-14 h-14 object-contain mx-auto mb-5"
+              className="w-32 h-32 lg:w-40 lg:h-40 object-contain mx-auto mb-5"
             />
             <h2 className="text-3xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white to-[#a9b7d1] bg-clip-text text-transparent">
               Ready to win more bids?
