@@ -1,2 +1,1 @@
-- [Bid Intelligence OS conventions](bid-intelligence-os.md) — frontend-only prototype: demo gate, shared data-contract pattern, and how to visually verify gated pages.
-- [Extending an existing design system with subagents](consistency-subagents.md) — use GENERAL subagents + shared data contract + style-reference files (not DESIGN) when the goal is matching an established look, not inventing one.
+- [Screenshotting the gated app](screenshot-demo-gate.md) — the in-app UI is hidden behind a sessionStorage gate; the screenshot tool only sees marketing unless the gate is temporarily forced open.

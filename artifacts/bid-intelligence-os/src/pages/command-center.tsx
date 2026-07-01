@@ -1,7 +1,7 @@
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
-import { seedBids } from "@/lib/data";
+import { seedBids, followUpQueue, analyticsData, documentReadiness } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import {
   jobDeployments,
@@ -30,6 +30,9 @@ import {
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
   CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 import {
   FolderKanban,
@@ -49,6 +52,11 @@ import {
   ShieldCheck,
   Clock,
   Sun,
+  PieChart as PieIcon,
+  Target,
+  PhoneCall,
+  ExternalLink,
+  ClipboardCheck,
 } from "lucide-react";
 
 const severityColor: Record<AlertSeverity, string> = {
@@ -126,6 +134,60 @@ export default function CommandCenter() {
     (s) => s.status === "At Risk" || s.status === "Delayed"
   );
 
+  // --- Bid intelligence derived data ---
+  const bidsWithConfidence = activeBids.filter((b) => typeof b.confidence === "number");
+  const avgConfidence = bidsWithConfidence.length
+    ? Math.round(
+        bidsWithConfidence.reduce((sum, b) => sum + (b.confidence ?? 0), 0) /
+          bidsWithConfidence.length
+      )
+    : 0;
+
+  const confidenceBands = [
+    { key: "High", label: "High (80%+)", min: 80, max: 101, color: "#22C55E" },
+    { key: "Medium", label: "Medium (60–79%)", min: 60, max: 80, color: "#38BDF8" },
+    { key: "Watch", label: "Watch (40–59%)", min: 40, max: 60, color: "#F59E0B" },
+    { key: "Low", label: "Low (<40%)", min: 0, max: 40, color: "#EF4444" },
+  ] as const;
+
+  const pipelineBreakdown = confidenceBands
+    .map((band) => {
+      const bids = activeBids.filter((b) => {
+        const c = b.confidence ?? 0;
+        return c >= band.min && c < band.max;
+      });
+      return {
+        name: band.label,
+        color: band.color,
+        count: bids.length,
+        value: bids.reduce((sum, b) => sum + b.amount, 0),
+      };
+    })
+    .filter((b) => b.value > 0);
+
+  const winRateSeries = analyticsData.winRateOverTime.slice(-8);
+  const latestWinRate = winRateSeries[winRateSeries.length - 1]?.rate ?? 0;
+  const firstWinRate = winRateSeries[0]?.rate ?? 0;
+  const winRateDelta = latestWinRate - firstWinRate;
+
+  const topActiveBids = [...activeBids]
+    .sort((a, b) => (b.confidence ?? 0) - (a.confidence ?? 0))
+    .slice(0, 5);
+
+  const confidenceColor = (c: number) =>
+    c >= 80 ? "#22C55E" : c >= 60 ? "#38BDF8" : c >= 40 ? "#F59E0B" : "#EF4444";
+
+  const priorityColor: Record<string, string> = {
+    High: "#EF4444",
+    Medium: "#F59E0B",
+    Low: "#38BDF8",
+  };
+
+  const docsComplete = documentReadiness.filter((d) => d.status === "complete").length;
+  const docsReadiness = documentReadiness.length
+    ? Math.round((docsComplete / documentReadiness.length) * 100)
+    : 0;
+
   const kpis = [
     {
       label: "Active Bids",
@@ -162,12 +224,12 @@ export default function CommandCenter() {
       href: "/alerts",
     },
     {
-      label: "Avg Projected ROI",
-      value: `${avgRoi.toFixed(1)}%`,
-      icon: TrendingUp,
-      color: "#38BDF8",
-      sub: "Across active jobs",
-      href: "/cost-roi",
+      label: "Avg Bid Confidence",
+      value: `${avgConfidence}%`,
+      icon: Target,
+      color: "#0BA3A8",
+      sub: `${avgRoi.toFixed(1)}% avg projected ROI`,
+      href: "/analytics",
     },
   ];
 
@@ -217,13 +279,23 @@ export default function CommandCenter() {
             const Icon = kpi.icon;
             return (
               <Link key={kpi.label} href={kpi.href}>
-                <Card className="bg-[#0F1830] border-[#1C253B] shadow-sm relative overflow-hidden group cursor-pointer hover:border-[#2A3756] transition-colors h-full">
-                  <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                <Card className="bg-gradient-to-br from-[#0F1830] to-[#111A2E] border-[#1C253B] shadow-sm relative overflow-hidden group cursor-pointer hover:border-[#2A3756] hover:shadow-[0_0_24px_-6px_rgba(56,189,248,0.25)] transition-all duration-300 h-full">
+                  <div
+                    className="absolute top-0 left-0 h-[2px] w-full opacity-60"
+                    style={{ background: `linear-gradient(90deg, ${kpi.color}, transparent)` }}
+                  />
+                  <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full blur-2xl opacity-10 group-hover:opacity-20 transition-opacity" style={{ backgroundColor: kpi.color }} />
+                  <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-25 transition-opacity">
                     <Icon className="w-10 h-10" style={{ color: kpi.color }} />
                   </div>
                   <CardContent className="p-4 relative z-10">
                     <div className="flex items-center gap-2 mb-2">
-                      <Icon className="w-4 h-4" style={{ color: kpi.color }} />
+                      <span
+                        className="inline-flex items-center justify-center w-6 h-6 rounded-md"
+                        style={{ backgroundColor: `${kpi.color}1a` }}
+                      >
+                        <Icon className="w-3.5 h-3.5" style={{ color: kpi.color }} />
+                      </span>
                       <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-wider">
                         {kpi.label}
                       </span>
@@ -240,6 +312,373 @@ export default function CommandCenter() {
             );
           })}
         </div>
+
+        {/* Row: Active Bids Intelligence + Follow-Up Queue */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2 bg-[#0F1830] border-[#1C253B] flex flex-col">
+            <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                <Target className="w-4 h-4 text-[#38BDF8]" />
+                ACTIVE BID INTELLIGENCE
+              </CardTitle>
+              <Link
+                href="/bids"
+                className="text-xs text-[#38BDF8] hover:text-white transition-colors flex items-center gap-1 font-medium"
+              >
+                All Bids <ArrowRight className="w-3 h-3" />
+              </Link>
+            </CardHeader>
+            <CardContent className="p-0 flex-1">
+              <div className="overflow-x-auto scrollbar-thin">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="text-[9px] font-bold uppercase tracking-widest text-[#5b6680] border-b border-[#1C253B]">
+                      <th className="px-4 py-2.5 font-bold">Opportunity</th>
+                      <th className="px-3 py-2.5 font-bold text-right">Value</th>
+                      <th className="px-3 py-2.5 font-bold">Confidence</th>
+                      <th className="px-4 py-2.5 font-bold">Next Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topActiveBids.map((bid) => {
+                      const conf = bid.confidence ?? 0;
+                      return (
+                        <tr
+                          key={bid.id}
+                          className="border-b border-[#1C253B] last:border-0 hover:bg-[#151D2E] transition-colors"
+                        >
+                          <td className="px-4 py-3 min-w-[180px]">
+                            <div className="text-xs font-semibold text-white truncate">
+                              {bid.name}
+                            </div>
+                            <div className="text-[10px] text-[#8A96B0] truncate">
+                              {bid.recipient} · {bid.location}
+                            </div>
+                          </td>
+                          <td className="px-3 py-3 text-right whitespace-nowrap">
+                            <span className="text-xs font-bold text-white">
+                              ${(bid.amount / 1_000_000).toFixed(2)}M
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 min-w-[120px]">
+                            <div className="flex items-center gap-2">
+                              <div className="h-1.5 flex-1 rounded-full bg-[#1C253B] overflow-hidden min-w-[48px]">
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{
+                                    width: `${conf}%`,
+                                    backgroundColor: confidenceColor(conf),
+                                  }}
+                                />
+                              </div>
+                              <span
+                                className="text-[11px] font-bold tabular-nums"
+                                style={{ color: confidenceColor(conf) }}
+                              >
+                                {conf}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 min-w-[150px]">
+                            <div className="text-[11px] font-medium text-[#c3ccdd] truncate">
+                              {bid.nextAction ?? "—"}
+                            </div>
+                            {bid.nextActionDate && (
+                              <div className="text-[9px] text-[#8A96B0] flex items-center gap-1 mt-0.5">
+                                <Clock className="w-2.5 h-2.5" />
+                                Due {bid.nextActionDate}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <p className="text-[10px] text-[#5b6680] px-4 py-3 flex items-center gap-1.5 border-t border-[#1C253B]">
+                <ShieldCheck className="w-3 h-3 text-[#38BDF8]" />
+                Confidence is decision-support scoring only — no outcome is guaranteed.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[#0F1830] border-[#1C253B] flex flex-col">
+            <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                <PhoneCall className="w-4 h-4 text-[#0BA3A8]" />
+                FOLLOW-UP QUEUE
+              </CardTitle>
+              <Link
+                href="/bids"
+                className="text-xs text-[#38BDF8] hover:text-white transition-colors font-medium"
+              >
+                Manage
+              </Link>
+            </CardHeader>
+            <CardContent className="p-0 flex-1 flex flex-col">
+              <div className="divide-y divide-[#1C253B]">
+                {followUpQueue.map((item) => (
+                  <div
+                    key={item.id}
+                    className="p-3 flex items-start justify-between gap-3 hover:bg-[#151D2E] transition-colors"
+                  >
+                    <div className="flex items-start gap-2.5 min-w-0">
+                      <span
+                        className="mt-1 w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: priorityColor[item.priority] ?? "#8A96B0" }}
+                      />
+                      <div className="min-w-0">
+                        <div className="text-xs font-semibold text-white truncate">
+                          {item.client}
+                        </div>
+                        <div className="text-[10px] text-[#8A96B0] truncate">{item.action}</div>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-[10px] font-semibold text-white">{item.date}</div>
+                      <span
+                        className="text-[8px] font-bold uppercase tracking-widest"
+                        style={{ color: priorityColor[item.priority] ?? "#8A96B0" }}
+                      >
+                        {item.priority}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="p-3 border-t border-[#1C253B] mt-auto">
+                <button
+                  onClick={() =>
+                    toast({
+                      title: "VoiceConnect",
+                      description: 'Say "Call my next follow-up" to dial the top of the queue.',
+                    })
+                  }
+                  className="w-full py-2 bg-[#0BA3A8]/15 hover:bg-[#0BA3A8]/25 text-[#5eead4] text-xs font-semibold rounded transition-colors flex items-center justify-center gap-2"
+                >
+                  <PhoneCall className="w-3.5 h-3.5" /> Auto-dial with VoiceConnect
+                </button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Row: Win Rate Over Time + Pipeline Value Breakdown */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2 bg-[#0F1830] border-[#1C253B] flex flex-col">
+            <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-[#22C55E]" />
+                WIN RATE OVER TIME
+              </CardTitle>
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <span className="text-lg font-bold text-white">{latestWinRate}%</span>
+                  <span
+                    className={`ml-2 text-[10px] font-bold ${
+                      winRateDelta >= 0 ? "text-[#22C55E]" : "text-[#EF4444]"
+                    }`}
+                  >
+                    {winRateDelta >= 0 ? "▲" : "▼"} {Math.abs(winRateDelta)} pts
+                  </span>
+                </div>
+                <Link
+                  href="/analytics"
+                  className="text-xs text-[#38BDF8] hover:text-white transition-colors font-medium"
+                >
+                  Analytics
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4 flex-1 flex flex-col">
+              <div className="h-48 w-full mt-auto">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart
+                    data={winRateSeries}
+                    margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                  >
+                    <defs>
+                      <linearGradient id="ccWinRate" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#22C55E" stopOpacity={0.35} />
+                        <stop offset="95%" stopColor="#22C55E" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1C253B" vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      stroke="#8A96B0"
+                      fontSize={10}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="#8A96B0"
+                      fontSize={10}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(v) => `${v}%`}
+                      domain={[0, 100]}
+                    />
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "#0F1830",
+                        borderColor: "#1C253B",
+                        fontSize: "12px",
+                      }}
+                      formatter={(v: number) => [`${v}%`, "Win rate"]}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="rate"
+                      stroke="#22C55E"
+                      fill="url(#ccWinRate)"
+                      strokeWidth={2}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="text-[10px] text-[#5b6680] mt-3 flex items-center gap-1.5">
+                <ShieldCheck className="w-3 h-3 text-[#38BDF8]" />
+                Trailing win-rate trend across submitted bids. Past performance is not a guarantee.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[#0F1830] border-[#1C253B] flex flex-col">
+            <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+                <PieIcon className="w-4 h-4 text-[#38BDF8]" />
+                PIPELINE BY CONFIDENCE
+              </CardTitle>
+              <Link
+                href="/bids"
+                className="text-xs text-[#38BDF8] hover:text-white transition-colors font-medium"
+              >
+                Pipeline
+              </Link>
+            </CardHeader>
+            <CardContent className="p-4 flex-1 flex flex-col">
+              {pipelineBreakdown.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center py-10">
+                  <PieIcon className="w-8 h-8 text-[#2A3756] mb-2" />
+                  <p className="text-xs text-[#8A96B0]">No active pipeline to break down yet.</p>
+                </div>
+              ) : (
+                <>
+              <div className="relative h-40">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={pipelineBreakdown}
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={48}
+                      outerRadius={70}
+                      paddingAngle={2}
+                      stroke="none"
+                    >
+                      {pipelineBreakdown.map((entry) => (
+                        <Cell key={entry.name} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip
+                      contentStyle={{
+                        backgroundColor: "#0F1830",
+                        borderColor: "#1C253B",
+                        fontSize: "12px",
+                      }}
+                      formatter={(v: number, n: string) => [
+                        `$${(v / 1_000_000).toFixed(2)}M`,
+                        n,
+                      ]}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-[#5b6680]">
+                    Open value
+                  </span>
+                  <span className="text-xl font-bold text-white">
+                    ${(openBidValue / 1_000_000).toFixed(1)}M
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-1.5 mt-3">
+                {pipelineBreakdown.map((band) => (
+                  <div key={band.name} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: band.color }}
+                      />
+                      <span className="text-[11px] text-[#c3ccdd] truncate">{band.name}</span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-white whitespace-nowrap">
+                      ${(band.value / 1_000_000).toFixed(2)}M
+                      <span className="text-[9px] text-[#8A96B0] ml-1">({band.count})</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* ComplianceConnect ecosystem banner */}
+        <Card className="bg-gradient-to-br from-[#0F1830] to-[#141A33] border-[#2A2350] relative overflow-hidden">
+          <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-[#A855F7]/10 blur-3xl pointer-events-none" />
+          <CardContent className="p-5 relative z-10 flex flex-col lg:flex-row lg:items-center gap-5">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-[#A855F7]/15 flex-shrink-0">
+                <ClipboardCheck className="w-6 h-6 text-[#c084fc]" />
+              </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#c084fc]">
+                    CCA Ecosystem
+                  </span>
+                  <span className="text-[9px] text-[#8A96B0]">·</span>
+                  <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A96B0]">
+                    ComplianceConnect
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white">
+                  Bid-ready compliance, synced from ComplianceConnect
+                </h3>
+                <p className="text-[11px] text-[#8A96B0] mt-1 max-w-xl leading-snug">
+                  Licensing, bonding, and insurance readiness flow into every bid package. Keep
+                  qualifications current in ComplianceConnect to avoid disqualification.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 flex-shrink-0">
+              <div className="text-center">
+                <div
+                  className="text-2xl font-bold"
+                  style={{ color: docsReadiness >= 90 ? "#22C55E" : "#F59E0B" }}
+                >
+                  {docsReadiness}%
+                </div>
+                <div className="text-[9px] text-[#8A96B0] uppercase tracking-wider">
+                  Docs ready
+                </div>
+              </div>
+              <a
+                href="https://demo.ccacomplianceconnect.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#A855F7]/20 hover:bg-[#A855F7]/30 border border-[#A855F7]/40 text-[#e9d5ff] text-xs font-semibold transition-colors whitespace-nowrap"
+              >
+                Open ComplianceConnect <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Row: Daily Briefing + Today's Schedule */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -24,12 +24,34 @@ import {
   HelpCircle,
   ChevronDown,
   Check,
+  ExternalLink,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { VERTICALS } from "@/lib/verticals";
 import { VoiceConnectCommandBar } from "@/components/voice-connect/command-bar";
 import logo from "@/assets/bidintelligence-logo.png";
+
+const ECOSYSTEM_LINKS = [
+  {
+    label: "ComplianceConnect",
+    note: "Licensing & compliance",
+    href: "https://demo.ccacomplianceconnect.com/",
+    color: "#A855F7",
+  },
+  {
+    label: "CCA Website",
+    note: "Contractor Compliance Authority",
+    href: "https://www.contractor-compliance-authority.com/",
+    color: "#38BDF8",
+  },
+  {
+    label: "Compliance Authority Group",
+    note: "Parent company",
+    href: "https://complianceauthoritygroup.com/",
+    color: "#5eead4",
+  },
+];
 
 type NavItem = { href: string; label: string; icon: typeof LayoutDashboard };
 type NavGroup = { title: string; items: NavItem[] };
@@ -189,7 +211,37 @@ export function Layout({ children }: { children: ReactNode }) {
         ))}
       </nav>
 
-      <div className="p-4 mt-auto border-t border-[#1C253B]">
+      <div className="p-4 mt-auto border-t border-[#1C253B] space-y-3">
+        <div>
+          <p className="px-1 mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-[#5b6680]">
+            CCA Ecosystem
+          </p>
+          <div className="space-y-0.5">
+            {ECOSYSTEM_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg text-[#8A96B0] hover:text-white hover:bg-[#151D2E] transition-colors group"
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: link.color }}
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[11px] font-medium leading-tight truncate">
+                    {link.label}
+                  </span>
+                  <span className="block text-[9px] text-[#5b6680] leading-tight truncate">
+                    {link.note}
+                  </span>
+                </span>
+                <ExternalLink className="w-3 h-3 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </a>
+            ))}
+          </div>
+        </div>
         <div
           className={`rounded-lg p-3 border flex items-center gap-2 transition-colors ${
             mode === "addon" ? "bg-[#38BDF8]/10 border-[#38BDF8]/30" : "bg-[#0F1830] border-[#1C253B]"

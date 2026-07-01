@@ -128,15 +128,31 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
       {/* Utility strip */}
       <div className="hidden md:block border-b border-white/5 bg-[#080B14]">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 h-9 flex items-center justify-between text-[11px] tracking-wide">
-          <span className="text-[#6B7794]">
+          <span className="text-[#6B7794] flex items-center">
             Powering Smarter Work Across
             <span className="ml-2 text-[#38BDF8] font-semibold">BuildConnect</span>
             <span className="mx-1.5 text-[#2A3550]">·</span>
             <span className="text-[#5eead4] font-semibold">ContractorConnect</span>
             <span className="mx-1.5 text-[#2A3550]">·</span>
             <span className="text-[#a5b4fc] font-semibold">QualifierConnect</span>
+            <span className="mx-1.5 text-[#2A3550]">·</span>
+            <a
+              href="https://demo.ccacomplianceconnect.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#c084fc] font-semibold hover:text-white transition-colors"
+            >
+              ComplianceConnect
+            </a>
           </span>
-          <span className="text-[#6B7794]">The Intelligence Edge for Contractors</span>
+          <a
+            href="https://www.contractor-compliance-authority.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#6B7794] hover:text-white transition-colors"
+          >
+            A product of Contractor Compliance Authority
+          </a>
         </div>
       </div>
 
@@ -469,17 +485,50 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
 
       {/* Footer */}
       <footer className="border-t border-white/10">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-[#8A96B0] text-xs">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#38BDF8]" />
-            <span>
-              Interactive prototype — output is for demonstration and requires review
-              before use.
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-6 space-y-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[#8A96B0] text-xs">
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#5b6680]">
+              The CCA Ecosystem
+            </span>
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+              <a
+                href="https://demo.ccacomplianceconnect.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 hover:text-white transition-colors"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#c084fc]" /> ComplianceConnect
+              </a>
+              <a
+                href="https://www.contractor-compliance-authority.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 hover:text-white transition-colors"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" /> Contractor Compliance Authority
+              </a>
+              <a
+                href="https://complianceauthoritygroup.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 hover:text-white transition-colors"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5eead4]" /> Compliance Authority Group
+              </a>
+            </div>
+          </div>
+          <div className="border-t border-white/5 pt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[#8A96B0] text-xs">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <span>
+                Interactive prototype — output is for demonstration and requires review
+                before use.
+              </span>
+            </div>
+            <span className="text-white/80">
+              CCA BidIntelligenceOS is a product of Contractor Connect
             </span>
           </div>
-          <span className="text-white/80">
-            CCA BidIntelligenceOS is a product of Contractor Connect
-          </span>
         </div>
       </footer>
     </div>
