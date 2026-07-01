@@ -181,11 +181,30 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
         <div className="max-w-6xl mx-auto px-6 lg:px-8 h-9 flex items-center justify-between text-[11px] tracking-wide">
           <span className="text-[#6B7794] flex items-center">
             Powering Smarter Work Across
-            <span className="ml-2 text-[#38BDF8] font-semibold">BuildConnect</span>
+            <a
+              href="https://demo.ccabuildconnect.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-2 text-[#38BDF8] font-semibold hover:text-white transition-colors"
+            >
+              BuildConnect
+            </a>
             <span className="mx-1.5 text-[#2A3550]">·</span>
-            <span className="text-[#5eead4] font-semibold">ContractorConnect</span>
+            <a
+              href="https://demo.ccacontractorconnect.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#5eead4] font-semibold hover:text-white transition-colors"
+            >
+              ContractorConnect
+            </a>
             <span className="mx-1.5 text-[#2A3550]">·</span>
-            <span className="text-[#a5b4fc] font-semibold">QualifierConnect</span>
+            <span className="text-[#a5b4fc] font-semibold">
+              QualifierConnect
+              <span className="ml-1 text-[9px] uppercase tracking-wider text-[#6B7794] font-medium">
+                Coming Soon
+              </span>
+            </span>
             <span className="mx-1.5 text-[#2A3550]">·</span>
             <a
               href="https://demo.ccacomplianceconnect.com/"
