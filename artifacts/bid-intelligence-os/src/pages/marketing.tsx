@@ -37,6 +37,7 @@ import { COMPETITORWATCH } from "@/lib/competitorwatch";
 import { AI_FEATURES } from "@/lib/ai-features";
 import heroImage from "@/assets/hero-construction.jpg";
 import logoLockup from "@/assets/bidintelligence-logo.png";
+import brandShield from "@assets/Firefly_shield_only_610849_(1)_1782948090598.png";
 
 const INDUSTRY_ICONS: Record<IndustryIconKey, LucideIcon> = {
   roofing: Home,
@@ -723,7 +724,11 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             aria-hidden="true"
           />
           <div className="relative">
-            <CCACrest className="w-10 h-10 text-[#38BDF8] mx-auto mb-5" />
+            <img
+              src={brandShield}
+              alt="BidIntelligenceOS"
+              className="w-14 h-14 object-contain mx-auto mb-5"
+            />
             <h2 className="text-3xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white to-[#a9b7d1] bg-clip-text text-transparent">
               Ready to win more bids?
             </h2>
