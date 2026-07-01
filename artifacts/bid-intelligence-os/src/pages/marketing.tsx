@@ -1,12 +1,23 @@
 import { useRef } from "react";
 import {
   ArrowRight,
-  LayoutDashboard,
-  Compass,
-  PackageCheck,
-  LineChart,
-  ShieldCheck,
   PlayCircle,
+  ShieldCheck,
+  Search,
+  PackageCheck,
+  HardHat,
+  CalendarClock,
+  ClipboardCheck,
+  CloudLightning,
+  DollarSign,
+  Mic,
+  Building2,
+  Wind,
+  Home,
+  Zap,
+  GitBranch,
+  TrendingUp,
+  CheckCircle2,
 } from "lucide-react";
 import { CCACrest } from "@/components/cca-crest";
 import { WalkthroughPlayer } from "@/components/walkthrough/walkthrough-player";
@@ -14,27 +25,96 @@ import { VoiceConnectMarketingSection } from "@/components/voice-connect/marketi
 import heroImage from "@/assets/hero-construction.jpg";
 import logoLockup from "@/assets/bidintelligence-logo.png";
 
-const FEATURES = [
+const INDUSTRIES = [
+  { icon: Building2, label: "GC" },
+  { icon: Wind, label: "HVAC" },
+  { icon: ShieldCheck, label: "Insurance" },
+  { icon: Home, label: "Roofing" },
+  { icon: Zap, label: "Electrical" },
+];
+
+const KPIS = [
+  { label: "Open Bid Value", value: "$18.74M", delta: "+18.3% vs last 30d" },
+  { label: "Win Rate", value: "63%", delta: "+6% vs last 30d" },
+  { label: "Avg Confidence", value: "74%", delta: "+11% vs last 30d" },
+  { label: "Active Bids", value: "28", delta: "+12% vs last 30d" },
+];
+
+const PREVIEW_ROWS = [
+  { project: "Greenway Mixed-Use", value: "$4.2M", conf: 78, status: "In Progress" },
+  { project: "Riverside Tower", value: "$7.5M", conf: 82, status: "Submitted" },
+  { project: "Main St. Bridge Rehab", value: "$1.1M", conf: 71, status: "Pursuing" },
+];
+
+const MODULES = [
   {
-    icon: LayoutDashboard,
-    title: "Cockpit Command Center",
-    body: "Every active bid, win rate, deadline, and next action in one live view.",
-  },
-  {
-    icon: Compass,
-    title: "Guided Bid Analysis",
-    body: "Walk through scope, cost inputs, and fit scoring before you commit.",
+    icon: Search,
+    title: "Bid Intelligence",
+    body: "Identify smarter opportunities and analyze scope with confidence scoring.",
   },
   {
     icon: PackageCheck,
-    title: "Vendor-Ready Packages",
-    body: "Assemble clean, vendor-facing bid packages — internal strategy stays private.",
+    title: "Bid Package Builder",
+    body: "Build compliant, competitive, vendor-ready bid packages — faster.",
   },
   {
-    icon: LineChart,
-    title: "Win / Loss Insights",
-    body: "Track outcomes over time to sharpen every future bid.",
+    icon: HardHat,
+    title: "Won Job Deployment",
+    body: "Move seamlessly from award to a fully staffed, scheduled execution plan.",
   },
+  {
+    icon: CalendarClock,
+    title: "Scheduling",
+    body: "Build intelligent schedules, sequence phases, and stay on track.",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Permits Tracking",
+    body: "Track, monitor, and manage permits, expirations, and renewals with ease.",
+  },
+  {
+    icon: CloudLightning,
+    title: "Weather Watch",
+    body: "Monitor jobsite conditions and reduce weather-related schedule risk.",
+  },
+  {
+    icon: DollarSign,
+    title: "Cost & ROI",
+    body: "Track costs, margins, and profitability against plan in real time.",
+  },
+  {
+    icon: Mic,
+    title: "VoiceConnect",
+    body: "Ask, listen, act. Get field-ready answers fast, hands-free.",
+  },
+];
+
+const STEPS = [
+  {
+    icon: Search,
+    step: "01",
+    title: "Analyze Scope",
+    body: "Extract, clarify, and validate scope with confidence scoring.",
+  },
+  {
+    icon: GitBranch,
+    step: "02",
+    title: "Build Strategy",
+    body: "Assemble the right team, plan resources, and structure winning bids.",
+  },
+  {
+    icon: TrendingUp,
+    step: "03",
+    title: "Deploy & Track Jobs",
+    body: "Deploy with precision — labor, subs, cost, ROI, and weather to closeout.",
+  },
+];
+
+const TRUST = [
+  { value: "1,000+", label: "Contractors" },
+  { value: "$18.7B+", label: "Project Value Analyzed" },
+  { value: "11", label: "Trade Verticals" },
+  { value: "AI + Human", label: "Reviewed Execution" },
 ];
 
 export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }) {
@@ -45,23 +125,42 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
 
   return (
     <div className="min-h-[100dvh] bg-[#0A0E1A] text-slate-200 font-sans">
+      {/* Utility strip */}
+      <div className="hidden md:block border-b border-white/5 bg-[#080B14]">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 h-9 flex items-center justify-between text-[11px] tracking-wide">
+          <span className="text-[#6B7794]">
+            Powering Smarter Work Across
+            <span className="ml-2 text-[#38BDF8] font-semibold">BuildConnect</span>
+            <span className="mx-1.5 text-[#2A3550]">·</span>
+            <span className="text-[#5eead4] font-semibold">ContractorConnect</span>
+            <span className="mx-1.5 text-[#2A3550]">·</span>
+            <span className="text-[#a5b4fc] font-semibold">QualifierConnect</span>
+          </span>
+          <span className="text-[#6B7794]">The Intelligence Edge for Contractors</span>
+        </div>
+      </div>
+
       {/* Nav */}
       <header className="sticky top-0 z-40 border-b border-white/5 bg-[#0A0E1A]/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center">
-            <img
-              src={logoLockup}
-              alt="CCA BidIntelligenceOS"
-              className="h-14 w-auto"
-            />
+            <img src={logoLockup} alt="CCA BidIntelligenceOS" className="h-14 w-auto" />
           </div>
-          <div className="flex items-center gap-3">
-            <a
-              href="#voiceconnect"
-              className="hidden sm:inline text-sm font-medium text-[#5eead4] hover:text-[#99f6e4] transition-colors"
-            >
+          <nav className="hidden lg:flex items-center gap-7 text-sm text-[#cbd5e1]">
+            <a href="#platform" className="hover:text-white transition-colors">
+              Platform
+            </a>
+            <a href="#industries" className="hover:text-white transition-colors">
+              Industries
+            </a>
+            <a href="#voiceconnect" className="hover:text-[#5eead4] transition-colors text-[#7fe3d8]">
               VoiceConnect
             </a>
+            <button onClick={scrollToPlayer} className="hover:text-white transition-colors">
+              Walkthrough
+            </button>
+          </nav>
+          <div className="flex items-center gap-3">
             <button
               onClick={onLaunchDemo}
               className="hidden sm:inline text-sm text-[#cbd5e1] hover:text-white transition-colors"
@@ -70,9 +169,9 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             </button>
             <button
               onClick={onLaunchDemo}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#38BDF8] text-[#0A0E1A] font-semibold text-sm hover:bg-[#5cc6fb] transition-colors shadow-[0_0_24px_rgba(56,189,248,0.3)]"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm hover:from-[#5cc6fb] hover:to-[#38a8e0] transition-all shadow-[0_0_24px_rgba(56,189,248,0.35)]"
             >
-              Launch the Live Demo
+              Request a Demo
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -82,31 +181,57 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0" aria-hidden="true">
-          <img src={heroImage} alt="" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-[#0A0E1A]/70" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0E1A]/60 via-[#0A0E1A]/85 to-[#0A0E1A]" />
-          <div className="absolute inset-0 blueprint-texture opacity-20" />
+          <img src={heroImage} alt="" className="w-full h-full object-cover opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0E1A]/85 via-[#0A0E1A]/92 to-[#0A0E1A]" />
+          <div className="absolute inset-0 blueprint-texture opacity-25" />
+          <div
+            className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[900px] rounded-full opacity-30"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(56,189,248,0.35) 0%, rgba(56,189,248,0) 60%)",
+            }}
+          />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-6 lg:px-8 pt-20 pb-16 lg:pt-28 text-center">
+        <div className="relative max-w-6xl mx-auto px-6 lg:px-8 pt-16 pb-14 lg:pt-24 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#38BDF8]/30 bg-[#38BDF8]/10 backdrop-blur-sm text-[#7dd3fc] text-xs font-semibold tracking-wide mb-7">
             <ShieldCheck className="w-3.5 h-3.5" />
             A product of Contractor Connect
           </div>
-          <h1 className="text-5xl lg:text-7xl font-bold text-white tracking-tight leading-[1.02] drop-shadow-[0_2px_30px_rgba(0,0,0,0.7)]">
-            Research Less,
-            <br />
-            <span className="text-[#38BDF8]">Win More.</span>
+          <h1 className="text-5xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.98]">
+            <span className="block bg-gradient-to-b from-white via-[#e7edf7] to-[#9fb0cc] bg-clip-text text-transparent drop-shadow-[0_2px_30px_rgba(0,0,0,0.6)]">
+              Win Smarter Bids.
+            </span>
+            <span className="block mt-1 bg-gradient-to-r from-[#e7edf7] via-[#7dd3fc] to-[#38BDF8] bg-clip-text text-transparent">
+              Run Smarter Work.
+            </span>
           </h1>
-          <p className="mt-6 max-w-2xl mx-auto text-lg text-[#cbd5e1] leading-relaxed">
-            The bid intelligence cockpit for commercial trade contractors. Analyze
-            opportunities, structure pricing, build vendor-ready packages, and track
-            outcomes — all in one workspace.
+          <p className="mt-7 max-w-2xl mx-auto text-lg text-[#cbd5e1] leading-relaxed">
+            From bid intelligence to job deployment, scheduling, permits, cost, and ROI —
+            one executive operating system for commercial trade contractors.
+            <span className="text-[#7fe3d8]"> Research less. Win more.</span>
           </p>
+
+          {/* Industry badges */}
+          <div id="industries" className="mt-8 flex flex-wrap items-center justify-center gap-2.5 scroll-mt-24">
+            {INDUSTRIES.map((ind) => (
+              <span
+                key={ind.label}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#1C253B] bg-[#0F1830]/70 text-sm text-[#cbd5e1]"
+              >
+                <ind.icon className="w-3.5 h-3.5 text-[#38BDF8]" />
+                {ind.label}
+              </span>
+            ))}
+            <span className="inline-flex items-center px-3.5 py-1.5 rounded-full border border-[#1C253B] bg-[#0F1830]/40 text-sm text-[#6B7794]">
+              + 6 more
+            </span>
+          </div>
+
           <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={onLaunchDemo}
-              className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg bg-[#38BDF8] text-[#0A0E1A] font-semibold text-sm hover:bg-[#5cc6fb] transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
+              className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
             >
               Launch the Live Demo
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
@@ -119,11 +244,166 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
               Watch the walkthrough
             </button>
           </div>
+
+          {/* Cockpit preview mockup */}
+          <div className="mt-14 relative max-w-4xl mx-auto text-left">
+            <div
+              className="absolute -inset-x-10 -bottom-6 top-10 rounded-[2rem] opacity-40 blur-2xl"
+              style={{
+                background:
+                  "radial-gradient(60% 60% at 50% 40%, rgba(56,189,248,0.28) 0%, rgba(56,189,248,0) 70%)",
+              }}
+              aria-hidden="true"
+            />
+            <div className="relative rounded-2xl border border-[#1C253B] bg-[#0B1122] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden">
+              {/* window chrome */}
+              <div className="flex items-center gap-2 px-4 h-10 border-b border-[#141C30] bg-[#0A0F1E]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444]/70" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/70" />
+                <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E]/70" />
+                <div className="ml-3 flex items-center gap-2 text-xs text-[#6B7794]">
+                  <img src={logoLockup} alt="" className="h-4 w-auto opacity-80" />
+                  <span className="hidden sm:inline">Command Center</span>
+                </div>
+                <span className="ml-auto text-[10px] text-[#4A5678]">Data as of May 20, 2025</span>
+              </div>
+              <div className="p-4 lg:p-5">
+                {/* KPI tiles */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  {KPIS.map((k) => (
+                    <div
+                      key={k.label}
+                      className="rounded-xl border border-[#141C30] bg-[#0F1830] p-3.5"
+                    >
+                      <p className="text-[10px] uppercase tracking-wider text-[#6B7794]">
+                        {k.label}
+                      </p>
+                      <p className="mt-1 text-xl font-bold text-white">{k.value}</p>
+                      <p className="mt-0.5 text-[10px] text-[#22C55E]">{k.delta}</p>
+                    </div>
+                  ))}
+                </div>
+                {/* Active bids table */}
+                <div className="mt-4 rounded-xl border border-[#141C30] bg-[#0F1830] overflow-hidden">
+                  <div className="px-4 py-2.5 border-b border-[#141C30] flex items-center justify-between">
+                    <span className="text-xs font-semibold text-[#cbd5e1]">Active Bids</span>
+                    <span className="text-[10px] text-[#38BDF8]">View all</span>
+                  </div>
+                  <div className="divide-y divide-[#141C30]">
+                    {PREVIEW_ROWS.map((r) => (
+                      <div
+                        key={r.project}
+                        className="grid grid-cols-12 items-center gap-2 px-4 py-2.5 text-xs"
+                      >
+                        <span className="col-span-5 text-[#e2e8f0] truncate">{r.project}</span>
+                        <span className="col-span-2 text-[#94a3b8]">{r.value}</span>
+                        <div className="col-span-3 flex items-center gap-2">
+                          <div className="h-1.5 flex-1 rounded-full bg-[#1C253B] overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-[#38BDF8] to-[#22C55E]"
+                              style={{ width: `${r.conf}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-[#8A96B0] w-7">{r.conf}%</span>
+                        </div>
+                        <span className="col-span-2 text-right text-[10px] text-[#7dd3fc]">
+                          {r.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust strip */}
+      <section className="border-y border-white/5 bg-[#080B14]">
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-7 grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {TRUST.map((t) => (
+            <div key={t.label} className="text-center">
+              <p className="text-2xl lg:text-3xl font-bold bg-gradient-to-b from-white to-[#9fb0cc] bg-clip-text text-transparent">
+                {t.value}
+              </p>
+              <p className="mt-1 text-xs text-[#6B7794] tracking-wide">{t.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* What it does */}
+      <section id="platform" className="max-w-6xl mx-auto px-6 lg:px-8 py-16 lg:py-20 scroll-mt-24">
+        <div className="text-center mb-10">
+          <span className="text-xs font-semibold uppercase tracking-widest text-[#38BDF8]">
+            One Platform
+          </span>
+          <h2 className="mt-2 text-3xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white to-[#a9b7d1] bg-clip-text text-transparent">
+            What BidIntelligenceOS Does
+          </h2>
+          <p className="mt-3 text-[#8A96B0] max-w-xl mx-auto">
+            One operating system, from opportunity to closeout.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {MODULES.map((m) => (
+            <div
+              key={m.title}
+              className="group relative rounded-xl border border-[#1C253B] bg-gradient-to-b from-[#0F1830]/80 to-[#0B1122]/80 p-6 hover:border-[#38BDF8]/40 transition-colors"
+            >
+              <div className="w-11 h-11 rounded-xl bg-[#38BDF8]/10 border border-[#38BDF8]/25 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(56,189,248,0.15)] group-hover:shadow-[0_0_28px_rgba(56,189,248,0.3)] transition-shadow">
+                <m.icon className="w-5 h-5 text-[#38BDF8]" />
+              </div>
+              <h3 className="text-base font-semibold text-white">{m.title}</h3>
+              <p className="mt-2 text-sm text-[#8A96B0] leading-relaxed">{m.body}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-8 flex items-center justify-center gap-2 text-sm text-[#7fe3d8]">
+          <ShieldCheck className="w-4 h-4" />
+          Decision-support intelligence. Human-reviewed execution.
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="max-w-6xl mx-auto px-6 lg:px-8 pb-8 lg:pb-12">
+        <div className="rounded-2xl border border-[#1C253B] bg-gradient-to-br from-[#0F1830] to-[#0B1122] p-8 lg:p-12">
+          <div className="text-center mb-10">
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#38BDF8]">
+              How It Works
+            </span>
+            <h2 className="mt-2 text-2xl lg:text-4xl font-bold text-white tracking-tight">
+              Win the bid. Then run the job better.
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {STEPS.map((s, i) => (
+              <div key={s.step} className="relative">
+                <div className="rounded-xl border border-[#1C253B] bg-[#0B1122]/60 p-6 h-full">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-[#38BDF8]/10 border border-[#38BDF8]/25 flex items-center justify-center">
+                      <s.icon className="w-5 h-5 text-[#38BDF8]" />
+                    </div>
+                    <span className="text-2xl font-bold text-[#1C2A45]">{s.step}</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">{s.title}</h3>
+                  <p className="mt-2 text-sm text-[#8A96B0] leading-relaxed">{s.body}</p>
+                </div>
+                {i < STEPS.length - 1 && (
+                  <ArrowRight className="hidden md:block absolute top-1/2 -right-3 -translate-y-1/2 w-5 h-5 text-[#2A3550]" />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Walkthrough */}
-      <section ref={playerRef} className="relative max-w-5xl mx-auto px-6 lg:px-8 py-12 lg:py-16 scroll-mt-24">
+      <section
+        ref={playerRef}
+        className="relative max-w-5xl mx-auto px-6 lg:px-8 py-12 lg:py-16 scroll-mt-24"
+      >
         <div className="text-center mb-8">
           <span className="text-xs font-semibold uppercase tracking-widest text-[#38BDF8]">
             Product Walkthrough
@@ -132,29 +412,11 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             See how a bid moves from lead to win
           </h2>
           <p className="mt-3 text-[#8A96B0] max-w-xl mx-auto">
-            A narrated, 50-second tour of the workspace — from the Cockpit to a
+            A narrated, 50-second tour of the workspace — from the Command Center to a
             vendor-ready package.
           </p>
         </div>
         <WalkthroughPlayer />
-      </section>
-
-      {/* Features */}
-      <section className="max-w-6xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {FEATURES.map((f) => (
-            <div
-              key={f.title}
-              className="rounded-xl border border-[#1C253B] bg-[#0F1830]/60 p-6 hover:border-[#38BDF8]/30 transition-colors"
-            >
-              <div className="w-10 h-10 rounded-lg bg-[#38BDF8]/10 border border-[#38BDF8]/20 flex items-center justify-center mb-4">
-                <f.icon className="w-5 h-5 text-[#38BDF8]" />
-              </div>
-              <h3 className="text-base font-semibold text-white">{f.title}</h3>
-              <p className="mt-2 text-sm text-[#8A96B0] leading-relaxed">{f.body}</p>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* VoiceConnect add-on */}
@@ -162,11 +424,19 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
 
       {/* Closing CTA */}
       <section className="max-w-6xl mx-auto px-6 lg:px-8 pb-16 pt-16">
-        <div className="relative overflow-hidden rounded-2xl border border-[#38BDF8]/20 bg-gradient-to-br from-[#0F1830] to-[#111A2E] p-10 lg:p-14 text-center">
+        <div className="relative overflow-hidden rounded-2xl border border-[#38BDF8]/25 bg-gradient-to-br from-[#0F1830] to-[#111A2E] p-10 lg:p-14 text-center">
           <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
+          <div
+            className="absolute -top-32 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full opacity-30 blur-2xl"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(56,189,248,0.3) 0%, rgba(56,189,248,0) 60%)",
+            }}
+            aria-hidden="true"
+          />
           <div className="relative">
             <CCACrest className="w-10 h-10 text-[#38BDF8] mx-auto mb-5" />
-            <h2 className="text-3xl lg:text-4xl font-bold text-white tracking-tight">
+            <h2 className="text-3xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white to-[#a9b7d1] bg-clip-text text-transparent">
               Ready to win more bids?
             </h2>
             <p className="mt-3 text-[#cbd5e1] max-w-lg mx-auto">
@@ -174,11 +444,25 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             </p>
             <button
               onClick={onLaunchDemo}
-              className="group mt-7 inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg bg-[#38BDF8] text-[#0A0E1A] font-semibold text-sm hover:bg-[#5cc6fb] transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)]"
+              className="group mt-7 inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
             >
               Launch the Live Demo
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[#6B7794]">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />
+                No setup required
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />
+                Sample data included
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />
+                Human-reviewed output
+              </span>
+            </div>
           </div>
         </div>
       </section>
