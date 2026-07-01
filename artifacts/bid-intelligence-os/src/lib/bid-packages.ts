@@ -336,5 +336,323 @@ export const samplePackages: BidPackageData[] = [
         content: "Upon approval, Northline requires a 30-day onboarding period to catalog assets across all 14 locations before assuming full maintenance responsibilities."
       }
     ]
+  },
+  {
+    id: "pkg-4",
+    name: "GC Tenant Improvement Proposal",
+    contractor: "Meridian Construction Group",
+    recipient: "Lakeside Capital Partners",
+    project: "Suite 1200 Office Tenant Improvement",
+    projectType: "General Contractor — Tenant Improvement",
+    date: "2024-01-18",
+    sections: [
+      {
+        id: "s4-cover",
+        type: "Cover",
+        title: "Proposal Cover",
+        required: true,
+        content: {
+          title: "GC Tenant Improvement Proposal",
+          subtitle: "Prepared for Lakeside Capital Partners · Suite 1200, 400 Market St · Proposal No. TI-2024-0118",
+        }
+      },
+      {
+        id: "s4-exec",
+        type: "Executive Summary",
+        title: "Executive Summary",
+        required: true,
+        content: "Meridian Construction Group is pleased to submit this proposal for the Suite 1200 office tenant improvement. Our team will coordinate all trades to deliver a turnkey 14,500 sq ft build-out on an occupied floor, protecting building operations while holding the critical path to your target occupancy date."
+      },
+      {
+        id: "s4-scope",
+        type: "Scope of Work",
+        title: "Scope of Work",
+        required: true,
+        content: [
+          "Demolition of existing partitions, ceilings, and finishes within the suite.",
+          "New metal-stud framing, drywall, and acoustic ceiling systems per the approved plan set.",
+          "Mechanical, electrical, plumbing, and fire-protection modifications coordinated across trades.",
+          "New flooring, millwork, glazing, and paint finishes throughout.",
+          "Final cleaning, punch list completion, and closeout documentation."
+        ]
+      },
+      {
+        id: "s4-pricing",
+        type: "Pricing Summary",
+        title: "Pricing Summary",
+        required: true,
+        content: {
+          items: [
+            { description: "General Conditions & Supervision", amount: "$62,000" },
+            { description: "Architectural & Finishes", amount: "$318,000" },
+            { description: "MEP & Fire Protection", amount: "$246,000" },
+            { description: "Permits & Fees", amount: "$19,500" }
+          ],
+          total: "$645,500"
+        }
+      },
+      {
+        id: "s4-timeline",
+        type: "Timeline",
+        title: "Timeline",
+        required: true,
+        content: [
+          { phase: "Permitting & Submittals", duration: "3 Weeks" },
+          { phase: "Demolition & Rough-In", duration: "4 Weeks" },
+          { phase: "Finishes & MEP Trim", duration: "5 Weeks" },
+          { phase: "Inspection, Punch & Closeout", duration: "2 Weeks" }
+        ]
+      },
+      {
+        id: "s4-assumptions",
+        type: "Assumptions",
+        title: "Assumptions",
+        content: [
+          "Building will provide freight elevator access during off-peak hours.",
+          "Existing base-building systems have adequate capacity for the new layout.",
+          "Work performed during standard business hours unless noise-sensitive tasks require after-hours."
+        ]
+      },
+      {
+        id: "s4-exclusions",
+        type: "Exclusions",
+        title: "Exclusions",
+        content: [
+          "Furniture, fixtures, and equipment (FF&E) procurement.",
+          "Low-voltage cabling and AV systems by others.",
+          "Hazardous material abatement, if encountered."
+        ]
+      },
+      {
+        id: "s4-qualifications",
+        type: "Qualifications",
+        title: "Qualifications",
+        content: "Meridian Construction Group is fully licensed, bonded, and insured, carrying $10M in general liability with 20+ years of occupied-building tenant improvement experience."
+      },
+      {
+        id: "s4-attachments",
+        type: "Attachments",
+        title: "Attachments",
+        content: ["Certificate of Insurance", "Preliminary Schedule", "Subcontractor List", "Safety & Logistics Plan"]
+      },
+      {
+        id: "s4-next",
+        type: "Next Steps",
+        title: "Next Steps",
+        content: "Upon award, Meridian will submit for permit within five business days and hold a pre-construction coordination meeting with building management and the design team."
+      }
+    ]
+  },
+  {
+    id: "pkg-5",
+    name: "Storm Damage Restoration Proposal",
+    contractor: "Rapid Restore Contractors",
+    recipient: "Harbor Point Property Owners Assn.",
+    project: "Building C Wind & Water Restoration",
+    projectType: "Storm Damage / Restoration",
+    date: "2024-02-05",
+    sections: [
+      {
+        id: "s5-cover",
+        type: "Cover",
+        title: "Proposal Cover",
+        required: true,
+        content: {
+          title: "Storm Damage Restoration Proposal",
+          subtitle: "Prepared for Harbor Point Property Owners Assn. · Building C, 88 Shoreline Dr · Proposal No. SR-2024-0205",
+        }
+      },
+      {
+        id: "s5-overview",
+        type: "Project Overview",
+        title: "Project Overview",
+        required: true,
+        content: "Rapid Restore Contractors provides this proposal for wind and water damage restoration to Building C following the February storm event. Our scope stabilizes the structure, mitigates further loss, and restores affected areas to pre-loss condition, with documentation prepared to support the insurance claim."
+      },
+      {
+        id: "s5-scope",
+        type: "Scope of Work",
+        title: "Scope of Work",
+        required: true,
+        content: [
+          "Emergency board-up, temporary roofing, and water extraction to stop ongoing damage.",
+          "Controlled demolition and removal of unsalvageable materials.",
+          "Structural drying, dehumidification, and antimicrobial treatment.",
+          "Reconstruction of affected roofing, exterior envelope, and interior finishes.",
+          "Photo, moisture-log, and scope documentation prepared for adjuster review."
+        ]
+      },
+      {
+        id: "s5-pricing",
+        type: "Pricing Summary",
+        title: "Pricing Summary",
+        required: true,
+        content: {
+          items: [
+            { description: "Emergency Mitigation & Stabilization", amount: "$48,000" },
+            { description: "Demolition & Drying", amount: "$37,500" },
+            { description: "Reconstruction & Finishes", amount: "$214,000" },
+            { description: "Documentation & Project Management", amount: "$16,000" }
+          ],
+          total: "$315,500"
+        }
+      },
+      {
+        id: "s5-timeline",
+        type: "Timeline",
+        title: "Timeline",
+        required: true,
+        content: [
+          { phase: "Emergency Response & Mitigation", duration: "Days 1–3" },
+          { phase: "Demolition & Structural Drying", duration: "Week 1–2" },
+          { phase: "Reconstruction", duration: "Weeks 3–7" },
+          { phase: "Final Inspection & Closeout", duration: "Week 8" }
+        ]
+      },
+      {
+        id: "s5-assumptions",
+        type: "Assumptions",
+        title: "Assumptions",
+        content: [
+          "Scope may be adjusted by supplement upon discovery of concealed damage, documented for adjuster approval.",
+          "Utilities are available or can be safely restored to affected areas.",
+          "Owner will provide timely access to all affected units."
+        ]
+      },
+      {
+        id: "s5-exclusions",
+        type: "Exclusions",
+        title: "Exclusions",
+        content: [
+          "Contents cleaning and personal property restoration (quoted separately).",
+          "Code upgrades not related to the loss, unless required by inspection.",
+          "Landscaping and site work beyond the immediate building envelope."
+        ]
+      },
+      {
+        id: "s5-qualifications",
+        type: "Qualifications",
+        title: "Qualifications",
+        content: "Rapid Restore Contractors is licensed, bonded, and insured, with IICRC-certified technicians and experience coordinating directly with carriers and adjusters on documented claims."
+      },
+      {
+        id: "s5-attachments",
+        type: "Attachments",
+        title: "Attachments",
+        content: ["Certificate of Insurance", "Moisture & Photo Log", "Mitigation Report", "Scope Documentation Packet"]
+      },
+      {
+        id: "s5-next",
+        type: "Next Steps",
+        title: "Next Steps",
+        content: "Upon authorization, Rapid Restore will mobilize emergency crews within 24 hours and coordinate the documentation packet with your adjuster before reconstruction begins."
+      }
+    ]
+  },
+  {
+    id: "pkg-6",
+    name: "General Engineering Sitework Proposal",
+    contractor: "Granite Civil Works",
+    recipient: "Northgate Development LLC",
+    project: "Northgate Commerce Park Sitework",
+    projectType: "General Engineering — Sitework",
+    date: "2024-02-22",
+    sections: [
+      {
+        id: "s6-cover",
+        type: "Cover",
+        title: "Proposal Cover",
+        required: true,
+        content: {
+          title: "General Engineering Sitework Proposal",
+          subtitle: "Prepared for Northgate Development LLC · Northgate Commerce Park, Parcel 4 · Proposal No. GE-2024-0222",
+        }
+      },
+      {
+        id: "s6-overview",
+        type: "Project Overview",
+        title: "Project Overview",
+        required: true,
+        content: "Granite Civil Works submits this proposal for the mass grading and underground sitework at Northgate Commerce Park, Parcel 4. Our approach sequences earthwork, utilities, and paving around permit milestones and weather windows to protect the overall development schedule."
+      },
+      {
+        id: "s6-scope",
+        type: "Scope of Work",
+        title: "Scope of Work",
+        required: true,
+        content: [
+          "Clearing, grubbing, and erosion control installation per the approved SWPPP.",
+          "Mass excavation and grading to design subgrade, including export of surplus material.",
+          "Underground wet and dry utilities: storm, sanitary, water, and conduit.",
+          "Aggregate base placement and preparation for building pads and drive aisles.",
+          "Asphalt paving, curb and gutter, and site concrete flatwork."
+        ]
+      },
+      {
+        id: "s6-pricing",
+        type: "Pricing Summary",
+        title: "Pricing Summary",
+        required: true,
+        content: {
+          items: [
+            { description: "Clearing, Erosion Control & Mobilization", amount: "$88,000" },
+            { description: "Earthwork & Grading", amount: "$472,000" },
+            { description: "Underground Utilities", amount: "$356,000" },
+            { description: "Paving & Site Concrete", amount: "$298,000" }
+          ],
+          total: "$1,214,000"
+        }
+      },
+      {
+        id: "s6-timeline",
+        type: "Timeline",
+        title: "Timeline",
+        required: true,
+        content: [
+          { phase: "Permits, SWPPP & Mobilization", duration: "3 Weeks" },
+          { phase: "Earthwork & Grading", duration: "6 Weeks" },
+          { phase: "Underground Utilities", duration: "5 Weeks" },
+          { phase: "Paving, Concrete & Punch", duration: "4 Weeks" }
+        ]
+      },
+      {
+        id: "s6-assumptions",
+        type: "Assumptions",
+        title: "Assumptions",
+        content: [
+          "Geotechnical report is accurate and subgrade soils are suitable for compaction.",
+          "Permits and utility approvals are issued on the anticipated schedule.",
+          "Weather-sensitive earthwork proceeds during workable soil-moisture windows."
+        ]
+      },
+      {
+        id: "s6-exclusions",
+        type: "Exclusions",
+        title: "Exclusions",
+        content: [
+          "Rock excavation or removal of unsuitable soils beyond quantities shown.",
+          "Dewatering beyond incidental surface water control.",
+          "Landscaping, irrigation, and building foundations by others."
+        ]
+      },
+      {
+        id: "s6-qualifications",
+        type: "Qualifications",
+        title: "Qualifications",
+        content: "Granite Civil Works holds a Class A general engineering license, is fully bonded and insured, and self-performs earthwork and underground utilities with an experienced field workforce."
+      },
+      {
+        id: "s6-attachments",
+        type: "Attachments",
+        title: "Attachments",
+        content: ["Certificate of Insurance", "SWPPP & Erosion Control Plan", "Preliminary Schedule", "Equipment & Crew Plan"]
+      },
+      {
+        id: "s6-next",
+        type: "Next Steps",
+        title: "Next Steps",
+        content: "Upon award, Granite Civil Works will finalize permits and the SWPPP, then mobilize erosion control and survey crews to establish site control ahead of earthwork."
+      }
+    ]
   }
 ];

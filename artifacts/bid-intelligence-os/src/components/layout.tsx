@@ -25,6 +25,8 @@ import {
   ChevronDown,
   Check,
   ExternalLink,
+  Factory,
+  Crosshair,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
@@ -53,7 +55,7 @@ const ECOSYSTEM_LINKS = [
   },
 ];
 
-type NavItem = { href: string; label: string; icon: typeof LayoutDashboard };
+type NavItem = { href: string; label: string; icon: typeof LayoutDashboard; badge?: string };
 type NavGroup = { title: string; items: NavItem[] };
 
 const navGroups: NavGroup[] = [
@@ -88,7 +90,9 @@ const navGroups: NavGroup[] = [
     title: "Intelligence",
     items: [
       { href: "/voice-connect", label: "VoiceConnect", icon: AudioLines },
+      { href: "/industry-use-cases", label: "Industry Use Cases", icon: Factory },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
+      { href: "/competitor-watch", label: "CompetitorWatchOS", icon: Crosshair, badge: "Soon" },
     ],
   },
   {
@@ -202,6 +206,11 @@ export function Layout({ children }: { children: ReactNode }) {
                         }`}
                       />
                       <span className="text-[13px] font-medium tracking-wide">{item.label}</span>
+                      {item.badge && (
+                        <span className="ml-auto text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-[#A855F7]/15 text-[#c084fc] border border-[#A855F7]/30">
+                          {item.badge}
+                        </span>
+                      )}
                     </div>
                   </Link>
                 );

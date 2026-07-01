@@ -1,0 +1,637 @@
+You are doing a full deep-dive audit, upgrade, and expansion of the existing BidIntelligenceOS app.
+
+This is not a small UI pass. You must inspect the entire app, identify every place that still looks outdated, incomplete, generic, inconsistent, or missing the expanded functionality, then upgrade the full product experience.
+
+PRODUCT
+BidIntelligenceOS
+
+TAGLINE
+Research Less, Win More
+
+BRAND DIRECTION
+Use the latest premium BidIntelligenceOS / CCA branding already provided in the project assets. The design should feel Fortune 500, enterprise-grade, premium, modern, trustworthy, and contractor-focused.
+
+The app should support:
+- Bidding
+- Bid package generation
+- VoiceConnect integration
+- Job deployment after bid win
+- Scheduling
+- Permits
+- Weather Watch
+- Labor and subs
+- Cost and ROI
+- Daily intelligent briefings
+- Industry-specific use cases
+- Coming soon add-on: CompetitorWatchOS
+
+IMPORTANT PRODUCT RELATIONSHIP
+VoiceConnect integrates with BidIntelligenceOS. VoiceConnect is not the client and not the main product. It is a field-capture/input layer that syncs site walkthrough notes, voice notes, field photos, risks, questions, and daily updates into BidIntelligenceOS.
+
+BidIntelligenceOS is the main platform.
+
+NON-NEGOTIABLE RULES
+- Do not expose internal CCA pricing formulas.
+- Do not show internal margin logic, COGS, bid confidence, competitor notes, or AI strategy inside client-facing bid packages.
+- Do not promise guaranteed bid wins.
+- Do not make competitor intelligence look like illegal spying or private data access.
+- Competitor information must be framed as lawful, public, contractor-provided, historical, or market-observed data only.
+- All AI output must be reviewable before client-facing export.
+- The app must feel like an operating system, not a simple bid form.
+
+PHASE 1 — DEEP DIVE AUDIT FIRST
+Before making changes, inspect the full project.
+
+Audit:
+- All pages
+- All components
+- All navigation
+- Dashboard / Command Center
+- Marketing page
+- Bid package builder
+- Bid intelligence pages
+- Job deployment pages
+- Scheduling pages
+- Weather pages
+- Permit pages
+- Cost and ROI pages
+- VoiceConnect areas
+- Responsive/mobile behavior
+- Reused components
+- Empty states
+- Placeholder copy
+- Inconsistent colors
+- Inconsistent logos
+- Broken buttons
+- Missing seeded data
+- Any page that still looks generic, unfinished, or disconnected from the upgraded product direction
+
+Create an internal audit checklist in the code comments or a markdown file named:
+BIDINTELLIGENCEOS_AUDIT_REPORT.md
+
+The audit report should include:
+- What was reviewed
+- What was outdated or missing
+- What was upgraded
+- What still needs backend/API work later
+- What is prototype-only
+- Verification checklist
+
+Then proceed with the upgrades. Do not stop after the audit.
+
+PHASE 2 — UPGRADE THE MARKETING PAGE
+Upgrade the marketing/front page so it clearly sells the expanded product.
+
+The marketing page must include:
+
+1. Hero Section
+Headline:
+“Win Smarter Bids. Run Smarter Work.”
+
+Supporting copy:
+“BidIntelligenceOS helps contractors and service businesses analyze opportunities, build stronger bids, deploy won jobs, manage labor and subs, track permits, monitor weather, control costs, and improve ROI from bid to closeout.”
+
+CTAs:
+- Request Demo
+- View Platform
+- See Industry Use Cases
+
+Visuals:
+- Premium dashboard mockup
+- Client-facing bid package examples
+- Job deployment / scheduling preview
+- VoiceConnect integration callout
+- CompetitorWatchOS coming soon card
+
+2. Expanded Product Capabilities
+Add sections/cards for:
+- Bid Intelligence
+- Bid Package Builder
+- VoiceConnect Field Capture
+- Won Job Deployment
+- Smart Scheduling
+- Weather Watch
+- Permit Tracking
+- Labor & Subcontractor Management
+- Cost & ROI Tracking
+- Daily Intelligent Briefings
+- Industry Intelligence
+- CompetitorWatchOS Coming Soon
+
+3. Industry Use Cases
+Create a strong industry section with specific tabs or cards for:
+
+Roofing
+Pain points:
+- Fast site walks after storm events
+- Accurate roof scope capture
+- Weather delays
+- Insurance documentation
+- Material price volatility
+- Crew scheduling
+- Warranty and permit tracking
+
+Features:
+- Storm damage bid workflow
+- Roof measurement and site photo checklist
+- Weather risk monitoring
+- Rain-out rescheduling
+- Insurance-ready documentation
+- Material and labor variance tracking
+
+Storm Damage / Restoration
+Pain points:
+- Emergency response speed
+- Claim documentation
+- Adjuster communication
+- Photos and voice notes
+- Scope supplements
+- Change orders
+- Job cost leakage
+
+Features:
+- VoiceConnect claim/site capture
+- Photo and note tagging
+- Supplement opportunity detection
+- Client/adjuster update generator
+- Emergency scheduling
+- Cost-to-completion tracking
+
+General Contractor
+Pain points:
+- Managing multiple trades
+- Scope gaps
+- Bid leveling
+- Subcontractor delays
+- Change orders
+- Permit dependencies
+- Timeline slippage
+
+Features:
+- Sub bid comparison
+- Trade scope gap detection
+- Subcontractor scorecards
+- Critical path scheduling
+- Permit dependency map
+- Change order detection
+- Daily executive project briefing
+
+HVAC
+Pain points:
+- Equipment lead times
+- Rooftop unit access
+- Controls scope
+- Mechanical/electrical coordination
+- Permit and inspection dates
+- Startup and commissioning
+
+Features:
+- Equipment lead-time alerts
+- Controls and electrical scope checklist
+- Rooftop access notes
+- Commissioning checklist
+- Warranty/submittal tracking
+- Cost variance monitoring
+
+General Engineering
+Pain points:
+- Site conditions
+- Equipment deployment
+- Civil scope complexity
+- Permit sequencing
+- Subcontractor coordination
+- Weather impacts
+
+Features:
+- Field condition capture
+- Equipment and crew deployment planning
+- Permit sequencing
+- Weather-sensitive scheduling
+- Civil scope risk flags
+- Daily progress reporting
+
+Electrical
+Pain points:
+- Panel schedules
+- Utility coordination
+- Long-lead gear
+- Inspection timing
+- Low-voltage exclusions
+- Change order exposure
+
+Features:
+- Long-lead item tracking
+- Permit and inspection tracker
+- Utility coordination checklist
+- Scope clarification prompts
+- Change order detection
+- Closeout documentation
+
+Plumbing
+Pain points:
+- Underground conflicts
+- Inspection dependencies
+- Fixture counts
+- Material changes
+- Coordination with GC and other trades
+
+Features:
+- Inspection dependency tracker
+- Material quantity checklist
+- Site conflict notes
+- VoiceConnect walkthrough capture
+- Labor and sub tracking
+- Cost-to-completion monitoring
+
+Facility Maintenance
+Pain points:
+- Multi-location work
+- Service response times
+- Recurring maintenance
+- Documentation consistency
+- Vendor/client reporting
+
+Features:
+- Multi-location service matrix
+- SLA/response tracking
+- Recurring work schedules
+- Client update generator
+- Cost by location
+- Performance dashboards
+
+Insurance / Restoration
+Pain points:
+- Claim scope documentation
+- Adjuster revisions
+- Supplement requests
+- Photos and notes
+- Time-sensitive approvals
+
+Features:
+- Claim package builder
+- Photo/voice note organization
+- Supplement detector
+- Adjuster communication drafts
+- Restoration timeline
+- Job profitability tracking
+
+4. Pain Point Section
+Add a section titled:
+“Built for the Hardest Part of Bidding: The Gap Between Walkthrough and Bid Submission.”
+
+Include these pain points:
+- Site walkthrough notes get lost
+- Photos are not tied to scope
+- Missing information delays pricing
+- Subs respond late or inconsistently
+- Material prices move
+- Weather changes the plan
+- Permit requirements are missed
+- Competitor pricing is unclear
+- Follow-ups are forgotten
+- Winning the bid does not automatically create a job plan
+
+Then show how BidIntelligenceOS solves each.
+
+5. CompetitorWatchOS Coming Soon
+Add a premium add-on card/section:
+“CompetitorWatchOS”
+Badge: Coming Soon
+
+Description:
+“An upcoming intelligence add-on designed to help contractors understand lawful market signals, bid patterns, public award history, pricing pressure, and competitor trends so they can position smarter without exposing internal strategy.”
+
+Show features as coming soon:
+- Public award history tracking
+- Market bid pattern monitoring
+- Competitor presence by region/trade
+- Pricing pressure indicators
+- Win/loss pattern insights
+- Public project intelligence
+- Contractor-provided competitor notes
+- Ethical competitor intelligence guardrails
+
+Include disclaimer:
+“CompetitorWatchOS uses lawful, public, historical, and contractor-provided data only. It does not access private competitor systems or confidential information.”
+
+PHASE 3 — UPGRADE THE COMMAND CENTER
+The Command Center must reflect the full expanded platform, not just bidding.
+
+Main dashboard should include:
+- Active Bids
+- Bids Due Soon
+- Follow-Ups Due
+- Bid Value Pipeline
+- Won Jobs
+- Jobs in Progress
+- Jobs at Risk
+- Weather Alerts
+- Permit Blockers
+- Labor Conflicts
+- Subcontractor Delays
+- Cost Variance
+- Projected ROI
+- Daily Briefing
+- VoiceConnect Activity
+- CompetitorWatchOS Coming Soon
+
+Add clear navigation:
+- Command Center
+- Bid Intelligence
+- Bid Packages
+- VoiceConnect
+- Won Jobs
+- Job Deployment
+- Scheduling
+- Labor & Subs
+- Permits & Documents
+- Weather Watch
+- Cost & ROI
+- Daily Briefings
+- Industry Use Cases
+- Analytics
+- CompetitorWatchOS
+- Settings
+
+Command Center daily briefing should include:
+- What bids need action today
+- What jobs are at risk
+- What permits are blocking work
+- What weather may impact field work
+- What labor/sub conflicts exist
+- What costs are trending above budget
+- What client/vendor follow-ups are due
+- What VoiceConnect captures need review
+- What AI recommends the user review first
+
+Sample briefing:
+“Good morning. You have 4 bid follow-ups due, 2 jobs with weather risk, 1 permit blocker, 3 subcontractor updates pending, and 1 project trending 7% above labor budget. Review the HVAC retrofit bid before noon and confirm the roofing crew schedule before Thursday’s rain window.”
+
+PHASE 4 — ADD AI / AUTOMATION FEATURES
+Add visible AI/automation features throughout the app.
+
+Include:
+
+1. Walkthrough-to-Bid AI
+Converts VoiceConnect site notes, photos, risks, and questions into:
+- Scope draft
+- Missing information list
+- Risk flags
+- Bid readiness score
+- Clarification questions
+- Bid package outline
+
+2. Market Price Intelligence
+Prototype with seeded data:
+- Material price movement
+- Labor rate assumptions
+- Regional pricing pressure
+- Lead-time warnings
+- Volatility flags
+- Market benchmark range
+
+Use copy:
+“Market data shown is for decision-support only and should be verified before submission.”
+
+3. Sub Quote Tracker
+Track:
+- Subs invited
+- Quotes received
+- Missing quotes
+- Quote expiration
+- Scope exclusions
+- Price variance
+- Reliability score
+
+4. Bid Leveling Assistant
+For GC use cases:
+- Compare subcontractor bids
+- Highlight missing inclusions
+- Flag exclusions
+- Detect unusual price spread
+- Recommend clarification questions
+
+5. Scope Gap Detector
+Find:
+- Missing spec sections
+- Unanswered RFI items
+- Permit issues
+- Long-lead materials
+- Weather-sensitive work
+- Exclusions that should be disclosed
+
+6. Change Order Detector
+For won jobs:
+- Flags field notes that may indicate scope creep
+- Suggests change order language
+- Links photo/voice proof
+- Marks client approval status
+
+7. Profit Fade Alerts
+Warns when:
+- Labor burn rate is high
+- Subs exceed budget
+- Materials exceed estimate
+- Weather delays affect labor cost
+- Change orders are not captured
+- ROI is drifting down
+
+8. Follow-Up Intelligence
+Suggests:
+- When to follow up
+- Who to contact
+- What to say
+- What bid risk to address
+- Whether to send clarification, revised pricing, or value-add note
+
+9. Client Update Generator
+Creates:
+- Bid follow-up emails
+- Project status reports
+- Weather delay notices
+- Permit delay updates
+- Change order notices
+- Completion summaries
+
+10. Win/Loss Learning Loop
+After outcome:
+- Captures reason won/lost
+- Compares estimated vs actual cost
+- Learns by industry, project type, client, region, and trade
+- Improves future recommendations
+
+PHASE 5 — ADD INDUSTRY-SPECIFIC COMMAND CENTER MODES
+Add an industry selector in both marketing and app/Command Center.
+
+Industry options:
+- Roofing
+- Storm Damage / Restoration
+- General Contractor
+- HVAC
+- General Engineering
+- Electrical
+- Plumbing
+- Facility Maintenance
+- Insurance / Restoration
+- Custom Business Type
+
+When selected, update labels, sample data, workflow cards, and pain points.
+
+Examples:
+
+Roofing dashboard should show:
+- Weather-sensitive jobs
+- Rain-out risks
+- Roof access notes
+- Material delivery
+- Warranty docs
+- Insurance documentation
+- Crew schedule
+- Permit/inspection status
+
+Storm Damage dashboard should show:
+- Claim documentation
+- Photo packets
+- Adjuster notes
+- Emergency response schedule
+- Supplement opportunities
+- Client approval status
+
+GC dashboard should show:
+- Subcontractor bid status
+- Trade coordination
+- Critical path
+- Permit blockers
+- Sub delays
+- Change order exposure
+
+HVAC dashboard should show:
+- Equipment lead times
+- Controls scope
+- Crane/roof access
+- Startup/commissioning
+- Inspection and warranty docs
+
+General Engineering dashboard should show:
+- Site condition flags
+- Equipment allocation
+- Crew deployment
+- Permit sequencing
+- Weather-sensitive earthwork
+- Civil scope risk
+
+PHASE 6 — COMPETITORWATCHOS ADD-ON
+Add a new nav item and page:
+CompetitorWatchOS
+
+Status:
+Coming Soon
+
+It should look like a premium locked/coming-soon add-on, not an empty page.
+
+Page sections:
+- Overview
+- Why it matters
+- Coming soon features
+- Data guardrails
+- Join waitlist / Request early access
+
+Copy:
+“CompetitorWatchOS is a planned intelligence add-on for BidIntelligenceOS that will help contractors understand lawful competitor and market signals, including public award history, regional bid activity, competitor presence, pricing pressure indicators, and contractor-provided win/loss notes.”
+
+Features:
+- Public bid award tracking
+- Competitor presence mapping
+- Market activity by trade and region
+- Pricing pressure signals
+- Contractor-provided competitor notes
+- Win/loss comparison
+- Bid positioning suggestions
+- Ethical intelligence guardrails
+
+Guardrail:
+“Uses lawful, public, historical, and contractor-provided data only. Does not access private competitor systems, confidential data, or non-public bid information.”
+
+Add CompetitorWatchOS small cards in:
+- Marketing page
+- Command Center
+- Bid Intelligence screen
+- Settings/Add-ons screen
+
+PHASE 7 — CLIENT-FACING BID PACKAGE RULES
+Upgrade bid package examples so they are client-facing and polished.
+
+Bid examples should include:
+- Roofing replacement
+- HVAC retrofit
+- GC tenant improvement
+- Storm damage restoration
+- General engineering sitework
+
+Each bid package should include:
+- Contractor logo/name
+- Prepared-for client
+- Project location
+- Proposal date
+- Proposal number
+- Executive summary
+- Scope
+- Pricing
+- Timeline
+- Assumptions
+- Exclusions
+- Qualifications
+- Attachments
+- Next steps
+
+Do not show:
+- Internal AI score
+- Internal strategy
+- Win probability
+- Competitor intelligence
+- Margin logic
+- COGS
+- Internal pricing formulas
+- Private notes
+
+Show optional attribution:
+“Generated with CCA BidIntelligenceOS”
+“VoiceConnect field capture synced into BidIntelligenceOS”
+
+PHASE 8 — RUN VERIFICATION
+After implementation, run the app and verify every main screen.
+
+Check:
+- Marketing page includes expanded functionality
+- Command Center includes expanded functionality
+- Industry use cases exist
+- VoiceConnect is correctly shown as an integration
+- CompetitorWatchOS Coming Soon exists
+- Client-facing bid examples are clean
+- No internal details appear in client-facing proposal outputs
+- No broken buttons
+- No empty screens
+- No lorem ipsum
+- No inconsistent old branding
+- No duplicated/conflicting navigation
+- Mobile and desktop layouts work
+
+Run available checks:
+- npm install if needed
+- npm run build
+- npm run lint if available
+- npm run typecheck if available
+- npm test if available
+
+Fix any issues found.
+
+FINAL OUTPUT REQUIRED
+When finished, provide a summary including:
+1. Audit completed
+2. Pages upgraded
+3. New functionality added
+4. Industry use cases added
+5. CompetitorWatchOS added
+6. VoiceConnect integration corrected
+7. Build/test status
+8. Any remaining backend/API recommendations

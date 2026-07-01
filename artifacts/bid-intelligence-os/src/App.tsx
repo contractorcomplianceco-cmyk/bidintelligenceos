@@ -23,7 +23,9 @@ import Permits from "@/pages/permits";
 import Weather from "@/pages/weather";
 import CostRoi from "@/pages/cost-roi";
 import VoiceConnect from "@/pages/voice-connect";
+import IndustryUseCases from "@/pages/industry-use-cases";
 import Analytics from "@/pages/analytics";
+import CompetitorWatch from "@/pages/competitor-watch";
 import BusinessProfile from "@/pages/business-profile";
 import Settings from "@/pages/settings";
 
@@ -69,7 +71,9 @@ function Router() {
 
       {/* Intelligence */}
       <Route path="/voice-connect" component={VoiceConnect} />
+      <Route path="/industry-use-cases" component={IndustryUseCases} />
       <Route path="/analytics" component={Analytics} />
+      <Route path="/competitor-watch" component={CompetitorWatch} />
 
       {/* Account */}
       <Route path="/business-profile" component={BusinessProfile} />

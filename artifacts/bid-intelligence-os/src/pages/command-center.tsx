@@ -57,6 +57,7 @@ import {
   PhoneCall,
   ExternalLink,
   ClipboardCheck,
+  Crosshair,
 } from "lucide-react";
 
 const severityColor: Record<AlertSeverity, string> = {
@@ -677,6 +678,41 @@ export default function CommandCenter() {
                 Open ComplianceConnect <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* CompetitorWatchOS coming-soon add-on card */}
+        <Card className="bg-gradient-to-br from-[#0F1830] to-[#141033] border-[#2A2350] relative overflow-hidden">
+          <div className="absolute -top-8 -left-8 w-40 h-40 rounded-full bg-[#A855F7]/10 blur-3xl pointer-events-none" />
+          <CardContent className="p-5 relative z-10 flex flex-col lg:flex-row lg:items-center gap-5">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-[#A855F7]/15 flex-shrink-0">
+                <Crosshair className="w-6 h-6 text-[#c084fc]" />
+              </span>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#c084fc]">
+                    CompetitorWatchOS
+                  </span>
+                  <span className="text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-[#A855F7]/15 text-[#c084fc] border border-[#A855F7]/30">
+                    Coming Soon
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white">
+                  Understand lawful market signals before you commit bid resources
+                </h3>
+                <p className="text-[11px] text-[#8A96B0] mt-1 max-w-xl leading-snug">
+                  Public award history, regional bid activity, competitor presence, and pricing
+                  pressure — lawful, public, and contractor-provided data only.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/competitor-watch"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#A855F7]/20 hover:bg-[#A855F7]/30 border border-[#A855F7]/40 text-[#e9d5ff] text-xs font-semibold transition-colors whitespace-nowrap flex-shrink-0"
+            >
+              Preview add-on <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
           </CardContent>
         </Card>
 

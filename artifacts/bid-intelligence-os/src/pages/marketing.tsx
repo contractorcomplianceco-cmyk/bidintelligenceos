@@ -18,12 +18,61 @@ import {
   GitBranch,
   TrendingUp,
   CheckCircle2,
+  Droplets,
+  Wrench,
+  SlidersHorizontal,
+  Ruler,
+  Eye,
+  Lock,
+  Sparkles,
+  Radar,
+  AlertTriangle,
+  type LucideIcon,
 } from "lucide-react";
 import { CCACrest } from "@/components/cca-crest";
 import { WalkthroughPlayer } from "@/components/walkthrough/walkthrough-player";
 import { VoiceConnectMarketingSection } from "@/components/voice-connect/marketing-section";
+import { INDUSTRY_USE_CASES, type IndustryIconKey } from "@/lib/industry-use-cases";
+import { COMPETITORWATCH } from "@/lib/competitorwatch";
+import { AI_FEATURES } from "@/lib/ai-features";
 import heroImage from "@/assets/hero-construction.jpg";
 import logoLockup from "@/assets/bidintelligence-logo.png";
+
+const INDUSTRY_ICONS: Record<IndustryIconKey, LucideIcon> = {
+  roofing: Home,
+  storm: CloudLightning,
+  gc: Building2,
+  hvac: Wind,
+  engineering: Ruler,
+  electrical: Zap,
+  plumbing: Droplets,
+  facility: Wrench,
+  insurance: ShieldCheck,
+  custom: SlidersHorizontal,
+};
+
+const PAIN_POINTS = [
+  {
+    icon: Mic,
+    title: "The gap between walkthrough and bid submission",
+    body: "Site notes, photos, and risks live in your head or a phone. BidIntelligenceOS turns the walkthrough into a bid-ready draft — nothing gets lost between the field and the proposal.",
+  },
+  {
+    icon: Search,
+    title: "Scope gaps become change orders",
+    body: "Missing spec sections, unanswered RFIs, and undisclosed exclusions surface after you've won. We flag them before they cost you margin.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Guessing at pricing and win probability",
+    body: "Confidence scoring, market signals, and win/loss learning replace gut-feel with decision-support you can defend.",
+  },
+  {
+    icon: AlertTriangle,
+    title: "Margin fades after the award",
+    body: "Labor burn, sub overages, weather delays, and uncaptured change orders quietly erode profit. Profit-fade alerts catch the drift early.",
+  },
+];
 
 const INDUSTRIES = [
   { icon: Building2, label: "GC" },
@@ -166,11 +215,14 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             <a href="#platform" className="hover:text-white transition-colors">
               Platform
             </a>
-            <a href="#industries" className="hover:text-white transition-colors">
-              Industries
+            <a href="#use-cases" className="hover:text-white transition-colors">
+              Use Cases
             </a>
             <a href="#voiceconnect" className="hover:text-[#5eead4] transition-colors text-[#7fe3d8]">
               VoiceConnect
+            </a>
+            <a href="#competitorwatch" className="hover:text-white transition-colors">
+              CompetitorWatch
             </a>
             <button onClick={scrollToPlayer} className="hover:text-white transition-colors">
               Walkthrough
@@ -259,6 +311,13 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
               <PlayCircle className="w-4 h-4" />
               Watch the walkthrough
             </button>
+            <a
+              href="#use-cases"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-white/15 bg-white/5 text-white font-semibold text-sm hover:bg-white/10 transition-colors backdrop-blur-sm"
+            >
+              See Industry Use Cases
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
 
           {/* Cockpit preview mockup */}
@@ -411,6 +470,219 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pain points */}
+      <section className="max-w-6xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
+        <div className="text-center mb-10">
+          <span className="text-xs font-semibold uppercase tracking-widest text-[#38BDF8]">
+            The Problem
+          </span>
+          <h2 className="mt-2 text-3xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white to-[#a9b7d1] bg-clip-text text-transparent">
+            Where bids leak time and margin
+          </h2>
+          <p className="mt-3 text-[#8A96B0] max-w-2xl mx-auto">
+            The costliest gap in contracting is the one between the walkthrough and the
+            submitted bid. BidIntelligenceOS closes it — and the ones that follow.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 gap-5">
+          {PAIN_POINTS.map((p) => (
+            <div
+              key={p.title}
+              className="flex gap-4 rounded-xl border border-[#1C253B] bg-gradient-to-b from-[#0F1830]/80 to-[#0B1122]/80 p-6"
+            >
+              <div className="shrink-0 w-11 h-11 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/25 flex items-center justify-center">
+                <p.icon className="w-5 h-5 text-[#F59E0B]" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-white">{p.title}</h3>
+                <p className="mt-2 text-sm text-[#8A96B0] leading-relaxed">{p.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Industry use cases */}
+      <section
+        id="use-cases"
+        className="border-y border-white/5 bg-[#080B14] scroll-mt-24"
+      >
+        <div className="max-w-6xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
+          <div className="text-center mb-10">
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#38BDF8]">
+              Built For Your Trade
+            </span>
+            <h2 className="mt-2 text-3xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white to-[#a9b7d1] bg-clip-text text-transparent">
+              Industry Use Cases
+            </h2>
+            <p className="mt-3 text-[#8A96B0] max-w-2xl mx-auto">
+              One operating system, tuned to how each trade actually bids and builds.
+              Select a business type and the workflow, checklists, and dashboard adapt.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {INDUSTRY_USE_CASES.map((ind) => {
+              const Icon = INDUSTRY_ICONS[ind.icon];
+              return (
+                <div
+                  key={ind.id}
+                  className="group rounded-xl border border-[#1C253B] bg-gradient-to-b from-[#0F1830]/80 to-[#0B1122]/80 p-6 hover:border-[#38BDF8]/40 transition-colors"
+                >
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-11 h-11 rounded-xl bg-[#38BDF8]/10 border border-[#38BDF8]/25 flex items-center justify-center shadow-[0_0_20px_rgba(56,189,248,0.15)] group-hover:shadow-[0_0_28px_rgba(56,189,248,0.3)] transition-shadow">
+                      <Icon className="w-5 h-5 text-[#38BDF8]" />
+                    </div>
+                    <h3 className="text-base font-semibold text-white">{ind.name}</h3>
+                  </div>
+                  <p className="text-sm text-[#8A96B0] leading-relaxed">{ind.tagline}</p>
+                  <ul className="mt-4 space-y-1.5">
+                    {ind.features.slice(0, 3).map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-xs text-[#94a3b8]">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E] mt-0.5 shrink-0" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              onClick={onLaunchDemo}
+              className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
+            >
+              View the Platform
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </button>
+            <button
+              onClick={onLaunchDemo}
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-white/15 bg-white/5 text-white font-semibold text-sm hover:bg-white/10 transition-colors backdrop-blur-sm"
+            >
+              Request a Demo
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* AI & automation capabilities */}
+      <section className="max-w-6xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
+        <div className="text-center mb-10">
+          <span className="text-xs font-semibold uppercase tracking-widest text-[#38BDF8]">
+            Intelligence, End To End
+          </span>
+          <h2 className="mt-2 text-3xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white to-[#a9b7d1] bg-clip-text text-transparent">
+            AI-assisted from lead to closeout
+          </h2>
+          <p className="mt-3 text-[#8A96B0] max-w-2xl mx-auto">
+            Decision-support intelligence at every stage — every output is human-reviewed
+            before it reaches a client.
+          </p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {AI_FEATURES.map((f) => (
+            <div
+              key={f.id}
+              className="rounded-xl border border-[#1C253B] bg-gradient-to-b from-[#0F1830]/80 to-[#0B1122]/80 p-6 hover:border-[#38BDF8]/40 transition-colors"
+            >
+              <div className="flex items-center gap-2.5 mb-3">
+                <Sparkles className="w-4 h-4 text-[#7dd3fc]" />
+                <h3 className="text-sm font-semibold text-white">{f.name}</h3>
+              </div>
+              <p className="text-sm text-[#8A96B0] leading-relaxed">{f.summary}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* VoiceConnect as integration framing */}
+        <div className="mt-8 rounded-2xl border border-[#5eead4]/20 bg-gradient-to-br from-[#0F1830] to-[#0B1F1C] p-8 lg:p-10">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+            <div className="shrink-0 w-14 h-14 rounded-2xl bg-[#5eead4]/10 border border-[#5eead4]/30 flex items-center justify-center shadow-[0_0_28px_rgba(94,234,212,0.25)]">
+              <Mic className="w-6 h-6 text-[#5eead4]" />
+            </div>
+            <div className="flex-1">
+              <span className="text-xs font-semibold uppercase tracking-widest text-[#5eead4]">
+                VoiceConnect — Integrated, Not Bolted On
+              </span>
+              <h3 className="mt-1.5 text-xl lg:text-2xl font-bold text-white tracking-tight">
+                Your field voice layer, wired into every module
+              </h3>
+              <p className="mt-2 text-sm text-[#a9b7d1] leading-relaxed max-w-2xl">
+                VoiceConnect isn't a standalone app — it's the hands-free capture layer that
+                feeds the whole platform. Walkthrough notes flow into bid drafts, field
+                observations into change orders, and site updates into client
+                communications. Ask, listen, act — and the intelligence follows the work.
+              </p>
+            </div>
+            <a
+              href="#voiceconnect"
+              className="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-[#5eead4]/30 bg-[#5eead4]/10 text-[#7fe3d8] font-semibold text-sm hover:bg-[#5eead4]/20 transition-colors"
+            >
+              Explore VoiceConnect
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* CompetitorWatchOS — coming soon */}
+      <section
+        id="competitorwatch"
+        className="max-w-6xl mx-auto px-6 lg:px-8 pb-16 scroll-mt-24"
+      >
+        <div className="relative overflow-hidden rounded-2xl border border-[#a5b4fc]/25 bg-gradient-to-br from-[#0F1830] to-[#141033] p-8 lg:p-12">
+          <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
+          <div
+            className="absolute -top-32 right-0 w-[500px] h-[500px] rounded-full opacity-25 blur-2xl"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(165,180,252,0.35) 0%, rgba(165,180,252,0) 60%)",
+            }}
+            aria-hidden="true"
+          />
+          <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#a5b4fc]/30 bg-[#a5b4fc]/10 text-[#c7d2fe] text-xs font-semibold tracking-wide mb-5">
+                <Radar className="w-3.5 h-3.5" />
+                {COMPETITORWATCH.status}
+              </div>
+              <h2 className="text-2xl lg:text-4xl font-bold tracking-tight bg-gradient-to-b from-white to-[#c7d2fe] bg-clip-text text-transparent">
+                {COMPETITORWATCH.name}
+              </h2>
+              <p className="mt-2 text-[#c7d2fe] font-medium">{COMPETITORWATCH.tagline}</p>
+              <p className="mt-4 text-sm text-[#8A96B0] leading-relaxed">
+                {COMPETITORWATCH.shortDescription}
+              </p>
+              <div className="mt-5 flex items-start gap-2 rounded-lg border border-[#a5b4fc]/20 bg-[#0B1122]/60 p-3.5">
+                <ShieldCheck className="w-4 h-4 text-[#a5b4fc] mt-0.5 shrink-0" />
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  {COMPETITORWATCH.guardrail}
+                </p>
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {COMPETITORWATCH.features.slice(0, 6).map((feat) => (
+                <div
+                  key={feat.title}
+                  className="relative rounded-xl border border-[#1C253B] bg-[#0B1122]/60 p-4"
+                >
+                  <Lock className="absolute top-3 right-3 w-3.5 h-3.5 text-[#4A5678]" />
+                  <div className="flex items-center gap-2 mb-1.5 pr-5">
+                    <Eye className="w-3.5 h-3.5 text-[#a5b4fc] shrink-0" />
+                    <h3 className="text-xs font-semibold text-white leading-tight">
+                      {feat.title}
+                    </h3>
+                  </div>
+                  <p className="text-[11px] text-[#8A96B0] leading-relaxed">
+                    {feat.description}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
