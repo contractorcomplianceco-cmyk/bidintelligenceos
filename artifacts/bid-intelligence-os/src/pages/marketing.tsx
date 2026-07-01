@@ -728,7 +728,7 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             <img
               src={brandShield}
               alt="BidIntelligenceOS"
-              className="w-32 h-32 lg:w-40 lg:h-40 object-contain mx-auto mb-5"
+              className="w-56 h-56 lg:w-72 lg:h-72 object-contain mx-auto mb-5"
             />
             <h2 className="text-3xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white to-[#a9b7d1] bg-clip-text text-transparent">
               Ready to win more bids?
