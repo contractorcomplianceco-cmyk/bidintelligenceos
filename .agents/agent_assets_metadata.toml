@@ -216,3 +216,63 @@ id = "6gkp4d0sgb3DMevbVWc0U"
 uri = "file://attached_assets/generated_audio/vo_v3_s9b_roseos.mp3"
 type = "audio"
 title = "roseos vo short"
+
+[[outputs]]
+id = "90gFFsSY4OIUKuZ7xVtDW"
+uri = "file://attached_assets/generated_audio/vo_v4_s1_hook.mp3"
+type = "audio"
+title = "v4 vo s1_hook"
+
+[[outputs]]
+id = "gpl2dE7gdEhuRJqzCLVUa"
+uri = "file://attached_assets/generated_audio/vo_v4_s2_capture.mp3"
+type = "audio"
+title = "v4 vo s2_capture"
+
+[[outputs]]
+id = "Q_gEyqhVgW0WXnwcOq9Vs"
+uri = "file://attached_assets/generated_audio/vo_v4_s3_bidintel.mp3"
+type = "audio"
+title = "v4 vo s3_bidintel"
+
+[[outputs]]
+id = "GI8gD-zHwLOLvR3LDqp8_"
+uri = "file://attached_assets/generated_audio/vo_v4_s4_bidtojob.mp3"
+type = "audio"
+title = "v4 vo s4_bidtojob"
+
+[[outputs]]
+id = "KUVOSevHNxaPfzQRLGWxo"
+uri = "file://attached_assets/generated_audio/vo_v4_s5_buildconnect.mp3"
+type = "audio"
+title = "v4 vo s5_buildconnect"
+
+[[outputs]]
+id = "Zl44TiuP2hC-yAgl9mseo"
+uri = "file://attached_assets/generated_audio/vo_v4_s6_execution.mp3"
+type = "audio"
+title = "v4 vo s6_execution"
+
+[[outputs]]
+id = "8jMu6HVT5cHEl2KwXt6wx"
+uri = "file://attached_assets/generated_audio/vo_v4_s7_market.mp3"
+type = "audio"
+title = "v4 vo s7_market"
+
+[[outputs]]
+id = "9gaNjwl_8hRqpM99YFrDK"
+uri = "file://attached_assets/generated_audio/vo_v4_s8_gov.mp3"
+type = "audio"
+title = "v4 vo s8_gov"
+
+[[outputs]]
+id = "ujjN5bmZ5OzC9xLqmcOny"
+uri = "file://attached_assets/generated_audio/vo_v4_s9_roseos.mp3"
+type = "audio"
+title = "v4 vo s9_roseos"
+
+[[outputs]]
+id = "ywYfgRdkwSS_aMbJZyEJ_"
+uri = "file://attached_assets/generated_audio/vo_v4_s10_closing.mp3"
+type = "audio"
+title = "v4 vo s10_closing"

@@ -14,16 +14,16 @@ import { Scene9 } from './video_scenes/Scene9';
 import { Scene10 } from './video_scenes/Scene10';
 
 export const SCENE_DURATIONS = {
-  hook: 6500,
-  capture: 9000,
-  bid_intel: 9500,
-  bid_to_job: 12000,
-  buildconnect: 9500,
-  execution: 12000,
-  market: 9500,
-  government: 9500,
-  roseos: 10000,
-  closing: 12000,
+  hook: 7500,
+  capture: 7800,
+  bid_intel: 7300,
+  bid_to_job: 8300,
+  buildconnect: 8200,
+  execution: 8000,
+  market: 7000,
+  government: 8200,
+  roseos: 10300,
+  closing: 10000,
 };
 
 const SCENE_COMPONENTS: Record<string, ComponentType> = {
