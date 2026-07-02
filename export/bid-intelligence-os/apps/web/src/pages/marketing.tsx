@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import {
+  Clapperboard,
   ArrowRight,
   PlayCircle,
   ShieldCheck,
@@ -53,6 +54,7 @@ import heroImage from "@/assets/hero-construction.jpg";
 import logoLockup from "@/assets/bidintelligence-logo.png";
 import brandShield from "@/assets/brand-shield.png";
 import brandLockup from "@/assets/brand-lockup.png";
+import { WALKTHROUGH_VIDEO_URL, PROMO_FILM_URL } from "@/lib/demo-links";
 
 const INDUSTRY_ICONS: Record<IndustryIconKey, LucideIcon> = {
   roofing: Home,
@@ -411,6 +413,30 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
               <PlayCircle className="w-4 h-4" />
               Watch the walkthrough
             </button>
+            {WALKTHROUGH_VIDEO_URL && (
+              <a
+                href={WALKTHROUGH_VIDEO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="link-walkthrough-video"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-[#38BDF8]/40 bg-[#38BDF8]/10 text-[#7dd3fc] font-semibold text-sm hover:bg-[#38BDF8]/20 hover:text-white transition-colors backdrop-blur-sm"
+              >
+                <PlayCircle className="w-4 h-4" />
+                Walkthrough Video
+              </a>
+            )}
+            {PROMO_FILM_URL && (
+              <a
+                href={PROMO_FILM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="link-promo-film"
+                className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-[#38BDF8]/40 bg-[#38BDF8]/10 text-[#7dd3fc] font-semibold text-sm hover:bg-[#38BDF8]/20 hover:text-white transition-colors backdrop-blur-sm"
+              >
+                <Clapperboard className="w-4 h-4" />
+                Promo Video
+              </a>
+            )}
             <a
               href="#use-cases"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-white/15 bg-white/5 text-white font-semibold text-sm hover:bg-white/10 transition-colors backdrop-blur-sm"

@@ -306,3 +306,9 @@ id = "taQlz1OT9cXE3_3sqzPKn"
 uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene10.mp3"
 type = "audio"
 title = "walkthrough vo scene10"
+
+[[outputs]]
+id = "fDvsXFn85MobMpBND8RVv"
+uri = "file://export/bid-intelligence-os-export.zip"
+type = "unspecified"
+title = "BidIntelligenceOS — GitHub/Cursor Export Package"

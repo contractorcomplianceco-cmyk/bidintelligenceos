@@ -6,6 +6,8 @@ A premium frontend prototype covering the full bid-to-job lifecycle: opportunity
 
 ## Quick start
 
+Requires **Node.js 20+** (tested on Node 24).
+
 ```bash
 npm install
 npm run dev
@@ -45,10 +47,14 @@ what the platform is → what it analyzes → how results are generated → the 
 
 Copy `.env.example` to `.env` at the repo root. All values are optional:
 
-| Variable         | Default | Purpose                                   |
-| ---------------- | ------- | ----------------------------------------- |
-| `VITE_DEMO_MODE` | `true`  | First-visit guided walkthrough modal      |
-| `API_PORT`       | `5001`  | Port for the placeholder API server       |
+| Variable                     | Default | Purpose                                                        |
+| ---------------------------- | ------- | -------------------------------------------------------------- |
+| `VITE_DEMO_MODE`             | `true`  | First-visit guided walkthrough modal                            |
+| `VITE_WALKTHROUGH_VIDEO_URL` | (blank) | External walkthrough video link on the marketing page (new tab) |
+| `VITE_PROMO_FILM_URL`        | (blank) | External promo film link on the marketing page (new tab)        |
+| `API_PORT`                   | `5001`  | Port for the placeholder API server                             |
+
+The video links render only when their URL is set — blank or missing hides that specific link. The videos themselves are hosted externally; no video app code ships in this repo.
 
 ## Scripts
 
