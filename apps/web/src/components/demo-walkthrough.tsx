@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  AlertTriangle,
   ArrowRight,
   Clapperboard,
   PlayCircle,
@@ -8,17 +7,18 @@ import {
   X,
 } from "lucide-react";
 import { WalkthroughPlayer } from "@/components/walkthrough/walkthrough-player";
+import { PromoFilmPlayer } from "@/components/promo-film/PromoFilmPlayer";
 import {
   HAS_INLINE_WALKTHROUGH,
-  PROMO_AUDIO_FALLBACK,
+  PROMO_FILM_URL,
   WALKTHROUGH_VIDEO_URL,
-  resolvePromoVideoUrl,
+  isVideoMedia,
 } from "@/lib/demo-links";
 
 type Panel = "promo" | "walkthrough";
 
 /**
- * Rose Demo modal — promo VIDEO first (mp4), audio-only fallback when missing.
+ * Rose Demo modal — visual promo first, then walkthrough / enter choices.
  */
 export function DemoWalkthrough({
   allowSound,
@@ -76,11 +76,7 @@ export function DemoWalkthrough({
 
         {panel === "promo" ? (
           <>
-            <PromoMedia
-              allowSound={allowSound}
-              replayKey={promoKey}
-              onFinished={onGoToHub}
-            />
+            <PromoMedia allowSound={allowSound} replayKey={promoKey} onFinished={onGoToHub} />
             <div className="p-6 sm:p-8 text-center border-t border-white/5">
               <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#6B7794]">
                 CCA BidIntelligenceOS · Rose Demo
@@ -162,8 +158,6 @@ export function DemoWalkthrough({
   );
 }
 
-type PromoStatus = "checking" | "video" | "missing";
-
 function PromoMedia({
   allowSound,
   replayKey,
@@ -173,73 +167,29 @@ function PromoMedia({
   replayKey: number;
   onFinished: () => void;
 }) {
-  const videoUrl = resolvePromoVideoUrl();
-  const [status, setStatus] = useState<PromoStatus>("checking");
-
-  useEffect(() => {
-    let cancelled = false;
-    setStatus("checking");
-    fetch(videoUrl, { method: "HEAD" })
-      .then((response) => {
-        if (cancelled) return;
-        const type = response.headers.get("content-type") ?? "";
-        if (response.ok && type.includes("video")) {
-          setStatus("video");
-        } else {
-          setStatus("missing");
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setStatus("missing");
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [videoUrl, replayKey]);
-
-  if (status === "checking") {
+  if (PROMO_FILM_URL && isVideoMedia(PROMO_FILM_URL)) {
     return (
-      <div
-        className="w-full aspect-video bg-black flex items-center justify-center text-slate-500 text-sm"
-        data-testid="promo-loading"
-      >
-        Loading promo…
-      </div>
-    );
-  }
-
-  if (status === "video") {
-    return (
-      <PromoVideoPlayer
-        url={videoUrl}
+      <HostedVideoPlayer
+        url={PROMO_FILM_URL}
         allowSound={allowSound}
         replayKey={replayKey}
-        onMissing={() => setStatus("missing")}
         onFinished={onFinished}
       />
     );
   }
 
-  return (
-    <MissingPromoVideo
-      allowSound={allowSound}
-      replayKey={replayKey}
-      onFinished={onFinished}
-    />
-  );
+  return <PromoFilmPlayer allowSound={allowSound} replayKey={replayKey} onEnded={onFinished} />;
 }
 
-function PromoVideoPlayer({
+function HostedVideoPlayer({
   url,
   allowSound,
   replayKey,
-  onMissing,
   onFinished,
 }: {
   url: string;
   allowSound: boolean;
   replayKey: number;
-  onMissing: () => void;
   onFinished: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -294,7 +244,6 @@ function PromoVideoPlayer({
         muted={!allowSound}
         playsInline
         controls
-        onError={onMissing}
         onEnded={finish}
         onTimeUpdate={handleTimeUpdate}
         className="w-full h-full object-contain"
@@ -310,100 +259,6 @@ function PromoVideoPlayer({
           <Volume2 className="w-3.5 h-3.5" /> Tap for sound
         </button>
       )}
-    </div>
-  );
-}
-
-/** Shown when promo-video.mp4 is not deployed — audio is NOT the primary promo. */
-function MissingPromoVideo({
-  allowSound,
-  replayKey,
-  onFinished,
-}: {
-  allowSound: boolean;
-  replayKey: number;
-  onFinished: () => void;
-}) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [needsTap, setNeedsTap] = useState(!allowSound);
-  const finished = useRef(false);
-
-  const finish = useCallback(() => {
-    if (finished.current) return;
-    finished.current = true;
-    onFinished();
-  }, [onFinished]);
-
-  useEffect(() => {
-    finished.current = false;
-  }, [replayKey]);
-
-  useEffect(() => {
-    const el = audioRef.current;
-    if (!el) return;
-    el.muted = !allowSound;
-    if (allowSound) {
-      el.volume = 1;
-      void el.play()
-        .then(() => setNeedsTap(false))
-        .catch(() => setNeedsTap(true));
-    }
-  }, [allowSound, replayKey]);
-
-  const handleTimeUpdate = () => {
-    const el = audioRef.current;
-    if (!el || !Number.isFinite(el.duration) || el.duration <= 0) return;
-    if (el.currentTime >= el.duration - 0.3) finish();
-  };
-
-  return (
-    <div className="w-full aspect-video bg-[#0A0E1A] flex flex-col">
-      <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6 text-center border-b border-amber-500/20 bg-amber-500/5">
-        <AlertTriangle className="w-8 h-8 text-amber-400" />
-        <p
-          className="text-sm font-semibold text-amber-200 max-w-md"
-          data-testid="promo-video-missing"
-        >
-          The actual promo video file is missing. Only audio exists.
-        </p>
-        <p className="text-xs text-slate-400 max-w-md">
-          Upload <code className="text-amber-300/90">apps/web/public/promo/promo-video.mp4</code>
-          {" "}then rebuild, or set{" "}
-          <code className="text-amber-300/90">VITE_PROMO_FILM_URL</code> to a hosted
-          .mp4 URL.
-        </p>
-      </div>
-      <div className="px-4 py-3 bg-black/40">
-        <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-2 text-center">
-          Temporary audio preview only
-        </p>
-        <audio
-          key={replayKey}
-          ref={audioRef}
-          src={PROMO_AUDIO_FALLBACK}
-          controls
-          muted={!allowSound}
-          onEnded={finish}
-          onTimeUpdate={handleTimeUpdate}
-          className="w-full"
-          data-testid="audio-promo-fallback"
-        />
-        {needsTap && (
-          <button
-            type="button"
-            onClick={() => {
-              const el = audioRef.current;
-              if (!el) return;
-              el.muted = false;
-              void el.play().then(() => setNeedsTap(false));
-            }}
-            className="mt-2 w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-black/60 border border-white/15 text-white text-xs font-semibold"
-            data-testid="button-promo-sound"
-          >
-            <Volume2 className="w-3.5 h-3.5" /> Tap for sound
-          </button>
-        )}
-      </div>
     </div>
   );
 }
