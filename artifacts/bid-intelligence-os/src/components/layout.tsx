@@ -27,6 +27,9 @@ import {
   ExternalLink,
   Factory,
   Crosshair,
+  ShieldAlert,
+  ClipboardCheck,
+  Dna,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
@@ -84,12 +87,15 @@ const navGroups: NavGroup[] = [
       { href: "/permits", label: "Permits & Documents", icon: FileCheck2 },
       { href: "/weather", label: "Weather Watch", icon: CloudSun },
       { href: "/cost-roi", label: "Cost & ROI", icon: DollarSign },
+      { href: "/risk", label: "Risk & Change Orders", icon: ShieldAlert },
+      { href: "/closeout", label: "Job Closeout", icon: ClipboardCheck },
     ],
   },
   {
     title: "Intelligence",
     items: [
       { href: "/voice-connect", label: "VoiceConnect", icon: AudioLines },
+      { href: "/bid-dna", label: "Bid DNA", icon: Dna },
       { href: "/industry-use-cases", label: "Industry Use Cases", icon: Factory },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/competitor-watch", label: "CompetitorWatchOS", icon: Crosshair, badge: "Soon" },

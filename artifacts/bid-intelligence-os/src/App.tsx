@@ -26,6 +26,9 @@ import VoiceConnect from "@/pages/voice-connect";
 import IndustryUseCases from "@/pages/industry-use-cases";
 import Analytics from "@/pages/analytics";
 import CompetitorWatch from "@/pages/competitor-watch";
+import BidDna from "@/pages/bid-dna";
+import Risk from "@/pages/risk";
+import Closeout from "@/pages/closeout";
 import BusinessProfile from "@/pages/business-profile";
 import Settings from "@/pages/settings";
 
@@ -68,12 +71,15 @@ function Router() {
       <Route path="/permits" component={Permits} />
       <Route path="/weather" component={Weather} />
       <Route path="/cost-roi" component={CostRoi} />
+      <Route path="/risk" component={Risk} />
+      <Route path="/closeout" component={Closeout} />
 
       {/* Intelligence */}
       <Route path="/voice-connect" component={VoiceConnect} />
       <Route path="/industry-use-cases" component={IndustryUseCases} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/competitor-watch" component={CompetitorWatch} />
+      <Route path="/bid-dna" component={BidDna} />
 
       {/* Account */}
       <Route path="/business-profile" component={BusinessProfile} />

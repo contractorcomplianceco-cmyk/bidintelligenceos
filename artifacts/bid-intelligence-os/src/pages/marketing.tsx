@@ -27,6 +27,9 @@ import {
   Sparkles,
   Radar,
   AlertTriangle,
+  ShieldAlert,
+  Dna,
+  RotateCcw,
   type LucideIcon,
 } from "lucide-react";
 import { CCACrest } from "@/components/cca-crest";
@@ -138,6 +141,21 @@ const MODULES = [
     title: "VoiceConnect",
     body: "Ask, listen, act. Get field-ready answers fast, hands-free.",
   },
+  {
+    icon: ShieldAlert,
+    title: "Risk & Change Orders",
+    body: "Risk radar, change-order detection, and profit-fade alerts protect margin after the award.",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Job Closeout",
+    body: "Punch lists, documentation, retainage, and final ROI — every job closes clean.",
+  },
+  {
+    icon: Dna,
+    title: "Bid DNA Learning Engine",
+    body: "Compares estimate vs. actual on every closed job so future bids get sharper.",
+  },
 ];
 
 const STEPS = [
@@ -157,7 +175,13 @@ const STEPS = [
     icon: TrendingUp,
     step: "03",
     title: "Deploy & Track Jobs",
-    body: "Deploy with precision — labor, subs, cost, ROI, and weather to closeout.",
+    body: "Deploy with precision — labor, subs, cost, ROI, risk radar, and weather in one view.",
+  },
+  {
+    icon: RotateCcw,
+    step: "04",
+    title: "Close & Learn",
+    body: "Close out clean, then feed estimate-vs-actual into Bid DNA so the next bid starts sharper.",
   },
 ];
 
@@ -473,7 +497,7 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
               Win the bid. Then run the job better.
             </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-5">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-5">
             {STEPS.map((s, i) => (
               <div key={s.step} className="relative">
                 <div className="rounded-xl border border-[#1C253B] bg-[#0B1122]/60 p-6 h-full">
@@ -491,6 +515,53 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
                 )}
               </div>
             ))}
+          </div>
+
+          {/* The OS learns — full-lifecycle loop */}
+          <div className="mt-8 relative overflow-hidden rounded-xl border border-[#38BDF8]/25 bg-gradient-to-r from-[#0B1122] via-[#0D1730] to-[#0B1122] p-6 lg:p-8">
+            <div
+              className="absolute -right-16 -top-16 w-56 h-56 rounded-full opacity-40 blur-2xl"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(56,189,248,0.35) 0%, rgba(56,189,248,0) 70%)",
+              }}
+              aria-hidden="true"
+            />
+            <div className="relative flex flex-col lg:flex-row lg:items-center gap-6">
+              <div className="shrink-0 flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-[#38BDF8]/10 border border-[#38BDF8]/25 flex items-center justify-center shadow-[0_0_24px_rgba(56,189,248,0.25)]">
+                  <Dna className="w-6 h-6 text-[#38BDF8]" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-semibold uppercase tracking-widest text-[#7fe3d8]">
+                    Bid DNA
+                  </span>
+                  <h3 className="text-lg font-semibold text-white leading-tight">
+                    The OS learns
+                  </h3>
+                </div>
+              </div>
+              <p className="text-sm text-[#a9b7d1] leading-relaxed lg:max-w-2xl">
+                Won jobs deploy, execution tracks cost and risk in real time, and every
+                closeout feeds estimate-vs-actual back into Bid DNA. Each closed job makes
+                the next bid a little sharper — a full-lifecycle loop that compounds over
+                time. It's decision-support you review, not a guaranteed outcome.
+              </p>
+              <div className="shrink-0 flex items-center gap-2 text-[11px] font-medium text-[#7dd3fc] lg:ml-auto">
+                <span className="px-2.5 py-1 rounded-full border border-[#1C253B] bg-[#0F1830]/70">
+                  Deploy
+                </span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#2A3550]" />
+                <span className="px-2.5 py-1 rounded-full border border-[#1C253B] bg-[#0F1830]/70">
+                  Track
+                </span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#2A3550]" />
+                <span className="px-2.5 py-1 rounded-full border border-[#1C253B] bg-[#0F1830]/70">
+                  Close
+                </span>
+                <RotateCcw className="w-3.5 h-3.5 text-[#38BDF8]" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
