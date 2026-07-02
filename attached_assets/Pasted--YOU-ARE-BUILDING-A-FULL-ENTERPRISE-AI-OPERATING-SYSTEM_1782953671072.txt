@@ -1,0 +1,428 @@
+
+YOU ARE BUILDING A FULL ENTERPRISE AI OPERATING SYSTEM.
+
+SYSTEM NAME:
+CCA BidIntelligenceOS Ecosystem
+
+THIS IS A MULTI-PRODUCT AI INTELLIGENCE PLATFORM FOR:
+- construction bidding
+- job execution
+- subcontractor orchestration
+- compliance + licensing
+- government contracting
+- market opportunity detection
+- profit optimization
+- field intelligence capture
+
+────────────────────────────────────
+🧠 CORE SYSTEM — BidIntelligenceOS
+────────────────────────────────────
+
+BidIntelligenceOS is the CENTRAL INTELLIGENCE ENGINE.
+
+It manages full lifecycle:
+
+Opportunity → Intelligence → Bid → Win/Loss → Job Execution → Profit Tracking → Learning Loop
+
+CORE FUNCTIONS:
+- bid intake
+- scope intelligence extraction
+- risk analysis engine
+- bid generation
+- proposal creation
+- job auto-creation after win
+- scheduling engine
+- permit tracking system
+- cost tracking (labor, subs, materials)
+- ROI tracking
+- change order detection
+- execution monitoring
+- performance feedback loop (Bid DNA learning)
+
+WHEN BID IS CREATED:
+1. System analyzes scope
+2. Detects missing info
+3. Assigns risk score
+4. Generates bid structure
+5. Builds client-ready proposal
+
+WHEN BID IS WON:
+1. Job is auto-created
+2. Subcontractors assigned via BuildConnect
+3. Schedule auto-generated
+4. Permits tracking activated
+5. Cost tracking starts
+6. Weather monitoring activated
+
+WHEN JOB IS ACTIVE:
+- real-time cost monitoring
+- labor tracking
+- sub performance scoring
+- margin drift detection
+- delay detection
+- risk alerts
+
+WHEN JOB IS COMPLETE:
+- profit vs estimate analysis
+- performance scoring
+- bid DNA learning updates
+
+────────────────────────────────────
+🎤 VOICECONNECT (ADD-ON MODULE)
+────────────────────────────────────
+
+Standalone field intelligence capture system.
+
+FUNCTIONS:
+- voice walkthrough capture
+- transcription
+- risk detection
+- scope extraction
+- tagging system (labor/sub/material/risk)
+- structured jobsite reports
+- sync into BidIntelligenceOS
+
+USE CASES:
+- roofing inspections
+- HVAC rooftop walkthroughs
+- GC site visits
+- insurance claims
+- restoration jobs
+
+────────────────────────────────────
+🎥 VIDEOCONNECT (ADD-ON MODULE)
+────────────────────────────────────
+
+Standalone visual intelligence system.
+
+FUNCTIONS:
+- video walkthrough capture
+- AI visual analysis
+- damage detection
+- scope extraction
+- automated reporting
+- insurance-ready documentation
+
+────────────────────────────────────
+🏗️ BUILDCONNECT (SUBCONTRACTOR NETWORK)
+────────────────────────────────────
+
+FUNCTIONS:
+- subcontractor marketplace
+- trade-based matching engine
+- job assignment system
+- availability tracking
+- bid-per-sub system
+- performance scoring
+- negotiation tracking
+- reliability scoring
+
+RULE:
+NO SELF-PERFORM MODEL
+
+Prime contractor wins → subs execute via BuildConnect
+
+────────────────────────────────────
+🧾 COMPLIANCECONNECT
+────────────────────────────────────
+
+FUNCTIONS:
+- license tracking
+- insurance tracking
+- bond tracking
+- compliance readiness scoring
+- audit readiness system
+- permit readiness tracking
+
+────────────────────────────────────
+🏛️ GOVERNMENT CONTRACTING MODULE
+────────────────────────────────────
+
+FULL FEDERAL CONTRACTING SYSTEM
+
+TRACK:
+- SAM.gov registration status
+- UEI tracking
+- CAGE code validation
+- EIN verification
+- W-9 tracking
+- insurance compliance
+- bonding requirements
+- capability statements
+- past performance records
+
+BIDDING:
+- RFP / RFQ / IFB tracking
+- submission deadlines
+- document checklists
+- eligibility validation
+
+SET-ASIDE TRACKING:
+- small business
+- woman-owned
+- minority-owned
+- veteran-owned
+- HUBZone
+
+OUTPUT:
+Government Contracting Readiness Score
+
+ALERTS:
+- SAM expiring
+- missing documents
+- eligibility mismatch
+- bid deadline alerts
+
+────────────────────────────────────
+📊 MARKETWATCHOS — OPPORTUNITY RADAR ENGINE (CRITICAL)
+────────────────────────────────────
+
+MarketWatchOS is NOT analytics.
+
+It is a REAL-TIME JOB + BID OPPORTUNITY DETECTION SYSTEM.
+
+────────────────────────────────────
+JOB SIGNALS DETECTION:
+- storm damage events
+- infrastructure failures
+- permit spikes
+- insurance claim surges
+- facility breakdown cycles
+- emergency restoration demand
+
+BID SIGNALS:
+- RFP releases
+- RFQ postings
+- contract expirations
+- government bid windows
+- private bid activity
+
+MARKET SIGNALS:
+- material price changes
+- labor shortages
+- subcontractor availability shifts
+- regional construction booms
+- weather-driven demand spikes
+
+────────────────────────────────────
+OPPORTUNITY RADAR OUTPUT:
+────────────────────────────────────
+
+🟢 HIGH OPPORTUNITY ALERT
+🟡 MEDIUM OPPORTUNITY ALERT
+🔴 CRITICAL BID WINDOW ALERT
+
+Each alert must include:
+- opportunity score (0–100)
+- trade type (roofing, HVAC, GC, etc.)
+- region heat level
+- competition density (public signals only)
+- estimated urgency level
+
+────────────────────────────────────
+INTEGRATION RULE:
+────────────────────────────────────
+
+MarketWatchOS feeds INTO:
+
+- BidIntelligenceOS (primary consumer)
+- ContractorConnect (lead distribution)
+- BuildConnect (labor demand matching)
+
+────────────────────────────────────
+🛰️ COMPETITORWATCHOS (COMING SOON)
+────────────────────────────────────
+
+- public competitor bid tracking only
+- regional competition mapping
+- pricing pressure trends
+- aggregated win/loss signals
+
+────────────────────────────────────
+🔗 ADD-ON ARCHITECTURE RULE
+────────────────────────────────────
+
+ALL ADD-ONS MUST:
+
+- be independent modules
+- NOT embedded inside BidIntelligenceOS UI
+- exist in integrations panel
+- feed data INTO BidIntelligenceOS
+
+────────────────────────────────────
+🏛️ INDUSTRY MODES
+────────────────────────────────────
+
+Supported Modes:
+- Roofing
+- HVAC
+- Electrical
+- Plumbing
+- General Contractor
+- Engineering
+- Restoration
+- Facility Maintenance
+- Government Contracting
+
+Each mode changes:
+- workflow logic
+- risk models
+- cost structure
+- alerts
+- terminology
+
+────────────────────────────────────
+🚀 WHITE LABEL + ENTERPRISE MODE
+────────────────────────────────────
+
+Must support:
+- white labeling per company
+- franchise deployment
+- multi-location enterprise dashboards
+- role-based access control
+- custom domain branding
+- regional segmentation
+
+────────────────────────────────────
+🧠 CORE AI SYSTEMS
+────────────────────────────────────
+
+- walkthrough-to-bid intelligence engine
+- scope extraction AI
+- risk detection engine
+- subcontractor intelligence scoring
+- market opportunity radar engine
+- change order detection
+- profit fade alerts
+- bid simulation engine
+- follow-up automation engine
+- Bid DNA learning loop
+
+────────────────────────────────────
+🎯 COMMAND CENTER UI
+────────────────────────────────────
+
+Must include:
+
+- Active bids
+- Jobs in progress
+- Jobs at risk
+- Weather alerts
+- Permit blockers
+- Sub delays
+- Cost variance tracking
+- ROI tracking
+- VoiceConnect feed
+- Market Opportunity Radar feed
+- Daily intelligence briefing
+
+DAILY BRIEFING EXAMPLE:
+
+“You have 3 bids due, 2 high-risk jobs due to weather, 1 permit delay, and 1 high-opportunity roofing surge detected in Florida.”
+
+────────────────────────────────────
+🎨 DESIGN SYSTEM (NON-NEGOTIABLE)
+────────────────────────────────────
+
+STYLE:
+Bloomberg Terminal + SpaceX Mission Control + Palantir OS
+
+BASE COLORS:
+- #0B1220 primary
+- #111827 secondary
+- #0F172A depth layers
+
+ACCENTS:
+- Blue = system actions
+- Teal = VoiceConnect
+- Amber = risk alerts
+- Red = critical alerts
+
+RULES:
+- NO white dashboards
+- NO SaaS marketing UI
+- NO soft gradients
+- NO consumer app styling
+- NO oversized hero sections
+
+SYSTEM MUST FEEL:
+- operational
+- dense
+- real-time intelligence
+- mission-critical control system
+
+────────────────────────────────────
+🎬 FULL WALKTHROUGH VIDEO SYSTEM (REBUILT)
+────────────────────────────────────
+
+VIDEO MUST AUTO-PLAY ON LANDING.
+
+────────────────────────────────────
+VIDEO STYLE:
+- fast paced
+- cinematic
+- high urgency
+- Bloomberg terminal demo style
+- no slow SaaS narration
+
+────────────────────────────────────
+VIDEO SCRIPT:
+
+0:00–0:05
+“Every job starts in the field… but intelligence is usually lost before execution.”
+
+SHOW: VoiceConnect + VideoConnect capture
+
+0:05–0:15
+“Now every walkthrough becomes structured intelligence instantly.”
+
+0:15–0:25
+“Scope, risk, and bid intelligence generated in seconds.”
+
+0:25–0:35
+“Professional bid packages created automatically.”
+
+0:35–0:50
+“The moment you win the bid, the job is already built.”
+
+0:50–1:05
+“Real-time cost, labor, and execution tracking across every job.”
+
+1:05–1:15
+“Detect risk before it becomes loss.”
+
+1:15–1:25
+“Government contracting intelligence integrated directly into operations.”
+
+1:25–1:35
+“Market Opportunity Radar identifies work before it exists.”
+
+1:35–END
+“Bid smarter. Execute faster. Learn continuously.”
+
+────────────────────────────────────
+VIDEO BEHAVIOR RULES:
+────────────────────────────────────
+
+- autoplay ON landing
+- does NOT loop
+- can be closed anytime
+- closing reveals marketing page
+- last frame freezes (no restart)
+
+────────────────────────────────────
+FINAL OUTPUT REQUIREMENTS:
+────────────────────────────────────
+
+SYSTEM MUST INCLUDE:
+- full command center UI
+- bid pipeline system
+- job execution tracking system
+- Market Opportunity Radar dashboard
+- government contracting module
+- compliance system
+- subcontractor network system
+- integrations marketplace
+- industry mode switching
+- real seeded operational data
+- enterprise-grade UI consistency
