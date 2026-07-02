@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 import logo from '@/assets/bidintelligence-logo.png';
-import { EASE, CYAN, TEAL, VIOLET, ORANGE, EMERALD, AMBER, GREEN, PANEL, MUTED } from './shared';
+import { EASE, CYAN, TEAL, VIOLET, ORANGE, EMERALD, AMBER, ROSE, GREEN, PANEL, MUTED } from './shared';
 
 const MODULES = [
+  { label: 'ROSEOS', color: ROSE },
   { label: 'VoiceConnect', color: TEAL },
   { label: 'VideoConnect', color: VIOLET },
   { label: 'BuildConnect', color: ORANGE },
@@ -63,15 +64,26 @@ export function Scene10() {
         <span style={{ color: TEAL }}>Learn continuously.</span>
       </motion.h2>
 
-      <motion.div
-        className="mt-[0.6vh] px-[2.4vw] py-[1.5vh] rounded-xl text-[1.15vw] font-bold text-[#04111e]"
-        style={{ background: CYAN, boxShadow: '0 0 60px -12px rgba(56,189,248,0.8)' }}
-        initial={{ opacity: 0, scale: 0.85 }}
-        animate={{ opacity: 1, scale: [0.85, 1.04, 1] }}
-        transition={{ delay: 4, duration: 0.7, ease: EASE }}
-      >
-        Request a Demo
-      </motion.div>
+      <div className="mt-[0.6vh] flex items-center gap-[1vw]">
+        <motion.div
+          className="px-[2.4vw] py-[1.5vh] rounded-xl text-[1.15vw] font-bold text-[#04111e]"
+          style={{ background: CYAN, boxShadow: '0 0 60px -12px rgba(56,189,248,0.8)' }}
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: [0.85, 1.04, 1] }}
+          transition={{ delay: 4, duration: 0.7, ease: EASE }}
+        >
+          Request a Demo
+        </motion.div>
+        <motion.div
+          className="px-[2.4vw] py-[1.5vh] rounded-xl text-[1.15vw] font-bold text-white border"
+          style={{ borderColor: `${CYAN}66`, background: 'rgba(56,189,248,0.08)' }}
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: [0.85, 1.04, 1] }}
+          transition={{ delay: 4.25, duration: 0.7, ease: EASE }}
+        >
+          Enter Command Center
+        </motion.div>
+      </div>
 
       <motion.p
         className="text-[0.82vw]"

@@ -204,3 +204,15 @@ id = "p2owr6E0JohC8gNOx1QV_"
 uri = "file://attached_assets/generated_audio/vo_v3_s10_closing.mp3"
 type = "audio"
 title = "v3 s10_closing"
+
+[[outputs]]
+id = "ivmgYRjZ-CHq36ZZfRRhr"
+uri = "file://attached_assets/generated_audio/vo_v3_s5b_buildconnect.mp3"
+type = "audio"
+title = "buildconnect vo short"
+
+[[outputs]]
+id = "6gkp4d0sgb3DMevbVWc0U"
+uri = "file://attached_assets/generated_audio/vo_v3_s9b_roseos.mp3"
+type = "audio"
+title = "roseos vo short"

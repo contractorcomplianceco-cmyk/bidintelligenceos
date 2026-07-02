@@ -217,6 +217,13 @@ export default function VideoWithControls() {
         loop={false}
         muted={muted}
         onSceneChange={onSceneChange}
+        onEnded={() => {
+          try {
+            window.parent?.postMessage({ type: 'bios-promo-ended' }, window.location.origin);
+          } catch {
+            // parent unavailable — standalone playback
+          }
+        }}
       />
 
       <div

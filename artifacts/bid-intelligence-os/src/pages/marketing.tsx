@@ -280,7 +280,7 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
 
   return (
     <div className="min-h-[100dvh] bg-[#0A0E1A] text-slate-200 font-sans">
-      {showPromo && <PromoOverlay onClose={closePromo} />}
+      {showPromo && <PromoOverlay onClose={closePromo} onEnterApp={onLaunchDemo} />}
       {/* Utility strip */}
       <div className="hidden md:block border-b border-white/5 bg-[#080B14]">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 h-9 flex items-center justify-between text-[11px] tracking-wide">
@@ -732,7 +732,7 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
               );
             })}
           </div>
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <div id="cta" className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 scroll-mt-24">
             <button
               onClick={onLaunchDemo}
               className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"

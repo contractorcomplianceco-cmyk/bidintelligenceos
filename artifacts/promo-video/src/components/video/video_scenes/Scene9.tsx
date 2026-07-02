@@ -1,129 +1,148 @@
 import { motion } from 'framer-motion';
-import { EASE, AMBER, CYAN, RED, GREEN, PANEL, PANEL2, BORDER, MUTED, DIM, Kicker, AppFrame } from './shared';
+import { EASE, ROSE, GREEN, AMBER, RED, CYAN, TEAL, ORANGE, EMERALD, PANEL, PANEL2, BORDER, MUTED, DIM } from './shared';
 
-const SIGNALS = [
-  { title: 'Storm surge — Gulf Coast metro', sub: 'Hail + wind event · roofing & HVAC demand spike', score: 92, tone: RED, x: 30, y: 34 },
-  { title: 'Permit spike — commercial retrofit', sub: '+41% mechanical permits, last 30 days', score: 84, tone: AMBER, x: 66, y: 44 },
-  { title: 'Aging infrastructure cluster', sub: 'RTUs past service life, 3 school districts', score: 77, tone: CYAN, x: 48, y: 66 },
+const VERDICTS = [
+  {
+    label: 'GREEN LIGHT',
+    tone: GREEN,
+    title: 'Northline HVAC Retrofit — proceed',
+    sub: 'Fit score 87 · margin healthy · crew capacity clear',
+  },
+  {
+    label: 'YELLOW FLAG',
+    tone: AMBER,
+    title: 'Harbor Point reroof — adjust strategy',
+    sub: 'Freight lead-time risk · re-slot lift week before commit',
+  },
+  {
+    label: 'RED ALERT',
+    tone: RED,
+    title: 'Westgate lump-sum — avoid or revise',
+    sub: 'Scope gaps + liquidated damages clause flagged for review',
+  },
+];
+
+const LAYERS = [
+  { label: 'BidIntelligenceOS', color: CYAN },
+  { label: 'MarketWatchOS', color: AMBER },
+  { label: 'BuildConnect', color: ORANGE },
+  { label: 'ComplianceConnect', color: EMERALD },
+  { label: 'VoiceConnect', color: TEAL },
 ];
 
 export function Scene9() {
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col items-center justify-center px-[7vw] gap-[2.4vh]"
+      className="absolute inset-0 flex flex-col items-center justify-center px-[9vw] gap-[2.6vh]"
       initial={{ opacity: 0, y: 60 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -60 }}
       transition={{ duration: 0.6, ease: EASE }}
     >
-      <div className="w-full">
-        <Kicker text="MarketWatchOS" color={AMBER} delay={0.2} />
-        <motion.h2
-          className="mt-[1vh] text-[2.3vw] font-bold text-white"
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6, ease: EASE }}
+      {/* ROSEOS lockup */}
+      <motion.div
+        className="flex items-center gap-[0.8vw]"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 0.6, ease: EASE }}
+      >
+        <motion.span
+          className="w-[2.2vw] h-[2.2vw] rounded-lg flex items-center justify-center text-[1.2vw] font-black text-white"
+          style={{ background: ROSE, boxShadow: `0 0 40px -8px ${ROSE}` }}
+          animate={{ boxShadow: [`0 0 30px -10px ${ROSE}`, `0 0 55px -6px ${ROSE}`, `0 0 30px -10px ${ROSE}`] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
         >
-          Market Opportunity Radar identifies work <span style={{ color: AMBER }}>before it exists</span>
-        </motion.h2>
+          R
+        </motion.span>
+        <span className="text-[1.9vw] font-bold text-white tracking-tight">
+          ROSE<span style={{ color: ROSE }}>OS</span>
+        </span>
+        <span
+          className="ml-[0.4vw] px-[0.7vw] py-[0.35vh] rounded-full text-[0.62vw] font-bold uppercase tracking-widest"
+          style={{ color: ROSE, background: `${ROSE}16`, border: `1px solid ${ROSE}55` }}
+        >
+          Executive Intelligence Layer
+        </span>
+      </motion.div>
+
+      <motion.h2
+        className="text-[2.2vw] font-bold text-white text-center leading-tight"
+        initial={{ opacity: 0, y: 22 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.6, ease: EASE }}
+      >
+        Every decision returns <span style={{ color: ROSE }}>a verdict</span>
+      </motion.h2>
+
+      {/* Verdict cards */}
+      <div className="w-full grid grid-cols-3 gap-[1.2vw]">
+        {VERDICTS.map((v, i) => (
+          <motion.div
+            key={v.label}
+            className="rounded-xl border p-[1.1vw]"
+            style={{ background: PANEL2, borderColor: `${v.tone}44` }}
+            initial={{ opacity: 0, y: 36, scale: 0.94 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 1.1 + i * 0.55, duration: 0.5, ease: EASE }}
+          >
+            <motion.span
+              className="inline-flex items-center gap-[0.4vw] px-[0.8vw] py-[0.4vh] rounded-full text-[0.66vw] font-black tracking-widest"
+              style={{ color: v.tone, background: `${v.tone}16`, border: `1px solid ${v.tone}66` }}
+              initial={{ scale: 0.7, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 1.3 + i * 0.55, duration: 0.4, ease: EASE }}
+            >
+              <motion.span
+                className="w-[0.5vw] h-[0.5vw] rounded-full"
+                style={{ background: v.tone }}
+                animate={{ opacity: [1, 0.35, 1] }}
+                transition={{ duration: 1.4, repeat: Infinity, delay: i * 0.3 }}
+              />
+              {v.label}
+            </motion.span>
+            <div className="mt-[1vh] text-[0.9vw] font-semibold text-white/90 leading-snug">{v.title}</div>
+            <div className="mt-[0.5vh] text-[0.68vw]" style={{ color: MUTED }}>
+              {v.sub}
+            </div>
+          </motion.div>
+        ))}
       </div>
 
+      {/* Signal layer strip */}
       <motion.div
-        className="w-full h-[58vh]"
-        initial={{ opacity: 0, y: 40, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.5, duration: 0.8, ease: EASE }}
+        className="flex items-center gap-[0.7vw] rounded-full border px-[1.2vw] py-[0.8vh]"
+        style={{ background: PANEL, borderColor: BORDER }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 3.4, duration: 0.6, ease: EASE }}
       >
-        <AppFrame label="MarketWatchOS — Opportunity Radar · Live Signals">
-          <div className="grid grid-cols-5 gap-[1.2vw] h-full">
-            {/* Radar */}
-            <div className="col-span-2 rounded-lg border relative overflow-hidden flex items-center justify-center" style={{ background: PANEL2, borderColor: BORDER }}>
-              <div className="relative w-[85%] aspect-square">
-                {[1, 0.66, 0.33].map((r) => (
-                  <div
-                    key={r}
-                    className="absolute rounded-full border"
-                    style={{ inset: `${(1 - r) * 50}%`, borderColor: `${AMBER}33` }}
-                  />
-                ))}
-                <div className="absolute left-1/2 top-0 bottom-0 w-px" style={{ background: `${AMBER}22` }} />
-                <div className="absolute top-1/2 left-0 right-0 h-px" style={{ background: `${AMBER}22` }} />
-                <motion.div
-                  className="absolute inset-0 origin-center"
-                  style={{
-                    background: `conic-gradient(from 0deg, ${AMBER}55, transparent 60deg)`,
-                    borderRadius: '9999px',
-                  }}
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                />
-                {SIGNALS.map((s, i) => (
-                  <motion.div
-                    key={s.title}
-                    className="absolute -translate-x-1/2 -translate-y-1/2"
-                    style={{ left: `${s.x}%`, top: `${s.y}%` }}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 1.2 + i * 0.5, duration: 0.4, ease: EASE }}
-                  >
-                    <motion.span
-                      className="block w-[1vw] h-[1vw] rounded-full"
-                      style={{ background: s.tone, boxShadow: `0 0 14px ${s.tone}` }}
-                      animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
-                      transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.3 }}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            {/* Scored opportunities */}
-            <div className="col-span-3 rounded-lg border p-[1vw] flex flex-col gap-[1vh]" style={{ background: PANEL2, borderColor: BORDER }}>
-              <div className="flex items-center justify-between">
-                <span className="text-[0.72vw] uppercase tracking-wider font-semibold" style={{ color: DIM }}>
-                  Scored opportunities
-                </span>
-                <motion.span
-                  className="flex items-center gap-[0.35vw] text-[0.66vw]"
-                  style={{ color: AMBER }}
-                  animate={{ opacity: [1, 0.4, 1] }}
-                  transition={{ duration: 1.2, repeat: Infinity }}
-                >
-                  <span className="w-[0.4vw] h-[0.4vw] rounded-full" style={{ background: AMBER }} /> live
-                </motion.span>
-              </div>
-              {SIGNALS.map((s, i) => (
-                <motion.div
-                  key={s.title}
-                  className="rounded-md border px-[1vw] py-[0.8vh] flex items-center justify-between"
-                  style={{ background: PANEL, borderColor: `${s.tone}44` }}
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1.4 + i * 0.45, duration: 0.4, ease: EASE }}
-                >
-                  <div className="min-w-0">
-                    <div className="text-[0.82vw] text-white/90 font-medium truncate">{s.title}</div>
-                    <div className="text-[0.64vw]" style={{ color: MUTED }}>{s.sub}</div>
-                  </div>
-                  <div className="text-right shrink-0 ml-[1vw]">
-                    <div className="text-[1.1vw] font-bold" style={{ color: s.tone }}>{s.score}</div>
-                    <div className="text-[0.56vw]" style={{ color: DIM }}>opp score</div>
-                  </div>
-                </motion.div>
-              ))}
-              <motion.div
-                className="mt-auto text-[0.68vw]"
-                style={{ color: DIM }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 3 }}
-              >
-                Forward-looking signals for prioritization — not guaranteed demand.
-              </motion.div>
-            </div>
-          </div>
-        </AppFrame>
+        <span className="text-[0.62vw] uppercase tracking-widest font-semibold" style={{ color: DIM }}>
+          Reads signals from
+        </span>
+        {LAYERS.map((l, i) => (
+          <motion.span
+            key={l.label}
+            className="text-[0.68vw] font-semibold"
+            style={{ color: l.color }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 3.7 + i * 0.2, duration: 0.35 }}
+          >
+            {l.label}
+            {i < LAYERS.length - 1 && <span style={{ color: DIM }}> ·</span>}
+          </motion.span>
+        ))}
       </motion.div>
+
+      <motion.p
+        className="text-[0.9vw]"
+        style={{ color: DIM }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 5, duration: 0.6 }}
+      >
+        You decide. <span style={{ color: ROSE }}>ROSEOS informs</span> — every verdict is flagged for your review.
+      </motion.p>
     </motion.div>
   );
 }

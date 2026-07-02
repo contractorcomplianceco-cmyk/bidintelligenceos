@@ -15,27 +15,27 @@ import { Scene10 } from './video_scenes/Scene10';
 
 export const SCENE_DURATIONS = {
   hook: 6500,
-  capture: 10000,
-  bid_intel: 10000,
-  bid_package: 9000,
-  deployment: 15000,
-  execution: 15000,
-  risk: 10000,
-  government: 10000,
-  market: 10000,
-  closing: 10500,
+  capture: 9000,
+  bid_intel: 9500,
+  bid_to_job: 12000,
+  buildconnect: 9500,
+  execution: 12000,
+  market: 9500,
+  government: 9500,
+  roseos: 10000,
+  closing: 12000,
 };
 
 const SCENE_COMPONENTS: Record<string, ComponentType> = {
   hook: Scene1,
   capture: Scene2,
   bid_intel: Scene3,
-  bid_package: Scene4,
-  deployment: Scene5,
+  bid_to_job: Scene4,
+  buildconnect: Scene5,
   execution: Scene6,
-  risk: Scene7,
+  market: Scene7,
   government: Scene8,
-  market: Scene9,
+  roseos: Scene9,
   closing: Scene10,
 };
 
@@ -56,13 +56,15 @@ export default function VideoTemplate({
   loop = false,
   muted = false,
   onSceneChange,
+  onEnded,
 }: {
   durations?: Record<string, number>;
   loop?: boolean;
   muted?: boolean;
   onSceneChange?: (sceneKey: string) => void;
+  onEnded?: () => void;
 } = {}) {
-  const { currentScene, currentSceneKey } = useVideoPlayer({ durations, loop });
+  const { currentScene, currentSceneKey } = useVideoPlayer({ durations, loop, onVideoEnd: onEnded });
 
   useEffect(() => {
     onSceneChange?.(currentSceneKey);

@@ -15,6 +15,7 @@ export const EMERALD = '#059669';
 export const GREEN = '#22C55E';
 export const RED = '#EF4444';
 export const AMBER = '#F59E0B';
+export const ROSE = '#E11D48';
 export const MUTED = '#8A96B0';
 export const DIM = '#5b6680';
 
