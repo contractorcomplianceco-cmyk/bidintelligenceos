@@ -6,9 +6,9 @@ import { FeaturePillars } from "./pillars";
 const TEAL = "#0BA3A8";
 
 export function VoiceConnectMarketingSection({
-  onLaunchDemo,
+  onLaunchRoseDemo,
 }: {
-  onLaunchDemo: () => void;
+  onLaunchRoseDemo: () => void;
 }) {
   return (
     <section id="voiceconnect" className="relative overflow-hidden border-y border-[#0BA3A8]/15 bg-gradient-to-b from-[#0A0E1A] via-[#0B1418] to-[#0A0E1A] scroll-mt-16">
@@ -53,7 +53,7 @@ export function VoiceConnectMarketingSection({
 
         <div className="mt-12 text-center">
           <button
-            onClick={onLaunchDemo}
+            onClick={onLaunchRoseDemo}
             className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg font-semibold text-sm transition-all"
             style={{ background: TEAL, color: "#06080B", boxShadow: "0 0 36px rgba(11,163,168,0.4)" }}
           >

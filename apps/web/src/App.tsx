@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/lib/context";
 import { DemoWalkthrough } from "@/components/demo-walkthrough";
-import { shouldShowWalkthrough } from "@/lib/demo-mode";
+import { DemoChoiceHub } from "@/components/demo-choice-hub";
+import { isDemoModeEnabled } from "@/lib/demo-mode";
 
 import Marketing from "@/pages/marketing";
 import NotFound from "@/pages/not-found";
@@ -59,11 +60,34 @@ import Reports from "@/pages/reports";
 
 const queryClient = new QueryClient();
 
+type DemoView = "landing" | "hub" | "app";
+type RosePanel = "promo" | "walkthrough";
+
+function normalizePath(path: string): string {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  if (base && path.startsWith(base)) {
+    return path.slice(base.length) || "/";
+  }
+  return path;
+}
+
+function isDemoHubPath(): boolean {
+  if (typeof window === "undefined") return false;
+  return normalizePath(window.location.pathname) === "/demo";
+}
+
+function isRoseDemoLaunch(): boolean {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(window.location.search);
+  return params.has("rose-demo") || params.get("demo") === "rose";
+}
+
 function Router() {
   return (
     <Switch>
       {/* Operations */}
       <Route path="/" component={CommandCenter} />
+      <Route path="/dashboard" component={CommandCenter} />
       <Route path="/briefings" component={Briefings} />
       <Route path="/alerts" component={Alerts} />
 
@@ -125,39 +149,112 @@ function Router() {
 }
 
 function App() {
-  const [entered, setEntered] = useState(
-    () => sessionStorage.getItem("cca-demo-entered") === "1"
-  );
-  const [showWalkthrough, setShowWalkthrough] = useState(
-    () => shouldShowWalkthrough()
-  );
+  const [view, setView] = useState<DemoView>(() => {
+    if (typeof window === "undefined") return "landing";
+    if (isDemoHubPath()) return "hub";
+    if (sessionStorage.getItem("cca-demo-entered") === "1") return "app";
+    return "landing";
+  });
+  const [showRoseDemo, setShowRoseDemo] = useState(false);
+  const [roseDemoPanel, setRoseDemoPanel] = useState<RosePanel>("promo");
+  /** User click → try sound; direct ?rose-demo=1 link → muted until interaction. */
+  const [roseDemoAllowSound, setRoseDemoAllowSound] = useState(false);
 
-  const handleLaunch = () => {
+  const syncUrl = (path: string) => {
+    const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+    const next = `${base}${path === "/" ? "" : path}` || "/";
+    window.history.replaceState({}, "", next);
+  };
+
+  const openRoseDemo = (panel: RosePanel = "promo", allowSound = false) => {
+    setRoseDemoPanel(panel);
+    setRoseDemoAllowSound(allowSound);
+    setShowRoseDemo(true);
+  };
+
+  const handleRoseDemoLaunch = () => {
+    if (!isDemoModeEnabled()) {
+      sessionStorage.setItem("cca-demo-entered", "1");
+      setView("app");
+      syncUrl("/");
+      return;
+    }
+    openRoseDemo("promo", true);
+  };
+
+  const handleRoseDemoDismiss = () => {
+    setShowRoseDemo(false);
+    setRoseDemoAllowSound(false);
+    setView("landing");
+    syncUrl("/");
+  };
+
+  const handleRoseDemoGoToHub = () => {
+    setShowRoseDemo(false);
+    setRoseDemoAllowSound(false);
+    setView("hub");
+    syncUrl("/demo");
+  };
+
+  const handleRoseDemoEnter = () => {
     sessionStorage.setItem("cca-demo-entered", "1");
-    setEntered(true);
+    setShowRoseDemo(false);
+    setRoseDemoAllowSound(false);
+    setView("app");
+    syncUrl("/");
   };
 
-  const handleWalkthroughEnter = () => {
-    setShowWalkthrough(false);
-    handleLaunch();
-  };
+  useEffect(() => {
+    if (!isRoseDemoLaunch() || !isDemoModeEnabled()) return;
+    openRoseDemo("promo", false);
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete("rose-demo");
+    if (url.searchParams.get("demo") === "rose") url.searchParams.delete("demo");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }, []);
+
+  useEffect(() => {
+    if (view !== "app") return;
+    const onPop = () => {
+      const path = normalizePath(window.location.pathname);
+      if (path === "/demo") {
+        setView("hub");
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [view]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
         <TooltipProvider>
-          {showWalkthrough && (
+          {showRoseDemo && (
             <DemoWalkthrough
-              onEnterPlatform={handleWalkthroughEnter}
-              onDismiss={() => setShowWalkthrough(false)}
+              allowSound={roseDemoAllowSound}
+              initialPanel={roseDemoPanel}
+              onEnterPlatform={handleRoseDemoEnter}
+              onDismiss={handleRoseDemoDismiss}
+              onGoToHub={handleRoseDemoGoToHub}
             />
           )}
-          {entered ? (
+          {view === "app" ? (
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
               <Router />
             </WouterRouter>
+          ) : view === "hub" ? (
+            <DemoChoiceHub
+              onEnterDemo={handleRoseDemoEnter}
+              onWatchWalkthrough={() => openRoseDemo("walkthrough", true)}
+              onWatchPromo={() => openRoseDemo("promo", true)}
+              onReturnHome={() => {
+                setView("landing");
+                syncUrl("/");
+              }}
+            />
           ) : (
-            <Marketing onLaunchDemo={handleLaunch} />
+            <Marketing onLaunchRoseDemo={handleRoseDemoLaunch} />
           )}
           <Toaster />
         </TooltipProvider>

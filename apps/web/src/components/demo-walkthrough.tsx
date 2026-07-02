@@ -1,338 +1,407 @@
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Compass,
-  ScanSearch,
-  BrainCircuit,
-  TrendingUp,
+  AlertTriangle,
   ArrowRight,
-  ArrowLeft,
+  Clapperboard,
   PlayCircle,
   Volume2,
   X,
 } from "lucide-react";
-import { markWalkthroughComplete } from "@/lib/demo-mode";
-import { WALKTHROUGH_VIDEO_URL, PROMO_FILM_URL } from "@/lib/demo-links";
+import { WalkthroughPlayer } from "@/components/walkthrough/walkthrough-player";
+import {
+  HAS_INLINE_WALKTHROUGH,
+  PROMO_AUDIO_FALLBACK,
+  WALKTHROUGH_VIDEO_URL,
+  resolvePromoVideoUrl,
+} from "@/lib/demo-links";
+
+type Panel = "promo" | "walkthrough";
 
 /**
- * DemoWalkthrough — first-visit demo entry modal shown when DEMO_MODE is on.
- *
- * Behavior:
- * - If VITE_PROMO_FILM_URL is set, the promo video is shown first (muted
- *   autoplay where technically possible; the visitor clicks to enable sound).
- * - Two clear choices: "Watch Walkthrough" (opens VITE_WALKTHROUGH_VIDEO_URL
- *   in a new tab, hidden when unset) and "Enter Platform" (closes the modal,
- *   routes into the main app, and disables the modal via localStorage).
- * - A quick 5-step guided tour remains available as a secondary option.
+ * Rose Demo modal — promo VIDEO first (mp4), audio-only fallback when missing.
  */
-
-type Step = {
-  icon: typeof Compass;
-  kicker: string;
-  title: string;
-  body: string;
-  points: string[];
-};
-
-const STEPS: Step[] = [
-  {
-    icon: Compass,
-    kicker: "Step 1 · What it is",
-    title: "Welcome to CCA BidIntelligenceOS",
-    body: "A bid intelligence workspace built for commercial trade contractors — HVAC, roofing, electrical, concrete, facilities, and more. It brings your entire bid-to-job lifecycle into one command center.",
-    points: [
-      "One workspace from opportunity to closeout",
-      "Built around how trade contractors actually bid",
-      "Adapts to your business vertical",
-    ],
-  },
-  {
-    icon: ScanSearch,
-    kicker: "Step 2 · What it analyzes",
-    title: "Every angle of an opportunity",
-    body: "The platform structures each bid across scope, cost inputs, fit, and risk — so nothing gets decided on a hunch.",
-    points: [
-      "Scope analysis and cost structuring",
-      "Bid-fit scoring against your strengths and capacity",
-      "Market signals, compliance posture, and job-site risk",
-    ],
-  },
-  {
-    icon: BrainCircuit,
-    kicker: "Step 3 · How results are generated",
-    title: "Decision support, not auto-pilot",
-    body: "Insights are assembled from your inputs and the platform's structured bid data, then flagged for your review. Nothing is auto-submitted, and no outcome is ever guaranteed.",
-    points: [
-      "Every recommendation is framed \"flagged for review\"",
-      "You always see the rationale behind an insight",
-      "Final calls stay with you — the OS informs, you decide",
-    ],
-  },
-  {
-    icon: TrendingUp,
-    kicker: "Step 4 · The value",
-    title: "Research less, win more",
-    body: "Contractors use BidIntelligenceOS to spend less time assembling research and more time on the bids worth winning — then feed every outcome back into smarter future bids.",
-    points: [
-      "Faster go / no-go decisions with structured intelligence",
-      "Vendor-ready bid packages without exposing internal strategy",
-      "Won jobs flow straight into deployment, tracking, and closeout",
-    ],
-  },
-];
-
-/** Classify the promo URL so we can embed it with muted autoplay. */
-function promoEmbed(url: string):
-  | { kind: "video"; src: string }
-  | { kind: "iframe"; src: string } {
-  if (/\.(mp4|webm|ogv|ogg|mov)(\?|#|$)/i.test(url)) {
-    return { kind: "video", src: url };
-  }
-  // YouTube — normalize to the embed player with muted autoplay.
-  const yt = url.match(
-    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/i,
-  );
-  if (yt) {
-    return {
-      kind: "iframe",
-      src: `https://www.youtube.com/embed/${yt[1]}?autoplay=1&mute=1&playsinline=1&rel=0`,
-    };
-  }
-  // Vimeo — normalize to the player with muted autoplay.
-  const vm = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
-  if (vm) {
-    return {
-      kind: "iframe",
-      src: `https://player.vimeo.com/video/${vm[1]}?autoplay=1&muted=1`,
-    };
-  }
-  // Unknown host — embed as-is (autoplay depends on the host's own policy).
-  return { kind: "iframe", src: url };
-}
-
-function PromoPlayer({ url }: { url: string }) {
-  const embed = useMemo(() => promoEmbed(url), [url]);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [muted, setMuted] = useState(true);
-
-  const enableSound = () => {
-    const el = videoRef.current;
-    if (el) {
-      el.muted = false;
-      el.volume = 1;
-    }
-    setMuted(false);
-  };
-
-  return (
-    <div className="relative w-full aspect-video bg-black">
-      {embed.kind === "video" ? (
-        <>
-          <video
-            ref={videoRef}
-            src={embed.src}
-            autoPlay
-            muted
-            playsInline
-            controls
-            onVolumeChange={(e) => setMuted(e.currentTarget.muted)}
-            className="w-full h-full object-contain"
-            data-testid="video-promo"
-          />
-          {muted && (
-            <button
-              onClick={enableSound}
-              className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black/70 border border-white/20 text-white text-xs font-semibold hover:bg-black/90 transition-colors"
-              data-testid="button-promo-sound"
-            >
-              <Volume2 className="w-3.5 h-3.5" /> Tap for sound
-            </button>
-          )}
-        </>
-      ) : (
-        <iframe
-          src={embed.src}
-          title="Promo film"
-          className="w-full h-full"
-          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-          allowFullScreen
-          data-testid="iframe-promo"
-        />
-      )}
-    </div>
-  );
-}
-
 export function DemoWalkthrough({
+  allowSound,
+  initialPanel = "promo",
   onEnterPlatform,
   onDismiss,
+  onGoToHub,
 }: {
+  allowSound: boolean;
+  initialPanel?: Panel;
   onEnterPlatform: () => void;
+  /** X button — return to landing page. */
   onDismiss: () => void;
+  /** Video end, backdrop, or time-update fallback — open demo choice hub. */
+  onGoToHub: () => void;
 }) {
-  const [view, setView] = useState<"intro" | "tour">("intro");
-  const [step, setStep] = useState(0);
+  const [panel, setPanel] = useState<Panel>(initialPanel);
+  const [promoKey, setPromoKey] = useState(0);
 
-  const handleEnter = () => {
-    markWalkthroughComplete();
-    onEnterPlatform();
+  const replayPromo = () => {
+    setPanel("promo");
+    setPromoKey((k) => k + 1);
   };
 
-  const isFinal = step === STEPS.length;
-  const current = STEPS[Math.min(step, STEPS.length - 1)];
-  const Icon = current.icon;
+  const openWalkthrough = () => {
+    if (WALKTHROUGH_VIDEO_URL) {
+      window.open(WALKTHROUGH_VIDEO_URL, "_blank", "noopener,noreferrer");
+      return;
+    }
+    if (HAS_INLINE_WALKTHROUGH) {
+      setPanel("walkthrough");
+    }
+  };
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#05080F]/90 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label="Demo introduction"
+      aria-label="Rose Demo"
+      onClick={onGoToHub}
     >
-      <div className="relative w-full max-w-xl rounded-2xl border border-white/10 bg-[#0B1220] shadow-[0_0_80px_rgba(56,189,248,0.15)] overflow-hidden">
+      <div
+        className="relative w-full max-w-4xl rounded-2xl border border-white/10 bg-[#0B1220] shadow-[0_0_80px_rgba(56,189,248,0.2)] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
           onClick={onDismiss}
-          aria-label="Close for now"
-          className="absolute top-3.5 right-3.5 z-10 p-1.5 rounded-md text-slate-400 hover:text-white bg-black/30 hover:bg-white/10 transition-colors"
+          aria-label="Close and return to landing page"
+          className="absolute top-3.5 right-3.5 z-20 p-2 rounded-lg text-slate-300 hover:text-white bg-black/50 border border-white/15 hover:bg-white/10 transition-colors"
           data-testid="button-walkthrough-dismiss"
         >
           <X className="w-4 h-4" />
         </button>
 
-        {view === "intro" ? (
-          <div>
-            {PROMO_FILM_URL && <PromoPlayer url={PROMO_FILM_URL} />}
-            <div className="p-7 sm:p-8 text-center">
+        {panel === "promo" ? (
+          <>
+            <PromoMedia
+              allowSound={allowSound}
+              replayKey={promoKey}
+              onFinished={onGoToHub}
+            />
+            <div className="p-6 sm:p-8 text-center border-t border-white/5">
               <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#6B7794]">
-                CCA BidIntelligenceOS · Demo
+                CCA BidIntelligenceOS · Rose Demo
               </span>
-              <h2 className="text-2xl font-bold text-white mt-2.5 mb-2">
+              <h2 className="text-2xl font-bold text-white mt-2 mb-2">
                 Research Less, Win More
               </h2>
-              <p className="text-sm leading-relaxed text-slate-400 mb-6 max-w-md mx-auto">
-                The bid intelligence workspace for commercial trade contractors
-                — from opportunity analysis to job closeout, seeded with
-                realistic demo data.
+              <p className="text-sm leading-relaxed text-slate-400 mb-6 max-w-lg mx-auto">
+                Watch the promo film, take the narrated walkthrough, or step
+                straight into the live Command Center demo.
               </p>
               <div className="flex flex-col sm:flex-row items-stretch justify-center gap-3">
-                {WALKTHROUGH_VIDEO_URL && (
-                  <a
-                    href={WALKTHROUGH_VIDEO_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-[#38BDF8]/40 bg-[#38BDF8]/10 text-[#7dd3fc] font-semibold text-sm hover:bg-[#38BDF8]/20 hover:text-white transition-colors"
-                    data-testid="button-watch-walkthrough"
-                  >
-                    <PlayCircle className="w-4 h-4" />
-                    Watch Walkthrough
-                  </a>
-                )}
                 <button
-                  onClick={handleEnter}
+                  type="button"
+                  onClick={openWalkthrough}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-[#38BDF8]/40 bg-[#38BDF8]/10 text-[#7dd3fc] font-semibold text-sm hover:bg-[#38BDF8]/20 hover:text-white transition-colors"
+                  data-testid="button-watch-walkthrough"
+                >
+                  <PlayCircle className="w-4 h-4" />
+                  Watch Walkthrough
+                </button>
+                <button
+                  type="button"
+                  onClick={replayPromo}
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-white/15 bg-white/5 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
+                  data-testid="button-watch-promo"
+                >
+                  <Clapperboard className="w-4 h-4" />
+                  Watch Promo
+                </button>
+                <button
+                  type="button"
+                  onClick={onEnterPlatform}
                   className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
                   data-testid="button-walkthrough-enter"
                 >
-                  Enter Platform <ArrowRight className="w-4 h-4" />
+                  Enter Demo <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
+            </div>
+          </>
+        ) : (
+          <div className="p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4 pr-10">
+              <h2 className="text-lg font-bold text-white">Product Walkthrough</h2>
               <button
-                onClick={() => setView("tour")}
-                className="mt-4 text-xs text-slate-500 hover:text-slate-300 transition-colors"
-                data-testid="button-walkthrough-tour"
+                type="button"
+                onClick={replayPromo}
+                className="text-xs font-semibold text-[#7dd3fc] hover:text-white transition-colors"
+                data-testid="button-back-to-promo"
               >
-                Prefer a quick read? Take the 5-step tour
+                ← Back to Promo
+              </button>
+            </div>
+            <WalkthroughPlayer />
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                type="button"
+                onClick={replayPromo}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-white/15 bg-white/5 text-white font-semibold text-sm hover:bg-white/10 transition-colors"
+                data-testid="button-watch-promo-inline"
+              >
+                <Clapperboard className="w-4 h-4" />
+                Watch Promo
+              </button>
+              <button
+                type="button"
+                onClick={onEnterPlatform}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm shadow-[0_0_36px_rgba(56,189,248,0.4)]"
+                data-testid="button-walkthrough-enter-inline"
+              >
+                Enter Demo <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
-        ) : (
-          <div>
-            <div className="h-1 bg-white/5">
-              <div
-                className="h-full bg-gradient-to-r from-[#38BDF8] to-[#2A9BD8] transition-all duration-300"
-                style={{ width: `${((step + 1) / (STEPS.length + 1)) * 100}%` }}
-              />
-            </div>
-            {!isFinal ? (
-              <div className="p-7 sm:p-8">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-lg bg-[#38BDF8]/10 border border-[#38BDF8]/30 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-[#38BDF8]" />
-                  </div>
-                  <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#6B7794]">
-                    {current.kicker}
-                  </span>
-                </div>
-                <h2 className="text-xl font-bold text-white mb-2.5">{current.title}</h2>
-                <p className="text-sm leading-relaxed text-slate-400 mb-5">{current.body}</p>
-                <ul className="space-y-2.5 mb-7">
-                  {current.points.map((p) => (
-                    <li key={p} className="flex items-start gap-2.5 text-sm text-slate-300">
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#38BDF8] shrink-0" />
-                      {p}
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex items-center justify-between">
-                  <button
-                    onClick={() =>
-                      step === 0 ? setView("intro") : setStep((s) => s - 1)
-                    }
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-colors"
-                    data-testid="button-walkthrough-back"
-                  >
-                    <ArrowLeft className="w-4 h-4" /> Back
-                  </button>
-                  <div className="flex items-center gap-1.5">
-                    {[...STEPS, null].map((_, i) => (
-                      <span
-                        key={i}
-                        className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                          i === step ? "bg-[#38BDF8]" : "bg-white/15"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => setStep((s) => s + 1)}
-                    className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] text-sm font-semibold transition-all hover:shadow-[0_0_24px_rgba(56,189,248,0.45)]"
-                    data-testid="button-walkthrough-next"
-                  >
-                    Next <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="p-7 sm:p-8 text-center">
-                <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#6B7794]">
-                  Step 5 · You're ready
-                </span>
-                <h2 className="text-2xl font-bold text-white mt-3 mb-2.5">
-                  Step into the Command Center
-                </h2>
-                <p className="text-sm leading-relaxed text-slate-400 mb-7 max-w-sm mx-auto">
-                  Explore live bids, job execution, market signals, and the
-                  ROSEOS intelligence layer — all seeded with realistic demo
-                  data.
-                </p>
-                <button
-                  onClick={handleEnter}
-                  className="w-full inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
-                  data-testid="button-walkthrough-enter-final"
-                >
-                  Enter Platform <ArrowRight className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    setStep(0);
-                    setView("intro");
-                  }}
-                  className="mt-3 text-xs text-slate-500 hover:text-slate-300 transition-colors"
-                  data-testid="button-walkthrough-restart"
-                >
-                  Back to the start
-                </button>
-              </div>
-            )}
-          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+type PromoStatus = "checking" | "video" | "missing";
+
+function PromoMedia({
+  allowSound,
+  replayKey,
+  onFinished,
+}: {
+  allowSound: boolean;
+  replayKey: number;
+  onFinished: () => void;
+}) {
+  const videoUrl = resolvePromoVideoUrl();
+  const [status, setStatus] = useState<PromoStatus>("checking");
+
+  useEffect(() => {
+    let cancelled = false;
+    setStatus("checking");
+    fetch(videoUrl, { method: "HEAD" })
+      .then((response) => {
+        if (cancelled) return;
+        const type = response.headers.get("content-type") ?? "";
+        if (response.ok && type.includes("video")) {
+          setStatus("video");
+        } else {
+          setStatus("missing");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setStatus("missing");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [videoUrl, replayKey]);
+
+  if (status === "checking") {
+    return (
+      <div
+        className="w-full aspect-video bg-black flex items-center justify-center text-slate-500 text-sm"
+        data-testid="promo-loading"
+      >
+        Loading promo…
+      </div>
+    );
+  }
+
+  if (status === "video") {
+    return (
+      <PromoVideoPlayer
+        url={videoUrl}
+        allowSound={allowSound}
+        replayKey={replayKey}
+        onMissing={() => setStatus("missing")}
+        onFinished={onFinished}
+      />
+    );
+  }
+
+  return (
+    <MissingPromoVideo
+      allowSound={allowSound}
+      replayKey={replayKey}
+      onFinished={onFinished}
+    />
+  );
+}
+
+function PromoVideoPlayer({
+  url,
+  allowSound,
+  replayKey,
+  onMissing,
+  onFinished,
+}: {
+  url: string;
+  allowSound: boolean;
+  replayKey: number;
+  onMissing: () => void;
+  onFinished: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [needsTap, setNeedsTap] = useState(!allowSound);
+  const finished = useRef(false);
+
+  const finish = useCallback(() => {
+    if (finished.current) return;
+    finished.current = true;
+    onFinished();
+  }, [onFinished]);
+
+  useEffect(() => {
+    finished.current = false;
+  }, [replayKey, url]);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = !allowSound;
+    if (allowSound) {
+      el.volume = 1;
+      void el.play()
+        .then(() => setNeedsTap(false))
+        .catch(() => setNeedsTap(true));
+    } else {
+      void el.play().catch(() => undefined);
+    }
+  }, [allowSound, replayKey, url]);
+
+  const enableSound = () => {
+    const el = videoRef.current;
+    if (!el) return;
+    el.muted = false;
+    el.volume = 1;
+    void el.play().then(() => setNeedsTap(false));
+  };
+
+  const handleTimeUpdate = () => {
+    const el = videoRef.current;
+    if (!el || !Number.isFinite(el.duration) || el.duration <= 0) return;
+    if (el.currentTime >= el.duration - 0.3) finish();
+  };
+
+  return (
+    <div className="relative w-full aspect-video bg-black">
+      <video
+        key={`${url}-${replayKey}`}
+        ref={videoRef}
+        src={url}
+        autoPlay
+        muted={!allowSound}
+        playsInline
+        controls
+        onError={onMissing}
+        onEnded={finish}
+        onTimeUpdate={handleTimeUpdate}
+        className="w-full h-full object-contain"
+        data-testid="video-promo"
+      />
+      {needsTap && (
+        <button
+          type="button"
+          onClick={enableSound}
+          className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black/75 border border-white/20 text-white text-xs font-semibold"
+          data-testid="button-promo-sound"
+        >
+          <Volume2 className="w-3.5 h-3.5" /> Tap for sound
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** Shown when promo-video.mp4 is not deployed — audio is NOT the primary promo. */
+function MissingPromoVideo({
+  allowSound,
+  replayKey,
+  onFinished,
+}: {
+  allowSound: boolean;
+  replayKey: number;
+  onFinished: () => void;
+}) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [needsTap, setNeedsTap] = useState(!allowSound);
+  const finished = useRef(false);
+
+  const finish = useCallback(() => {
+    if (finished.current) return;
+    finished.current = true;
+    onFinished();
+  }, [onFinished]);
+
+  useEffect(() => {
+    finished.current = false;
+  }, [replayKey]);
+
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    el.muted = !allowSound;
+    if (allowSound) {
+      el.volume = 1;
+      void el.play()
+        .then(() => setNeedsTap(false))
+        .catch(() => setNeedsTap(true));
+    }
+  }, [allowSound, replayKey]);
+
+  const handleTimeUpdate = () => {
+    const el = audioRef.current;
+    if (!el || !Number.isFinite(el.duration) || el.duration <= 0) return;
+    if (el.currentTime >= el.duration - 0.3) finish();
+  };
+
+  return (
+    <div className="w-full aspect-video bg-[#0A0E1A] flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6 text-center border-b border-amber-500/20 bg-amber-500/5">
+        <AlertTriangle className="w-8 h-8 text-amber-400" />
+        <p
+          className="text-sm font-semibold text-amber-200 max-w-md"
+          data-testid="promo-video-missing"
+        >
+          The actual promo video file is missing. Only audio exists.
+        </p>
+        <p className="text-xs text-slate-400 max-w-md">
+          Upload <code className="text-amber-300/90">apps/web/public/promo/promo-video.mp4</code>
+          {" "}then rebuild, or set{" "}
+          <code className="text-amber-300/90">VITE_PROMO_FILM_URL</code> to a hosted
+          .mp4 URL.
+        </p>
+      </div>
+      <div className="px-4 py-3 bg-black/40">
+        <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-2 text-center">
+          Temporary audio preview only
+        </p>
+        <audio
+          key={replayKey}
+          ref={audioRef}
+          src={PROMO_AUDIO_FALLBACK}
+          controls
+          muted={!allowSound}
+          onEnded={finish}
+          onTimeUpdate={handleTimeUpdate}
+          className="w-full"
+          data-testid="audio-promo-fallback"
+        />
+        {needsTap && (
+          <button
+            type="button"
+            onClick={() => {
+              const el = audioRef.current;
+              if (!el) return;
+              el.muted = false;
+              void el.play().then(() => setNeedsTap(false));
+            }}
+            className="mt-2 w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md bg-black/60 border border-white/15 text-white text-xs font-semibold"
+            data-testid="button-promo-sound"
+          >
+            <Volume2 className="w-3.5 h-3.5" /> Tap for sound
+          </button>
         )}
       </div>
     </div>

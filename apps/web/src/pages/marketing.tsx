@@ -249,7 +249,11 @@ const GOVERNMENT = {
     "Government Contracting tracks your public registrations and lawful, published solicitation data — decision-support you review, not guaranteed awards.",
 };
 
-export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }) {
+export default function Marketing({
+  onLaunchRoseDemo,
+}: {
+  onLaunchRoseDemo: () => void;
+}) {
   const playerRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToPlayer = () =>
@@ -332,16 +336,16 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
           </nav>
           <div className="flex items-center gap-3">
             <button
-              onClick={onLaunchDemo}
+              onClick={onLaunchRoseDemo}
               className="hidden sm:inline text-sm text-[#cbd5e1] hover:text-white transition-colors"
             >
               Sign in
             </button>
             <button
-              onClick={onLaunchDemo}
+              onClick={onLaunchRoseDemo}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm hover:from-[#5cc6fb] hover:to-[#38a8e0] transition-all shadow-[0_0_24px_rgba(56,189,248,0.35)]"
             >
-              Request a Demo
+              Launch Rose Demo
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -400,10 +404,10 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
 
           <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
-              onClick={onLaunchDemo}
+              onClick={onLaunchRoseDemo}
               className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
             >
-              Launch the Live Demo
+              Launch Rose Demo
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
             <button
@@ -726,17 +730,17 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
           </div>
           <div id="cta" className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 scroll-mt-24">
             <button
-              onClick={onLaunchDemo}
+              onClick={onLaunchRoseDemo}
               className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
             >
               View the Platform
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
             <button
-              onClick={onLaunchDemo}
+              onClick={onLaunchRoseDemo}
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-white/15 bg-white/5 text-white font-semibold text-sm hover:bg-white/10 transition-colors backdrop-blur-sm"
             >
-              Request a Demo
+              Launch Rose Demo
             </button>
           </div>
         </div>
@@ -1253,7 +1257,7 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
       </section>
 
       {/* VoiceConnect add-on */}
-      <VoiceConnectMarketingSection onLaunchDemo={onLaunchDemo} />
+      <VoiceConnectMarketingSection onLaunchRoseDemo={onLaunchRoseDemo} />
 
       {/* Closing CTA */}
       <section className="max-w-6xl mx-auto px-6 lg:px-8 pb-16 pt-16">
@@ -1280,10 +1284,10 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
               Explore the full interactive demo with sample data — no setup required.
             </p>
             <button
-              onClick={onLaunchDemo}
+              onClick={onLaunchRoseDemo}
               className="group mt-7 inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
             >
-              Launch the Live Demo
+              Launch Rose Demo
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[#6B7794]">
