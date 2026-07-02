@@ -140,9 +140,9 @@ export function WalkthroughPlayer() {
                 <span className="absolute inset-0 rounded-full border border-[#38BDF8] animate-ping opacity-40" />
               </span>
               <span className="mt-5 text-sm font-semibold tracking-wide text-white">
-                Watch the 50-second walkthrough
+                Watch the 90-second walkthrough
               </span>
-              <span className="mt-1 text-xs text-[#8A96B0]">Narrated product tour</span>
+              <span className="mt-1 text-xs text-[#8A96B0]">Narrated tour of the full platform</span>
             </motion.button>
           )}
         </AnimatePresence>

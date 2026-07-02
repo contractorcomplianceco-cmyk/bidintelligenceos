@@ -11,31 +11,31 @@ title = "commercial construction site skyscraper cranes city skyline"
 id = "zkVxTmq-5DyTZOBjIceCo"
 uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene1.mp3"
 type = "audio"
-title = "scene1"
+title = "walkthrough vo scene1"
 
 [[outputs]]
 id = "Gm17bpKjveVlSnbhTo9bl"
 uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene2.mp3"
 type = "audio"
-title = "scene2"
+title = "walkthrough vo scene2"
 
 [[outputs]]
 id = "ele8kcNwyt0PfOjIE8Gtj"
 uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene3.mp3"
 type = "audio"
-title = "scene3"
+title = "walkthrough vo scene3"
 
 [[outputs]]
 id = "5VziTGM0xMrs2amQy817x"
 uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene4.mp3"
 type = "audio"
-title = "scene4"
+title = "walkthrough vo scene4"
 
 [[outputs]]
 id = "UZ3dvhBve-KvrozubrnpL"
 uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene5.mp3"
 type = "audio"
-title = "scene5"
+title = "walkthrough vo scene5"
 
 [[outputs]]
 id = "HIgQWhjL3Rb1pYE7WQWkc"
@@ -276,3 +276,33 @@ id = "ywYfgRdkwSS_aMbJZyEJ_"
 uri = "file://attached_assets/generated_audio/vo_v4_s10_closing.mp3"
 type = "audio"
 title = "v4 vo s10_closing"
+
+[[outputs]]
+id = "pC-dAJAZkzxxedx8FPkgb"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene6.mp3"
+type = "audio"
+title = "walkthrough vo scene6"
+
+[[outputs]]
+id = "LlJVoW8C0cQXVitwlPeCM"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene7.mp3"
+type = "audio"
+title = "walkthrough vo scene7"
+
+[[outputs]]
+id = "N7HBN1IbKr3VG8hBpRRM2"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene8.mp3"
+type = "audio"
+title = "walkthrough vo scene8"
+
+[[outputs]]
+id = "CIewSwbDh2T3wh9q1m2UX"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene9.mp3"
+type = "audio"
+title = "walkthrough vo scene9"
+
+[[outputs]]
+id = "taQlz1OT9cXE3_3sqzPKn"
+uri = "file://artifacts/bid-intelligence-os/public/walkthrough/scene10.mp3"
+type = "audio"
+title = "walkthrough vo scene10"
