@@ -40,7 +40,7 @@ The frontend imports business data via the `@core/*` alias and shared utilities 
 
 - Clicking **Launch Demo** on the landing page opens the modal first — **Enter Demo** inside it is the only path into the dashboard, and the **X** returns to the landing page.
 - The promo film plays at the top of the modal — muted autoplay (YouTube/Vimeo/direct video files are handled automatically); visitors click to enable sound.
-- Promo video source: `VITE_PROMO_FILM_URL` when set; otherwise the default local file `apps/web/public/promo/promo-video.mp4`. **The real promo video is not in the repo yet — upload it to that path.** Until it exists, the modal shows a temporary audio preview (`apps/web/public/promo/composite_audio.mp3`) instead.
+- Promo video source: `VITE_PROMO_FILM_URL` when set; otherwise the default local file `apps/web/public/promo/promo-video.mp4` (the rendered promo film ships in the repo). If the file is ever removed, the modal falls back to a temporary audio preview (`apps/web/public/promo/composite_audio.mp3`).
 - Three choices: **Watch Walkthrough** (opens `VITE_WALKTHROUGH_VIDEO_URL` in a new tab; hidden when unset), **Watch Promo** (opens the promo in a new tab; hidden while the video file is missing), and **Enter Demo** (routes into the live Command Center).
 - A secondary "5-step tour" link offers a quick text walkthrough: what the platform is → what it analyzes → how results are generated → the value → Enter Demo.
 - Clicking **Enter Demo** permanently disables the modal for that browser (localStorage flag `bios-walkthrough-complete`) — later "Launch Demo" clicks go straight to the dashboard.
@@ -58,7 +58,7 @@ Copy `.env.example` to `.env` at the repo root. All values are optional:
 | `VITE_PROMO_FILM_URL`        | (blank) | Promo film override URL; blank = local `/promo/promo-video.mp4` |
 | `API_PORT`                   | `5001`  | Port for the placeholder API server                             |
 
-The walkthrough link renders only when its URL is set. The promo film defaults to the local file `apps/web/public/promo/promo-video.mp4` — upload the real video there (only `composite_audio.mp3`, a temporary audio fallback, ships in the repo today). No video app code ships in this repo.
+The walkthrough link renders only when its URL is set. The promo film defaults to the local file `apps/web/public/promo/promo-video.mp4`, which ships in the repo (`composite_audio.mp3` remains as an audio-only fallback). No video app code ships in this repo.
 
 ## Scripts
 
