@@ -1,2 +1,0 @@
-- [Screenshotting the gated app](screenshot-demo-gate.md) — the in-app UI is hidden behind a sessionStorage gate; the screenshot tool only sees marketing unless the gate is temporarily forced open.
-- [Standalone export package](standalone-export-package.md) — Replit-free copy of the app under export/ for GitHub/Cursor; single app, videos as env links; does not auto-track the live app.
