@@ -60,18 +60,18 @@ const SEVERITY_META: Record<
 > = {
   Critical: { color: "#EF4444", bg: "rgba(239,68,68,0.10)", border: "rgba(239,68,68,0.30)" },
   High: { color: "#F59E0B", bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.30)" },
-  Medium: { color: "#38BDF8", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.30)" },
-  Low: { color: "#8A96B0", bg: "rgba(138,150,176,0.10)", border: "rgba(138,150,176,0.30)" },
+  Medium: { color: "#0EA5E9", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.30)" },
+  Low: { color: "#64748B", bg: "rgba(138,150,176,0.10)", border: "rgba(138,150,176,0.30)" },
 };
 
 const CATEGORY_META: Record<
   RiskCategory,
   { icon: typeof CloudRain; color: string }
 > = {
-  Weather: { icon: CloudRain, color: "#38BDF8" },
+  Weather: { icon: CloudRain, color: "#0EA5E9" },
   Labor: { icon: Users, color: "#A855F7" },
   Permit: { icon: FileCheck2, color: "#F59E0B" },
-  Scope: { icon: Ruler, color: "#38BDF8" },
+  Scope: { icon: Ruler, color: "#0EA5E9" },
   Cost: { icon: DollarSign, color: "#22C55E" },
 };
 
@@ -90,16 +90,16 @@ const CO_STATUS_META: Record<
   ChangeOrderStatus,
   { color: string; bg: string; border: string }
 > = {
-  Draft: { color: "#8A96B0", bg: "rgba(138,150,176,0.10)", border: "rgba(138,150,176,0.30)" },
-  Submitted: { color: "#38BDF8", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.30)" },
+  Draft: { color: "#64748B", bg: "rgba(138,150,176,0.10)", border: "rgba(138,150,176,0.30)" },
+  Submitted: { color: "#0EA5E9", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.30)" },
   Approved: { color: "#22C55E", bg: "rgba(34,197,94,0.10)", border: "rgba(34,197,94,0.30)" },
   Disputed: { color: "#EF4444", bg: "rgba(239,68,68,0.10)", border: "rgba(239,68,68,0.30)" },
 };
 
 function detectionMeta(source: DetectionSource): { icon: typeof Bot; color: string } {
   if (source === "Field report via VoiceConnect") return { icon: Radio, color: "#0BA3A8" };
-  if (source === "Risk Radar AI") return { icon: Bot, color: "#38BDF8" };
-  return { icon: ClipboardCheck, color: "#8A96B0" };
+  if (source === "Risk Radar AI") return { icon: Bot, color: "#0EA5E9" };
+  return { icon: ClipboardCheck, color: "#64748B" };
 }
 
 export default function Risk() {
@@ -129,18 +129,18 @@ export default function Risk() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
-              <Radar className="w-7 h-7 text-[#38BDF8]" />
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <Radar className="w-7 h-7 text-[#0284C7]" />
               Risk &amp; Change Orders
             </h1>
-            <p className="text-[#8A96B0] mt-1">
+            <p className="text-slate-500 mt-1">
               Risk radar, change-order tracking, and profit-fade watch across active{" "}
               {verticalConfig.name} deployments.
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-lg border border-[#1C253B] bg-[#0F1830] px-3 py-2">
-            <Info className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
-            <span className="text-[11px] text-[#8A96B0]">
+          <div className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2">
+            <Info className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
+            <span className="text-[11px] text-slate-500">
               AI detections are flagged for review — decision support only.
             </span>
           </div>
@@ -150,7 +150,7 @@ export default function Risk() {
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <KpiCard
             icon={ShieldAlert}
-            color="#38BDF8"
+            color="#0EA5E9"
             label="Open Risks"
             value={String(riskStats.openRisks)}
             sub={`${riskStats.mitigating} mitigating · ${riskStats.resolved} resolved`}
@@ -186,20 +186,20 @@ export default function Risk() {
         </div>
 
         {/* Risk Radar board */}
-        <Card className="bg-[#0F1830] border-[#1C253B] flex flex-col">
-          <CardHeader className="p-4 border-b border-[#1C253B] flex flex-col gap-4">
+        <Card className="bg-white border-[#E2E8F0] shadow-sm flex flex-col">
+          <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-col gap-4">
             <div className="flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
-                <Radar className="w-4 h-4 text-[#38BDF8]" />
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
+                <Radar className="w-4 h-4 text-[#0284C7]" />
                 RISK RADAR
               </CardTitle>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
                 {filteredRisks.length} shown
               </span>
             </div>
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0] mr-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mr-1">
                   Severity
                 </span>
                 <FilterChip
@@ -218,7 +218,7 @@ export default function Risk() {
                 ))}
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0] mr-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mr-1">
                   Category
                 </span>
                 <FilterChip
@@ -240,7 +240,7 @@ export default function Risk() {
           </CardHeader>
           <CardContent className="p-4">
             {filteredRisks.length === 0 ? (
-              <div className="p-10 text-center text-[#8A96B0] text-sm flex flex-col items-center gap-2">
+              <div className="p-10 text-center text-slate-500 text-sm flex flex-col items-center gap-2">
                 <CheckCircle2 className="w-6 h-6 text-[#22C55E]" />
                 No risks match the current filters.
               </div>
@@ -256,13 +256,13 @@ export default function Risk() {
 
         {/* Change Orders: table + detail card */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <Card className="bg-[#0F1830] border-[#1C253B] flex flex-col xl:col-span-2">
-            <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#38BDF8]" />
+          <Card className="bg-white border-[#E2E8F0] shadow-sm flex flex-col xl:col-span-2">
+            <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#0284C7]" />
                 CHANGE ORDERS
               </CardTitle>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
                 {changeOrders.length} total ·{" "}
                 <span className="text-[#22C55E]">
                   {fmtCompact(riskStats.approvedChangeOrderValue)} approved
@@ -271,13 +271,13 @@ export default function Risk() {
             </CardHeader>
             <CardContent className="p-0 overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[720px]">
-                <thead className="bg-[#151D2E] border-b border-[#1C253B]">
+                <thead className="bg-[#F1F5F9] border-b border-[#E2E8F0]">
                   <tr>
                     {["CO #", "Job / Title", "Origin", "Amount", "Status", "Days Pending"].map(
                       (h, i) => (
                         <th
                           key={h}
-                          className={`px-3 py-3 text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest whitespace-nowrap ${
+                          className={`px-3 py-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap ${
                             i >= 3 ? "text-right" : ""
                           }`}
                         >
@@ -287,7 +287,7 @@ export default function Risk() {
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#1C253B]">
+                <tbody className="divide-y divide-[#E2E8F0]">
                   {changeOrders.map((co) => {
                     const meta = CO_STATUS_META[co.status];
                     const selected = co.id === selectedCoId;
@@ -296,20 +296,20 @@ export default function Risk() {
                         key={co.id}
                         onClick={() => setSelectedCoId(co.id)}
                         className={`transition-colors cursor-pointer ${
-                          selected ? "bg-[#151D2E]" : "hover:bg-[#151D2E]"
+                          selected ? "bg-[#F1F5F9]" : "hover:bg-[#F1F5F9]"
                         }`}
                       >
-                        <td className="px-3 py-3 text-xs font-semibold text-[#38BDF8] whitespace-nowrap">
+                        <td className="px-3 py-3 text-xs font-semibold text-[#0284C7] whitespace-nowrap">
                           {co.coNumber}
                         </td>
                         <td className="px-3 py-3">
-                          <div className="text-xs font-semibold text-white">{co.title}</div>
-                          <div className="text-[10px] text-[#8A96B0] mt-0.5">{co.jobName}</div>
+                          <div className="text-xs font-semibold text-slate-900">{co.title}</div>
+                          <div className="text-[10px] text-slate-500 mt-0.5">{co.jobName}</div>
                         </td>
-                        <td className="px-3 py-3 text-[11px] text-[#8A96B0] max-w-[200px]">
+                        <td className="px-3 py-3 text-[11px] text-slate-500 max-w-[200px]">
                           {co.origin}
                         </td>
-                        <td className="px-3 py-3 text-right text-xs font-semibold text-white whitespace-nowrap">
+                        <td className="px-3 py-3 text-right text-xs font-semibold text-slate-900 whitespace-nowrap">
                           {fmtFull(co.amount)}
                         </td>
                         <td className="px-3 py-3 text-right whitespace-nowrap">
@@ -332,7 +332,7 @@ export default function Risk() {
                                   ? "text-[#EF4444] font-semibold"
                                   : co.daysPending >= 5
                                     ? "text-[#F59E0B] font-semibold"
-                                    : "text-[#8A96B0]"
+                                    : "text-slate-500"
                               }
                             >
                               {co.daysPending}d
@@ -353,13 +353,13 @@ export default function Risk() {
         </div>
 
         {/* Profit Fade watch */}
-        <Card className="bg-[#0F1830] border-[#1C253B] flex flex-col">
-          <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+        <Card className="bg-white border-[#E2E8F0] shadow-sm flex flex-col">
+          <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
               <TrendingDown className="w-4 h-4 text-[#EF4444]" />
               PROFIT FADE WATCH
             </CardTitle>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
               Projected margin trend · flagged for review
             </span>
           </CardHeader>
@@ -372,8 +372,8 @@ export default function Risk() {
           </CardContent>
         </Card>
 
-        <p className="text-[11px] text-[#8A96B0] flex items-center gap-2">
-          <Info className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
+        <p className="text-[11px] text-slate-500 flex items-center gap-2">
+          <Info className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
           Risk Radar signals and margin projections are AI-assisted decision support flagged for
           human review. Figures are directional, not guaranteed outcomes, and no internal pricing
           formula or margin strategy is exposed.
@@ -397,19 +397,19 @@ function KpiCard({
   sub: string;
 }) {
   return (
-    <Card className="bg-[#0F1830] border-[#1C253B] relative overflow-hidden group">
+    <Card className="bg-white border-[#E2E8F0] shadow-sm relative overflow-hidden group">
       <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
         <Icon className="w-10 h-10" style={{ color }} />
       </div>
       <CardContent className="p-4 relative z-10">
         <div className="flex items-center gap-2 mb-2">
           <Icon className="w-4 h-4" style={{ color }} />
-          <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-wider">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
             {label}
           </span>
         </div>
-        <div className="text-3xl font-bold text-white tracking-tight">{value}</div>
-        <p className="text-[10px] text-[#8A96B0] mt-1 font-medium tracking-wide">{sub}</p>
+        <div className="text-3xl font-bold text-slate-900 tracking-tight">{value}</div>
+        <p className="text-[10px] text-slate-500 mt-1 font-medium tracking-wide">{sub}</p>
       </CardContent>
     </Card>
   );
@@ -434,8 +434,8 @@ function FilterChip({
       aria-pressed={active}
       className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-semibold transition-colors ${
         active
-          ? "border-[#38BDF8]/40 bg-[#38BDF8]/10 text-[#38BDF8]"
-          : "border-[#1C253B] bg-[#111A2E] text-[#8A96B0] hover:text-white hover:border-[#2A3756]"
+          ? "border-[#38BDF8]/40 bg-[#38BDF8]/10 text-[#0284C7]"
+          : "border-[#E2E8F0] bg-white text-slate-500 hover:text-slate-900 hover:border-[#CBD5E1]"
       }`}
     >
       {dotColor && <span className="w-2 h-2 rounded-full" style={{ backgroundColor: dotColor }} />}
@@ -456,8 +456,8 @@ function RiskCard({ item }: { item: RiskItem }) {
 
   return (
     <div
-      className="rounded-xl border bg-[#111A2E] p-4 flex flex-col gap-3 transition-colors hover:border-[#2A3756]"
-      style={{ borderColor: item.status === "Resolved" ? "#1C253B" : sev.border }}
+      className="rounded-xl border bg-white p-4 flex flex-col gap-3 transition-colors hover:border-[#CBD5E1]"
+      style={{ borderColor: item.status === "Resolved" ? "#E2E8F0" : sev.border }}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -474,7 +474,7 @@ function RiskCard({ item }: { item: RiskItem }) {
             >
               {item.severity}
             </span>
-            <span className="inline-flex w-fit items-center gap-1 rounded bg-[#1C253B] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[#8A96B0]">
+            <span className="inline-flex w-fit items-center gap-1 rounded bg-[#E2E8F0] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-500">
               {item.category}
             </span>
           </div>
@@ -489,18 +489,18 @@ function RiskCard({ item }: { item: RiskItem }) {
       </div>
 
       <div>
-        <h3 className="text-sm font-semibold text-white leading-snug">{item.title}</h3>
-        <p className="text-[12px] text-[#8A96B0] leading-snug mt-1">{item.description}</p>
+        <h3 className="text-sm font-semibold text-slate-900 leading-snug">{item.title}</h3>
+        <p className="text-[12px] text-slate-500 leading-snug mt-1">{item.description}</p>
       </div>
 
       <div
-        className="rounded-lg border border-[#1C253B] bg-[#0F1830] p-2.5 flex items-start gap-2"
+        className="rounded-lg border border-[#E2E8F0] bg-white p-2.5 flex items-start gap-2"
       >
-        <ArrowRight className="w-3.5 h-3.5 text-[#38BDF8] shrink-0 mt-0.5" />
-        <p className="text-[11px] text-[#C6D0E4] leading-snug">{item.recommendedAction}</p>
+        <ArrowRight className="w-3.5 h-3.5 text-[#0284C7] shrink-0 mt-0.5" />
+        <p className="text-[11px] text-slate-700 leading-snug">{item.recommendedAction}</p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-[#8A96B0] pt-1 border-t border-[#1C253B]">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-slate-500 pt-1 border-t border-[#E2E8F0]">
         <span className="inline-flex items-center gap-1">
           <Briefcase className="w-3 h-3" />
           {item.jobName}
@@ -524,16 +524,16 @@ function ChangeOrderDetail({ co }: { co: ChangeOrder }) {
   const DetIcon = det.icon;
 
   return (
-    <Card className="bg-[#0F1830] border-[#1C253B] flex flex-col">
-      <CardHeader className="p-4 border-b border-[#1C253B]">
-        <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
-          <FileText className="w-4 h-4 text-[#38BDF8]" />
+    <Card className="bg-white border-[#E2E8F0] shadow-sm flex flex-col">
+      <CardHeader className="p-4 border-b border-[#E2E8F0]">
+        <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
+          <FileText className="w-4 h-4 text-[#0284C7]" />
           CHANGE ORDER DETAIL
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-lg font-bold text-[#38BDF8]">{co.coNumber}</span>
+          <span className="text-lg font-bold text-[#0284C7]">{co.coNumber}</span>
           <span
             className="inline-flex items-center rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest"
             style={{ color: meta.color, backgroundColor: meta.bg, border: `1px solid ${meta.border}` }}
@@ -543,29 +543,29 @@ function ChangeOrderDetail({ co }: { co: ChangeOrder }) {
         </div>
 
         <div>
-          <h3 className="text-base font-semibold text-white leading-snug">{co.title}</h3>
-          <p className="text-[12px] text-[#8A96B0] mt-1 flex items-center gap-1">
+          <h3 className="text-base font-semibold text-slate-900 leading-snug">{co.title}</h3>
+          <p className="text-[12px] text-slate-500 mt-1 flex items-center gap-1">
             <Briefcase className="w-3 h-3" />
             {co.jobName}
           </p>
         </div>
 
-        <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-          <div className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0] mb-1">
+        <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">
             Origin
           </div>
-          <p className="text-[12px] text-[#C6D0E4]">{co.origin}</p>
+          <p className="text-[12px] text-slate-700">{co.origin}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0] mb-1">
+          <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">
               Amount
             </div>
-            <div className="text-xl font-bold text-white">{fmtFull(co.amount)}</div>
+            <div className="text-xl font-bold text-slate-900">{fmtFull(co.amount)}</div>
           </div>
-          <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0] mb-1">
+          <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">
               Days Pending
             </div>
             <div
@@ -577,7 +577,7 @@ function ChangeOrderDetail({ co }: { co: ChangeOrder }) {
                     : co.daysPending >= 5
                       ? "#F59E0B"
                       : co.daysPending > 0
-                        ? "#38BDF8"
+                        ? "#0EA5E9"
                         : "#22C55E",
               }}
             >
@@ -586,10 +586,10 @@ function ChangeOrderDetail({ co }: { co: ChangeOrder }) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 text-[11px] text-[#8A96B0] pt-1 border-t border-[#1C253B]">
+        <div className="flex flex-col gap-2 text-[11px] text-slate-500 pt-1 border-t border-[#E2E8F0]">
           <span className="inline-flex items-center gap-1.5">
-            <ArrowRight className="w-3.5 h-3.5 text-[#38BDF8]" />
-            Submitted to: <span className="text-white font-medium">{co.submittedTo}</span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#0284C7]" />
+            Submitted to: <span className="text-slate-900 font-medium">{co.submittedTo}</span>
           </span>
           <span className="inline-flex items-center gap-1.5" style={{ color: det.color }}>
             <DetIcon className="w-3.5 h-3.5" />
@@ -600,7 +600,7 @@ function ChangeOrderDetail({ co }: { co: ChangeOrder }) {
         {co.status === "Disputed" && (
           <div className="rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 p-2.5 flex items-start gap-2">
             <AlertTriangle className="w-3.5 h-3.5 text-[#EF4444] shrink-0 mt-0.5" />
-            <p className="text-[11px] text-[#C6D0E4] leading-snug">
+            <p className="text-[11px] text-slate-700 leading-snug">
               Flagged for review: disputed for {co.daysPending} days. Recommend a documented
               cost-and-schedule justification package before the next owner meeting.
             </p>
@@ -619,17 +619,17 @@ function ProfitFadeCard({ signal }: { signal: (typeof profitFadeSignals)[number]
   const max = Math.max(...values, signal.baselineMargin);
 
   return (
-    <div className="rounded-xl border border-[#1C253B] bg-[#111A2E] p-4 flex flex-col gap-3">
+    <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-4 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <h3 className="text-sm font-semibold text-white">{signal.jobName}</h3>
+          <h3 className="text-sm font-semibold text-slate-900">{signal.jobName}</h3>
           <div className="flex items-center gap-3 mt-1 text-[11px]">
-            <span className="text-[#8A96B0]">
+            <span className="text-slate-500">
               Baseline{" "}
-              <span className="text-white font-semibold">{signal.baselineMargin.toFixed(1)}%</span>
+              <span className="text-slate-900 font-semibold">{signal.baselineMargin.toFixed(1)}%</span>
             </span>
-            <ArrowRight className="w-3 h-3 text-[#8A96B0]" />
-            <span className="text-[#8A96B0]">
+            <ArrowRight className="w-3 h-3 text-slate-500" />
+            <span className="text-slate-500">
               Current{" "}
               <span className="text-[#F59E0B] font-semibold">
                 {signal.currentMargin.toFixed(1)}%
@@ -652,10 +652,10 @@ function ProfitFadeCard({ signal }: { signal: (typeof profitFadeSignals)[number]
                 <stop offset="95%" stopColor="#F59E0B" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1C253B" vertical={false} />
-            <XAxis dataKey="week" stroke="#8A96B0" fontSize={9} tickLine={false} axisLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+            <XAxis dataKey="week" stroke="#64748B" fontSize={9} tickLine={false} axisLine={false} />
             <YAxis
-              stroke="#8A96B0"
+              stroke="#64748B"
               fontSize={9}
               tickLine={false}
               axisLine={false}
@@ -663,7 +663,7 @@ function ProfitFadeCard({ signal }: { signal: (typeof profitFadeSignals)[number]
               tickFormatter={(v) => `${v}%`}
             />
             <RechartsTooltip
-              contentStyle={{ backgroundColor: "#0F1830", borderColor: "#1C253B", fontSize: "12px" }}
+              contentStyle={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0", fontSize: "12px" }}
               formatter={(v: number) => [`${v.toFixed(1)}%`, "Projected margin"]}
             />
             <ReferenceLine
@@ -684,8 +684,8 @@ function ProfitFadeCard({ signal }: { signal: (typeof profitFadeSignals)[number]
         </ResponsiveContainer>
       </div>
 
-      <div className="pt-1 border-t border-[#1C253B]">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0] mb-1.5">
+      <div className="pt-1 border-t border-[#E2E8F0]">
+        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5">
           Fade Drivers · flagged for review
         </div>
         <div className="flex flex-wrap gap-1.5">

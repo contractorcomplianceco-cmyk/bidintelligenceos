@@ -36,11 +36,11 @@ import {
 } from "recharts";
 
 const tooltipStyle = {
-  backgroundColor: "#0F1830",
-  borderColor: "#1C253B",
+  backgroundColor: "#FFFFFF",
+  borderColor: "#E2E8F0",
   borderRadius: "8px",
   fontSize: "12px",
-  color: "#fff",
+  color: "#0F172A",
 };
 
 const LOSS_COLORS = ["#EF4444", "#F59E0B", "#38BDF8", "#8A96B0", "#A855F7"];
@@ -141,22 +141,22 @@ export default function Analytics() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
-              <BarChart3 className="w-7 h-7 text-[#38BDF8]" />
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <BarChart3 className="w-7 h-7 text-[#0284C7]" />
               Analytics
             </h1>
-            <p className="text-[#8A96B0] mt-1">
+            <p className="text-slate-500 mt-1">
               Win/loss and performance intelligence for {verticalConfig.name}. Decision-support guidance only.
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex rounded-lg border border-[#1C253B] bg-[#0F1830] p-1">
+            <div className="flex rounded-lg border border-[#E2E8F0] bg-white p-1">
               {(["6M", "12M"] as const).map((r) => (
                 <button
                   key={r}
                   onClick={() => setRange(r)}
                   className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
-                    range === r ? "bg-[#38BDF8] text-[#0A0E1A]" : "text-[#8A96B0] hover:text-white"
+                    range === r ? "bg-[#2563EB] text-white" : "text-slate-500 hover:text-slate-900"
                   }`}
                 >
                   {r === "6M" ? "6 Months" : "12 Months"}
@@ -167,7 +167,7 @@ export default function Analytics() {
               onClick={() =>
                 toast({ title: "Export queued", description: "Analytics report is being compiled. Review before sharing." })
               }
-              className="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg border border-[#1C253B] bg-[#0F1830] text-[#8A96B0] hover:text-white transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg border border-[#E2E8F0] bg-white text-slate-500 hover:text-slate-900 transition-colors"
             >
               <Download className="w-3.5 h-3.5" />
               Export
@@ -178,15 +178,15 @@ export default function Analytics() {
         {/* KPI Row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map((k) => (
-            <div key={k.label} className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-5 relative overflow-hidden group">
+            <div key={k.label} className="rounded-xl border border-[#E2E8F0] bg-white p-5 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                 <k.icon className="w-10 h-10" style={{ color: k.color }} />
               </div>
               <div className="flex items-center gap-2 mb-2 relative z-10">
                 <k.icon className="w-4 h-4" style={{ color: k.color }} />
-                <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-wider">{k.label}</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{k.label}</span>
               </div>
-              <div className="text-3xl font-bold text-white tracking-tight relative z-10">{k.value}</div>
+              <div className="text-3xl font-bold text-slate-900 tracking-tight relative z-10">{k.value}</div>
               <p
                 className={`text-[10px] mt-1 font-medium tracking-wide relative z-10 ${
                   k.positive ? "text-[#22C55E]" : "text-[#EF4444]"
@@ -200,10 +200,10 @@ export default function Analytics() {
 
         {/* Win Rate + Margin Trend */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 bg-[#0F1830] border-[#1C253B]">
-            <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-bold text-white tracking-wide">WIN RATE OVER TIME</CardTitle>
-              <span className="text-xs text-[#8A96B0]">{range === "6M" ? "Last 6 months" : "Trailing 12 months"}</span>
+          <Card className="lg:col-span-2 bg-white border-[#E2E8F0]">
+            <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">WIN RATE OVER TIME</CardTitle>
+              <span className="text-xs text-slate-500">{range === "6M" ? "Last 6 months" : "Trailing 12 months"}</span>
             </CardHeader>
             <CardContent className="p-5">
               <div className="h-64 w-full">
@@ -215,9 +215,9 @@ export default function Analytics() {
                         <stop offset="95%" stopColor="#38BDF8" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1C253B" vertical={false} />
-                    <XAxis dataKey="month" stroke="#8A96B0" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#8A96B0" fontSize={11} tickLine={false} axisLine={false} unit="%" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                    <XAxis dataKey="month" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} unit="%" />
                     <RechartsTooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "Win Rate"]} />
                     <Area type="monotone" dataKey="rate" stroke="#38BDF8" strokeWidth={2} fill="url(#winGrad)" />
                   </AreaChart>
@@ -226,17 +226,17 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#0F1830] border-[#1C253B]">
-            <CardHeader className="p-5 border-b border-[#1C253B]">
-              <CardTitle className="text-sm font-bold text-white tracking-wide">GROSS MARGIN TREND</CardTitle>
+          <Card className="bg-white border-[#E2E8F0]">
+            <CardHeader className="p-5 border-b border-[#E2E8F0]">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">GROSS MARGIN TREND</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={analyticsData.marginTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1C253B" vertical={false} />
-                    <XAxis dataKey="month" stroke="#8A96B0" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#8A96B0" fontSize={11} tickLine={false} axisLine={false} unit="%" domain={["dataMin - 1", "dataMax + 1"]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                    <XAxis dataKey="month" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} unit="%" domain={["dataMin - 1", "dataMax + 1"]} />
                     <RechartsTooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "Margin"]} />
                     <Line type="monotone" dataKey="margin" stroke="#22C55E" strokeWidth={2} dot={{ r: 3, fill: "#22C55E" }} activeDot={{ r: 5 }} />
                   </LineChart>
@@ -248,22 +248,22 @@ export default function Analytics() {
 
         {/* Bid Outcomes + Win/Loss by type */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2 bg-[#0F1830] border-[#1C253B]">
-            <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-bold text-white tracking-wide">BID OUTCOME TIMELINE ($M)</CardTitle>
+          <Card className="lg:col-span-2 bg-white border-[#E2E8F0]">
+            <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">BID OUTCOME TIMELINE ($M)</CardTitle>
               <div className="flex gap-4 text-[10px] font-bold uppercase tracking-widest">
                 <span className="flex items-center gap-1.5 text-[#22C55E]"><span className="w-2 h-2 rounded-full bg-[#22C55E]" />Won</span>
                 <span className="flex items-center gap-1.5 text-[#EF4444]"><span className="w-2 h-2 rounded-full bg-[#EF4444]" />Lost</span>
-                <span className="flex items-center gap-1.5 text-[#8A96B0]"><span className="w-2 h-2 rounded-full bg-[#8A96B0]" />No Decision</span>
+                <span className="flex items-center gap-1.5 text-slate-500"><span className="w-2 h-2 rounded-full bg-[#8A96B0]" />No Decision</span>
               </div>
             </CardHeader>
             <CardContent className="p-5">
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analyticsData.bidOutcomeTimeline} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1C253B" vertical={false} />
-                    <XAxis dataKey="month" stroke="#8A96B0" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#8A96B0" fontSize={11} tickLine={false} axisLine={false} unit="M" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                    <XAxis dataKey="month" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} unit="M" />
                     <RechartsTooltip contentStyle={tooltipStyle} formatter={(v: number) => `$${v}M`} />
                     <Bar dataKey="won" stackId="a" fill="#22C55E" radius={[0, 0, 0, 0]} />
                     <Bar dataKey="lost" stackId="a" fill="#EF4444" />
@@ -274,18 +274,18 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#0F1830] border-[#1C253B]">
-            <CardHeader className="p-5 border-b border-[#1C253B]">
-              <CardTitle className="text-sm font-bold text-white tracking-wide">WIN / LOSS BY TYPE</CardTitle>
+          <Card className="bg-white border-[#E2E8F0]">
+            <CardHeader className="p-5 border-b border-[#E2E8F0]">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">WIN / LOSS BY TYPE</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analyticsData.projectTypes} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1C253B" horizontal={false} />
-                    <XAxis type="number" stroke="#8A96B0" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis type="category" dataKey="type" stroke="#8A96B0" fontSize={11} tickLine={false} axisLine={false} width={70} />
-                    <RechartsTooltip contentStyle={tooltipStyle} cursor={{ fill: "#1C253B33" }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
+                    <XAxis type="number" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
+                    <YAxis type="category" dataKey="type" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} width={70} />
+                    <RechartsTooltip contentStyle={tooltipStyle} cursor={{ fill: "#E2E8F0" }} />
                     <Legend wrapperStyle={{ fontSize: "11px" }} />
                     <Bar dataKey="won" name="Won" stackId="b" fill="#22C55E" radius={[0, 0, 0, 0]} />
                     <Bar dataKey="lost" name="Lost" stackId="b" fill="#EF4444" radius={[0, 3, 3, 0]} />
@@ -298,9 +298,9 @@ export default function Analytics() {
 
         {/* Loss reasons + ROI by job */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="bg-[#0F1830] border-[#1C253B]">
-            <CardHeader className="p-5 border-b border-[#1C253B]">
-              <CardTitle className="text-sm font-bold text-white tracking-wide">LOSS REASONS</CardTitle>
+          <Card className="bg-white border-[#E2E8F0]">
+            <CardHeader className="p-5 border-b border-[#E2E8F0]">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">LOSS REASONS</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
               <div className="flex items-center gap-4">
@@ -327,11 +327,11 @@ export default function Analytics() {
                 <div className="flex-1 space-y-2">
                   {analyticsData.lossReasons.map((r, i) => (
                     <div key={r.reason} className="flex items-center justify-between text-[11px]">
-                      <span className="flex items-center gap-2 text-[#8A96B0]">
+                      <span className="flex items-center gap-2 text-slate-500">
                         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: LOSS_COLORS[i % LOSS_COLORS.length] }} />
                         {r.reason}
                       </span>
-                      <span className="font-bold text-white">{r.count}</span>
+                      <span className="font-bold text-slate-900">{r.count}</span>
                     </div>
                   ))}
                 </div>
@@ -339,22 +339,22 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-2 bg-[#0F1830] border-[#1C253B]">
-            <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-bold text-white tracking-wide">ROI BY JOB — PROJECTED VS ACTUAL</CardTitle>
+          <Card className="lg:col-span-2 bg-white border-[#E2E8F0]">
+            <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">ROI BY JOB — PROJECTED VS ACTUAL</CardTitle>
               <div className="flex gap-4 text-[10px] font-bold uppercase tracking-widest">
                 <span className="flex items-center gap-1.5 text-[#0BA3A8]"><span className="w-2 h-2 rounded-full bg-[#0BA3A8]" />Projected</span>
-                <span className="flex items-center gap-1.5 text-[#38BDF8]"><span className="w-2 h-2 rounded-full bg-[#38BDF8]" />Actual</span>
+                <span className="flex items-center gap-1.5 text-[#0284C7]"><span className="w-2 h-2 rounded-full bg-[#38BDF8]" />Actual</span>
               </div>
             </CardHeader>
             <CardContent className="p-5">
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={roiByJob} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1C253B" vertical={false} />
-                    <XAxis dataKey="name" stroke="#8A96B0" fontSize={10} tickLine={false} axisLine={false} interval={0} angle={-12} textAnchor="end" height={50} />
-                    <YAxis stroke="#8A96B0" fontSize={11} tickLine={false} axisLine={false} unit="%" />
-                    <RechartsTooltip contentStyle={tooltipStyle} cursor={{ fill: "#1C253B33" }} formatter={(v: number) => `${v}%`} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                    <XAxis dataKey="name" stroke="#64748B" fontSize={10} tickLine={false} axisLine={false} interval={0} angle={-12} textAnchor="end" height={50} />
+                    <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} unit="%" />
+                    <RechartsTooltip contentStyle={tooltipStyle} cursor={{ fill: "#E2E8F0" }} formatter={(v: number) => `${v}%`} />
                     <Bar dataKey="projected" name="Projected ROI" fill="#0BA3A8" radius={[3, 3, 0, 0]} />
                     <Bar dataKey="actual" name="Actual ROI" fill="#38BDF8" radius={[3, 3, 0, 0]} />
                   </BarChart>
@@ -365,16 +365,16 @@ export default function Analytics() {
         </div>
 
         {/* Job completion progress */}
-        <Card className="bg-[#0F1830] border-[#1C253B]">
-          <CardHeader className="p-5 border-b border-[#1C253B]">
-            <CardTitle className="text-sm font-bold text-white tracking-wide">JOB COMPLETION PROGRESS</CardTitle>
+        <Card className="bg-white border-[#E2E8F0]">
+          <CardHeader className="p-5 border-b border-[#E2E8F0]">
+            <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">JOB COMPLETION PROGRESS</CardTitle>
           </CardHeader>
           <CardContent className="p-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
               {completionData.map((j) => (
                 <div key={j.name}>
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-medium text-white truncate pr-2">{j.name}</span>
+                    <span className="text-xs font-medium text-slate-900 truncate pr-2">{j.name}</span>
                     <div className="flex items-center gap-2 shrink-0">
                       <span
                         className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${
@@ -384,15 +384,15 @@ export default function Analytics() {
                             ? "bg-[#F59E0B]/10 text-[#F59E0B]"
                             : j.status === "Completed"
                             ? "bg-[#22C55E]/10 text-[#22C55E]"
-                            : "bg-[#38BDF8]/10 text-[#38BDF8]"
+                            : "bg-[#38BDF8]/10 text-[#0284C7]"
                         }`}
                       >
                         {j.status}
                       </span>
-                      <span className="text-xs font-bold text-white w-9 text-right">{j.completion}%</span>
+                      <span className="text-xs font-bold text-slate-900 w-9 text-right">{j.completion}%</span>
                     </div>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-[#1C253B] overflow-hidden">
+                  <div className="h-2 w-full rounded-full bg-[#E2E8F0] overflow-hidden">
                     <div
                       className="h-full rounded-full"
                       style={{
@@ -408,18 +408,18 @@ export default function Analytics() {
         </Card>
 
         {/* Post-job learning loop */}
-        <Card className="bg-[#0F1830] border-[#1C253B]">
-          <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+        <Card className="bg-white border-[#E2E8F0]">
+          <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
               <Lightbulb className="w-4 h-4 text-[#F59E0B]" />
               POST-JOB LEARNING LOOP
             </CardTitle>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">AI-synthesized insights</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">AI-synthesized insights</span>
           </CardHeader>
           <CardContent className="p-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {insights.map((ins) => (
-                <div key={ins.title} className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-4 flex gap-3">
+                <div key={ins.title} className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 flex gap-3">
                   <div
                     className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                     style={{ backgroundColor: `${ins.tone}1A` }}
@@ -427,14 +427,14 @@ export default function Analytics() {
                     <ins.icon className="w-5 h-5" style={{ color: ins.tone }} />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-white mb-1">{ins.title}</h4>
-                    <p className="text-[11px] text-[#8A96B0] leading-relaxed">{ins.body}</p>
+                    <h4 className="text-xs font-bold text-slate-900 mb-1">{ins.title}</h4>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">{ins.body}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-4 flex items-center gap-2 text-[11px] text-[#8A96B0] border-t border-[#1C253B] pt-4">
-              <ArrowRight className="w-3.5 h-3.5 text-[#38BDF8]" />
+            <div className="mt-4 flex items-center gap-2 text-[11px] text-slate-500 border-t border-[#E2E8F0] pt-4">
+              <ArrowRight className="w-3.5 h-3.5 text-[#0284C7]" />
               Insights are decision-support only and require user verification before acting on client-facing output.
             </div>
           </CardContent>

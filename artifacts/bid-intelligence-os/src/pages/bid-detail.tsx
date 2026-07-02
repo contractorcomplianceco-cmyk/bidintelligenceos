@@ -47,11 +47,11 @@ export default function BidDetail() {
     return (
       <Layout>
         <div className="max-w-xl mx-auto text-center py-24">
-          <h2 className="text-2xl font-bold text-white">Bid not found</h2>
-          <p className="text-[#8A96B0] mt-2">This opportunity is no longer available.</p>
+          <h2 className="text-2xl font-bold text-slate-900">Bid not found</h2>
+          <p className="text-slate-500 mt-2">This opportunity is no longer available.</p>
           <Link
             href="/bids"
-            className="inline-flex items-center gap-2 mt-6 text-[#38BDF8] hover:text-white transition-colors font-medium"
+            className="inline-flex items-center gap-2 mt-6 text-[#0284C7] hover:text-slate-900 transition-colors font-medium"
           >
             <ArrowLeft className="w-4 h-4" /> Back to Bids
           </Link>
@@ -66,8 +66,8 @@ export default function BidDetail() {
   }));
 
   const kpis = [
-    { label: "Bid Value", value: `$${(bid.amount / 1000000).toFixed(2)}M`, icon: Calculator, color: "#38BDF8" },
-    { label: "Fit Score", value: `${bid.fit ?? "-"}%`, icon: Target, color: "#38BDF8" },
+    { label: "Bid Value", value: `$${(bid.amount / 1000000).toFixed(2)}M`, icon: Calculator, color: "#0284C7" },
+    { label: "Fit Score", value: `${bid.fit ?? "-"}%`, icon: Target, color: "#0284C7" },
     { label: "Confidence", value: `${bid.confidence ?? "-"}%`, icon: ShieldCheck, color: "#22C55E" },
     { label: "Days Remaining", value: `${bid.daysRemaining ?? "-"}`, icon: CalendarClock, color: "#F59E0B" },
   ];
@@ -79,13 +79,13 @@ export default function BidDetail() {
         <div>
           <Link
             href="/bids"
-            className="inline-flex items-center gap-1.5 text-xs text-[#8A96B0] hover:text-[#38BDF8] transition-colors font-medium"
+            className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-[#0284C7] transition-colors font-medium"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Bids Workspace
           </Link>
         </div>
 
-        <div className="relative overflow-hidden rounded-2xl border border-[#1C253B] bg-gradient-to-br from-[#0F1830] to-[#111A2E] p-6 lg:p-7">
+        <div className="relative overflow-hidden rounded-2xl border border-[#E2E8F0] bg-gradient-to-br from-white to-[#F8FAFC] p-6 lg:p-7">
           <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
           <div className="relative flex flex-col lg:flex-row lg:items-start justify-between gap-5">
             <div className="min-w-0">
@@ -93,19 +93,19 @@ export default function BidDetail() {
                 <span
                   className={`inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded ${
                     bid.publicPrivate === "Public"
-                      ? "bg-[#38BDF8]/10 text-[#38BDF8]"
-                      : "bg-purple-500/10 text-purple-400"
+                      ? "bg-sky-50 text-[#0284C7]"
+                      : "bg-purple-50 text-purple-700 border border-purple-200"
                   }`}
                 >
                   {bid.publicPrivate}
                 </span>
-                <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded bg-[#38BDF8]/10 text-[#38BDF8] border border-[#38BDF8]/20">
+                <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded bg-sky-50 text-[#0284C7] border border-sky-200">
                   {bid.status}
                 </span>
-                <span className="text-[11px] text-[#8A96B0] uppercase tracking-widest">{bid.type}</span>
+                <span className="text-[11px] text-slate-500 uppercase tracking-widest">{bid.type}</span>
               </div>
-              <h2 className="mt-3 text-2xl lg:text-3xl font-bold text-white tracking-tight">{bid.name}</h2>
-              <div className="mt-2 flex items-center gap-4 flex-wrap text-sm text-[#8A96B0]">
+              <h2 className="mt-3 text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">{bid.name}</h2>
+              <div className="mt-2 flex items-center gap-4 flex-wrap text-sm text-slate-500">
                 <span className="inline-flex items-center gap-1.5">
                   <Building2 className="w-4 h-4" /> {bid.recipient}
                 </span>
@@ -120,13 +120,13 @@ export default function BidDetail() {
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => toast({ title: "Edit bid", description: "Opening the bid record for editing." })}
-                className="inline-flex items-center gap-2 rounded-lg border border-[#1C253B] bg-[#0B1222] px-4 py-2.5 text-sm font-medium text-[#c2cad6] hover:bg-[#151D2E] transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#F1F5F9] transition-colors"
               >
                 <Pencil className="w-4 h-4" /> Edit
               </button>
               <button
                 onClick={() => navigate("/scope-analyzer")}
-                className="inline-flex items-center gap-2 rounded-lg bg-[#38BDF8] px-4 py-2.5 text-sm font-semibold text-[#06080B] hover:bg-[#5cccfa] transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
               >
                 Open Analysis Workspace <ArrowRight className="w-4 h-4" />
               </button>
@@ -137,12 +137,12 @@ export default function BidDetail() {
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map((k) => (
-            <div key={k.label} className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-4">
+            <div key={k.label} className="rounded-xl border border-[#E2E8F0] bg-white p-4">
               <div className="flex items-center gap-2 mb-2">
                 <k.icon className="w-4 h-4" style={{ color: k.color }} />
-                <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-wider">{k.label}</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{k.label}</span>
               </div>
-              <div className="text-2xl font-bold text-white tracking-tight">{k.value}</div>
+              <div className="text-2xl font-bold text-slate-900 tracking-tight">{k.value}</div>
             </div>
           ))}
         </div>
@@ -151,24 +151,24 @@ export default function BidDetail() {
           {/* Left column */}
           <div className="lg:col-span-2 space-y-6">
             {/* Summary + scope */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#1C253B]">
-                <ListChecks className="w-4 h-4 text-[#38BDF8]" />
-                <h3 className="text-sm font-bold text-white tracking-wide">SCOPE SUMMARY</h3>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#E2E8F0]">
+                <ListChecks className="w-4 h-4 text-[#0284C7]" />
+                <h3 className="text-sm font-bold text-slate-900 tracking-wide">SCOPE SUMMARY</h3>
               </div>
               <div className="p-5">
-                <p className="text-sm text-[#c2cad6] leading-relaxed">{detail.summary}</p>
+                <p className="text-sm text-slate-700 leading-relaxed">{detail.summary}</p>
                 <ul className="mt-4 space-y-2.5">
                   {detail.scopeItems.map((item) => (
-                    <li key={item} className="flex items-start gap-2.5 text-sm text-[#c2cad6]">
-                      <CheckCircle2 className="w-4 h-4 text-[#38BDF8] shrink-0 mt-0.5" />
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-slate-700">
+                      <CheckCircle2 className="w-4 h-4 text-[#0284C7] shrink-0 mt-0.5" />
                       {item}
                     </li>
                   ))}
                 </ul>
                 <Link
                   href="/scope-analyzer"
-                  className="inline-flex items-center gap-1.5 mt-5 text-xs text-[#38BDF8] hover:text-white transition-colors font-medium"
+                  className="inline-flex items-center gap-1.5 mt-5 text-xs text-[#0284C7] hover:text-slate-900 transition-colors font-medium"
                 >
                   Open full scope analysis <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -176,36 +176,36 @@ export default function BidDetail() {
             </div>
 
             {/* Cost summary */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#1C253B]">
-                <Calculator className="w-4 h-4 text-[#38BDF8]" />
-                <h3 className="text-sm font-bold text-white tracking-wide">COST SUMMARY</h3>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#E2E8F0]">
+                <Calculator className="w-4 h-4 text-[#0284C7]" />
+                <h3 className="text-sm font-bold text-slate-900 tracking-wide">COST SUMMARY</h3>
               </div>
               <div className="p-5">
                 <div className="space-y-2.5">
                   {costLines.map((line) => (
                     <div key={line.label} className="flex items-center justify-between">
-                      <span className="text-sm text-[#8A96B0]">{line.label}</span>
-                      <span className="text-sm font-medium text-[#c2cad6]">
+                      <span className="text-sm text-slate-500">{line.label}</span>
+                      <span className="text-sm font-medium text-slate-700">
                         ${line.amount.toLocaleString()}
                       </span>
                     </div>
                   ))}
-                  <div className="h-px w-full bg-[#1C253B] my-1" />
+                  <div className="h-px w-full bg-[#E2E8F0] my-1" />
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-white">Target Bid Value</span>
-                    <span className="text-base font-bold text-[#38BDF8]">
+                    <span className="text-sm font-bold text-slate-900">Target Bid Value</span>
+                    <span className="text-base font-bold text-[#0284C7]">
                       ${bid.amount.toLocaleString()}
                     </span>
                   </div>
                 </div>
-                <p className="mt-4 text-[11px] text-[#5b6680] leading-relaxed">
+                <p className="mt-4 text-[11px] text-slate-400 leading-relaxed">
                   Illustrative breakdown for this demo. Final pricing is set in the analysis
                   workspace and requires review before submission.
                 </p>
                 <Link
                   href="/cost-inputs"
-                  className="inline-flex items-center gap-1.5 mt-3 text-xs text-[#38BDF8] hover:text-white transition-colors font-medium"
+                  className="inline-flex items-center gap-1.5 mt-3 text-xs text-[#0284C7] hover:text-slate-900 transition-colors font-medium"
                 >
                   Adjust cost inputs <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -213,10 +213,10 @@ export default function BidDetail() {
             </div>
 
             {/* Timeline */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#1C253B]">
-                <CalendarClock className="w-4 h-4 text-[#38BDF8]" />
-                <h3 className="text-sm font-bold text-white tracking-wide">TIMELINE</h3>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#E2E8F0]">
+                <CalendarClock className="w-4 h-4 text-[#0284C7]" />
+                <h3 className="text-sm font-bold text-slate-900 tracking-wide">TIMELINE</h3>
               </div>
               <div className="p-5">
                 <ol className="space-y-4">
@@ -226,25 +226,25 @@ export default function BidDetail() {
                         {m.status === "done" ? (
                           <CheckCircle2 className="w-5 h-5 text-[#22C55E]" />
                         ) : m.status === "active" ? (
-                          <div className="w-5 h-5 rounded-full border-2 border-[#38BDF8] flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-[#38BDF8]" />
+                          <div className="w-5 h-5 rounded-full border-2 border-[#0284C7] flex items-center justify-center">
+                            <div className="w-2 h-2 rounded-full bg-[#0284C7]" />
                           </div>
                         ) : (
-                          <Circle className="w-5 h-5 text-[#3E4752]" />
+                          <Circle className="w-5 h-5 text-slate-300" />
                         )}
                         {i < detail.milestones.length - 1 && (
-                          <div className="w-px h-6 bg-[#1C253B] mt-1" />
+                          <div className="w-px h-6 bg-[#E2E8F0] mt-1" />
                         )}
                       </div>
                       <div className="pt-0.5">
                         <div
                           className={`text-sm font-medium ${
-                            m.status === "upcoming" ? "text-[#8A96B0]" : "text-white"
+                            m.status === "upcoming" ? "text-slate-500" : "text-slate-900"
                           }`}
                         >
                           {m.label}
                         </div>
-                        <div className="text-[11px] text-[#5b6680]">{m.date}</div>
+                        <div className="text-[11px] text-slate-400">{m.date}</div>
                       </div>
                     </li>
                   ))}
@@ -256,25 +256,25 @@ export default function BidDetail() {
           {/* Right column */}
           <div className="space-y-6">
             {/* Owner contact */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-5">
-              <h3 className="text-sm font-bold text-white tracking-wide mb-3">OWNER CONTACT</h3>
-              <div className="text-sm font-semibold text-white">{detail.contact.name}</div>
-              <div className="text-xs text-[#8A96B0] mt-0.5">{detail.contact.role}</div>
-              <div className="text-xs text-[#8A96B0]">{detail.contact.org}</div>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white p-5">
+              <h3 className="text-sm font-bold text-slate-900 tracking-wide mb-3">OWNER CONTACT</h3>
+              <div className="text-sm font-semibold text-slate-900">{detail.contact.name}</div>
+              <div className="text-xs text-slate-500 mt-0.5">{detail.contact.role}</div>
+              <div className="text-xs text-slate-500">{detail.contact.org}</div>
               {bid.nextAction && (
-                <div className="mt-4 rounded-lg border border-[#1C253B] bg-[#0B1222] p-3">
-                  <div className="text-[10px] uppercase tracking-widest text-[#5b6680]">Next Action</div>
-                  <div className="text-sm text-white mt-1">{bid.nextAction}</div>
-                  <div className="text-[11px] text-[#8A96B0]">by {bid.nextActionDate}</div>
+                <div className="mt-4 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3">
+                  <div className="text-[10px] uppercase tracking-widest text-slate-400">Next Action</div>
+                  <div className="text-sm text-slate-900 mt-1">{bid.nextAction}</div>
+                  <div className="text-[11px] text-slate-500">by {bid.nextActionDate}</div>
                 </div>
               )}
             </div>
 
             {/* Risks */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] overflow-hidden">
-              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#1C253B]">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-[#E2E8F0]">
                 <ShieldAlert className="w-4 h-4 text-[#F59E0B]" />
-                <h3 className="text-sm font-bold text-white tracking-wide">RISK FLAGS</h3>
+                <h3 className="text-sm font-bold text-slate-900 tracking-wide">RISK FLAGS</h3>
               </div>
               <div className="p-3">
                 {detail.risks.map((r) => {
@@ -282,9 +282,9 @@ export default function BidDetail() {
                   return (
                     <div
                       key={r.label}
-                      className="flex items-center justify-between px-2 py-2.5 border-b border-[#151D2E] last:border-0"
+                      className="flex items-center justify-between px-2 py-2.5 border-b border-[#E2E8F0] last:border-0"
                     >
-                      <span className="text-sm text-[#c2cad6] pr-2">{r.label}</span>
+                      <span className="text-sm text-slate-700 pr-2">{r.label}</span>
                       <span
                         className="shrink-0 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded"
                         style={{ color: c.color, background: c.bg }}
@@ -298,13 +298,13 @@ export default function BidDetail() {
             </div>
 
             {/* Documents */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1C253B]">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E8F0]">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-[#38BDF8]" />
-                  <h3 className="text-sm font-bold text-white tracking-wide">DOCUMENTS</h3>
+                  <FileText className="w-4 h-4 text-[#0284C7]" />
+                  <h3 className="text-sm font-bold text-slate-900 tracking-wide">DOCUMENTS</h3>
                 </div>
-                <Link href="/documents" className="text-xs text-[#38BDF8] hover:text-white transition-colors font-medium">
+                <Link href="/documents" className="text-xs text-[#0284C7] hover:text-slate-900 transition-colors font-medium">
                   View all
                 </Link>
               </div>
@@ -316,7 +316,7 @@ export default function BidDetail() {
                     ) : (
                       <ShieldAlert className="w-3.5 h-3.5 text-yellow-500" />
                     )}
-                    <span className={`text-sm ${doc.status === "complete" ? "text-[#8A96B0]" : "text-white"}`}>
+                    <span className={`text-sm ${doc.status === "complete" ? "text-slate-500" : "text-slate-900"}`}>
                       {doc.name}
                     </span>
                   </div>
@@ -325,64 +325,64 @@ export default function BidDetail() {
             </div>
 
             {/* Competitor context */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] overflow-hidden">
-              <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1C253B]">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E8F0]">
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-[#38BDF8]" />
-                  <h3 className="text-sm font-bold text-white tracking-wide">COMPETITOR CONTEXT</h3>
+                  <Users className="w-4 h-4 text-[#0284C7]" />
+                  <h3 className="text-sm font-bold text-slate-900 tracking-wide">COMPETITOR CONTEXT</h3>
                 </div>
-                <Link href="/competitors" className="text-xs text-[#38BDF8] hover:text-white transition-colors font-medium">
+                <Link href="/competitors" className="text-xs text-[#0284C7] hover:text-slate-900 transition-colors font-medium">
                   View all
                 </Link>
               </div>
               <div className="p-3">
                 {competitorSignals.slice(0, 3).map((s) => (
                   <div key={s.id} className="flex items-center justify-between px-2 py-2">
-                    <span className="text-sm text-[#c2cad6]">{s.name}</span>
+                    <span className="text-sm text-slate-700">{s.name}</span>
                     <span
                       className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${
                         s.threat === "High"
-                          ? "text-red-400 bg-red-400/10"
+                          ? "text-red-700 bg-red-50 border border-red-200"
                           : s.threat === "Medium"
-                          ? "text-yellow-500 bg-yellow-500/10"
-                          : "text-slate-400 bg-slate-400/10"
+                          ? "text-amber-700 bg-amber-50 border border-amber-200"
+                          : "text-slate-600 bg-slate-100 border border-[#E2E8F0]"
                       }`}
                     >
                       {s.threat}
                     </span>
                   </div>
                 ))}
-                <p className="px-2 pt-2 text-[10px] text-[#5b6680] leading-relaxed">
+                <p className="px-2 pt-2 text-[10px] text-slate-400 leading-relaxed">
                   Based on lawful, publicly available signals only.
                 </p>
               </div>
             </div>
 
             {/* Next steps actions */}
-            <div className="rounded-xl border border-[#38BDF8]/25 bg-[#0F1830] p-5 space-y-2.5">
-              <h3 className="text-sm font-bold text-white tracking-wide mb-1">NEXT STEPS</h3>
+            <div className="rounded-xl border border-sky-200 bg-white p-5 space-y-2.5">
+              <h3 className="text-sm font-bold text-slate-900 tracking-wide mb-1">NEXT STEPS</h3>
               <button
                 onClick={() => navigate("/bid-fit")}
-                className="w-full inline-flex items-center justify-between rounded-lg border border-[#1C253B] bg-[#0B1222] px-4 py-2.5 text-sm font-medium text-[#c2cad6] hover:bg-[#151D2E] transition-colors"
+                className="w-full inline-flex items-center justify-between rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#F1F5F9] transition-colors"
               >
                 Evaluate bid-fit score <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => navigate("/strategy-memo")}
-                className="w-full inline-flex items-center justify-between rounded-lg border border-[#1C253B] bg-[#0B1222] px-4 py-2.5 text-sm font-medium text-[#c2cad6] hover:bg-[#151D2E] transition-colors"
+                className="w-full inline-flex items-center justify-between rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#F1F5F9] transition-colors"
               >
                 <span className="inline-flex items-center gap-2">
-                  <Lock className="w-3.5 h-3.5 text-[#8A96B0]" /> Internal strategy memo
+                  <Lock className="w-3.5 h-3.5 text-slate-500" /> Internal strategy memo
                 </span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
                 onClick={() => navigate("/package-builder")}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#38BDF8] px-4 py-2.5 text-sm font-semibold text-[#06080B] hover:bg-[#5cccfa] transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
               >
                 Build vendor bid package <ArrowRight className="w-4 h-4" />
               </button>
-              <p className="text-[10px] text-[#5b6680] text-center pt-1">
+              <p className="text-[10px] text-slate-400 text-center pt-1">
                 Internal strategy stays separate from the vendor-facing package. Review required before export.
               </p>
             </div>

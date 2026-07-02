@@ -18,45 +18,45 @@ export default function Reports() {
     <Layout>
       <div className="space-y-8 max-w-5xl mx-auto">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-             <FileBarChart className="h-8 w-8 text-teal-500" />
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+             <FileBarChart className="h-8 w-8 text-teal-600" />
              Reports
           </h2>
-          <p className="text-slate-400 mt-2 text-lg">Exportable summaries of pipeline and performance.</p>
+          <p className="text-slate-500 mt-2 text-lg">Exportable summaries of pipeline and performance.</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <Card className="bg-slate-900/80 border-slate-800 shadow-md flex flex-col">
+          <Card className="bg-white border-[#E2E8F0] shadow-sm flex flex-col">
             <CardHeader>
-              <CardTitle className="text-lg text-white">Pipeline Summary</CardTitle>
-              <CardDescription className="text-slate-400">Active bids and upcoming due dates.</CardDescription>
+              <CardTitle className="text-lg text-slate-900">Pipeline Summary</CardTitle>
+              <CardDescription className="text-slate-500">Active bids and upcoming due dates.</CardDescription>
             </CardHeader>
             <CardContent className="mt-auto pt-6">
-              <Button onClick={() => handleExport("Pipeline Summary PDF")} className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700">
+              <Button onClick={() => handleExport("Pipeline Summary PDF")} className="w-full bg-slate-100 hover:bg-slate-200 text-slate-900 border border-[#E2E8F0]">
                 <DownloadCloud className="w-4 h-4 mr-2" /> Export PDF
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900/80 border-slate-800 shadow-md flex flex-col">
+          <Card className="bg-white border-[#E2E8F0] shadow-sm flex flex-col">
             <CardHeader>
-              <CardTitle className="text-lg text-white">Win/Loss Report</CardTitle>
-              <CardDescription className="text-slate-400">Quarterly outcome analysis and factors.</CardDescription>
+              <CardTitle className="text-lg text-slate-900">Win/Loss Report</CardTitle>
+              <CardDescription className="text-slate-500">Quarterly outcome analysis and factors.</CardDescription>
             </CardHeader>
             <CardContent className="mt-auto pt-6">
-              <Button onClick={() => handleExport("Win/Loss Report DOCX")} className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700">
+              <Button onClick={() => handleExport("Win/Loss Report DOCX")} className="w-full bg-slate-100 hover:bg-slate-200 text-slate-900 border border-[#E2E8F0]">
                 <DownloadCloud className="w-4 h-4 mr-2" /> Export DOCX
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900/80 border-slate-800 shadow-md flex flex-col">
+          <Card className="bg-white border-[#E2E8F0] shadow-sm flex flex-col">
             <CardHeader>
-              <CardTitle className="text-lg text-white">Margin Tracking</CardTitle>
-              <CardDescription className="text-slate-400">Historical margin performance across trades.</CardDescription>
+              <CardTitle className="text-lg text-slate-900">Margin Tracking</CardTitle>
+              <CardDescription className="text-slate-500">Historical margin performance across trades.</CardDescription>
             </CardHeader>
             <CardContent className="mt-auto pt-6">
-              <Button onClick={() => handleExport("Margin Tracking XLS")} className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700">
+              <Button onClick={() => handleExport("Margin Tracking XLS")} className="w-full bg-slate-100 hover:bg-slate-200 text-slate-900 border border-[#E2E8F0]">
                 <DownloadCloud className="w-4 h-4 mr-2" /> Export XLS
               </Button>
             </CardContent>

@@ -47,19 +47,19 @@ function conditionColor(condition: WeatherCondition) {
     case "Clear":
       return "text-[#F59E0B]";
     case "Partly Cloudy":
-      return "text-[#38BDF8]";
+      return "text-[#0284C7]";
     case "Cloudy":
-      return "text-[#8A96B0]";
+      return "text-slate-500";
     case "Rain":
-      return "text-[#38BDF8]";
+      return "text-[#0284C7]";
     case "Storms":
       return "text-[#EF4444]";
     case "Windy":
-      return "text-[#38BDF8]";
+      return "text-[#0284C7]";
     case "Hot":
       return "text-[#F59E0B]";
     default:
-      return "text-[#8A96B0]";
+      return "text-slate-500";
   }
 }
 
@@ -76,10 +76,10 @@ function RiskBadge({ label, band, icon: Icon }: { label: string; band: RiskBand;
     <div className={`rounded-lg border ${s.border} ${s.bg} p-3`}>
       <div className="flex items-center gap-1.5 mb-2">
         <Icon className={`w-3.5 h-3.5 ${s.text}`} />
-        <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest">{label}</span>
+        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</span>
       </div>
       <div className={`text-sm font-bold ${s.text}`}>{band}</div>
-      <div className="mt-2 h-1.5 w-full rounded-full bg-[#1C253B] overflow-hidden">
+      <div className="mt-2 h-1.5 w-full rounded-full bg-[#E2E8F0] overflow-hidden">
         <div className={`h-full rounded-full ${s.bar}`} style={{ width: `${s.pct}%` }} />
       </div>
     </div>
@@ -110,26 +110,26 @@ export default function Weather() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-              <CloudRain className="h-7 w-7 text-[#38BDF8]" />
+            <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+              <CloudRain className="h-7 w-7 text-[#0284C7]" />
               Weather Watch
             </h2>
-            <p className="text-[#8A96B0] mt-1.5">
+            <p className="text-slate-500 mt-1.5">
               5-day jobsite forecasts, weather-risk bands, and schedule impact for active {verticalConfig.name} operations.
             </p>
           </div>
-          <div className="rounded-lg border border-[#1C253B] bg-[#0F1830] px-4 py-2.5">
-            <div className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest mb-0.5">Sites Monitored</div>
-            <div className="text-2xl font-bold text-white">{jobsiteWeather.length}</div>
+          <div className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-2.5">
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Sites Monitored</div>
+            <div className="text-2xl font-bold text-slate-900">{jobsiteWeather.length}</div>
           </div>
         </div>
 
         {/* Vertical weather note */}
-        <div className="rounded-xl border border-[#2A3756] bg-[#111A2E] p-4 flex items-start gap-3">
-          <CloudSun className="w-5 h-5 text-[#38BDF8] shrink-0 mt-0.5" />
+        <div className="rounded-xl border border-[#CBD5E1] bg-white p-4 flex items-start gap-3">
+          <CloudSun className="w-5 h-5 text-[#0284C7] shrink-0 mt-0.5" />
           <div>
-            <div className="text-xs font-bold text-white uppercase tracking-wide mb-1">{verticalConfig.name} Weather Exposure</div>
-            <p className="text-sm text-[#8A96B0] leading-snug">{verticalConfig.weatherNote}</p>
+            <div className="text-xs font-bold text-slate-900 uppercase tracking-wide mb-1">{verticalConfig.name} Weather Exposure</div>
+            <p className="text-sm text-slate-500 leading-snug">{verticalConfig.weatherNote}</p>
           </div>
         </div>
 
@@ -142,12 +142,12 @@ export default function Weather() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-sm font-bold text-white">Rain-Out & High-Wind Alert</span>
+                  <span className="text-sm font-bold text-slate-900">Rain-Out & High-Wind Alert</span>
                   <span className="text-[9px] font-bold uppercase tracking-widest text-[#EF4444] bg-[#EF4444]/15 px-1.5 py-0.5 rounded">
                     Action Recommended
                   </span>
                 </div>
-                <p className="text-sm text-[#8A96B0] leading-snug">
+                <p className="text-sm text-slate-500 leading-snug">
                   {highRiskSites.length} jobsite{highRiskSites.length > 1 ? "s have" : " has"} elevated weather risk this week.
                   {" "}
                   {highRiskSites.map((s) => s.jobName).join(", ")} — review weather-sensitive tasks and stage reschedules early.
@@ -160,11 +160,11 @@ export default function Weather() {
         {/* Site cards */}
         <div className="space-y-6">
           {jobsiteWeather.map((site) => (
-            <Card key={site.jobId} className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center justify-between gap-4">
+            <Card key={site.jobId} className="bg-white border-[#E2E8F0] shadow-sm">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center justify-between gap-4">
                 <div>
-                  <CardTitle className="text-base font-bold text-white">{site.jobName}</CardTitle>
-                  <div className="flex items-center gap-1.5 text-xs text-[#8A96B0] mt-1">
+                  <CardTitle className="text-base font-bold text-slate-900">{site.jobName}</CardTitle>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
                     <MapPin className="w-3.5 h-3.5" />
                     {site.location}
                   </div>
@@ -172,8 +172,8 @@ export default function Weather() {
                 <div className="flex items-center gap-2">
                   {conditionIcon(site.forecast[0].condition, `w-8 h-8 ${conditionColor(site.forecast[0].condition)}`)}
                   <div className="text-right">
-                    <div className="text-lg font-bold text-white leading-none">{site.forecast[0].high}&deg;</div>
-                    <div className="text-[10px] text-[#8A96B0]">Today High</div>
+                    <div className="text-lg font-bold text-slate-900 leading-none">{site.forecast[0].high}&deg;</div>
+                    <div className="text-[10px] text-slate-500">Today High</div>
                   </div>
                 </div>
               </CardHeader>
@@ -183,20 +183,20 @@ export default function Weather() {
                   {site.forecast.map((day) => (
                     <div
                       key={day.label}
-                      className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3 flex flex-col items-center text-center"
+                      className="rounded-lg border border-[#E2E8F0] bg-white p-3 flex flex-col items-center text-center"
                     >
-                      <div className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest mb-2">{day.label}</div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{day.label}</div>
                       {conditionIcon(day.condition, `w-7 h-7 mb-2 ${conditionColor(day.condition)}`)}
-                      <div className="text-[10px] text-[#8A96B0] mb-2">{day.condition}</div>
-                      <div className="text-sm font-bold text-white">
-                        {day.high}&deg; <span className="text-[#8A96B0] font-medium">/ {day.low}&deg;</span>
+                      <div className="text-[10px] text-slate-500 mb-2">{day.condition}</div>
+                      <div className="text-sm font-bold text-slate-900">
+                        {day.high}&deg; <span className="text-slate-500 font-medium">/ {day.low}&deg;</span>
                       </div>
                       <div className="mt-2 flex items-center justify-center gap-3 text-[10px]">
-                        <span className="flex items-center gap-0.5 text-[#38BDF8]">
+                        <span className="flex items-center gap-0.5 text-[#0284C7]">
                           <Droplets className="w-3 h-3" />
                           {day.rainRisk}%
                         </span>
-                        <span className="flex items-center gap-0.5 text-[#8A96B0]">
+                        <span className="flex items-center gap-0.5 text-slate-500">
                           <Wind className="w-3 h-3" />
                           {day.windMph}
                         </span>
@@ -216,16 +216,16 @@ export default function Weather() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div className="rounded-lg border border-[#38BDF8]/25 bg-[#38BDF8]/5 p-4">
                     <div className="flex items-center gap-1.5 mb-2">
-                      <CalendarClock className="w-4 h-4 text-[#38BDF8]" />
-                      <span className="text-[10px] font-bold text-[#38BDF8] uppercase tracking-widest">Recommendation</span>
+                      <CalendarClock className="w-4 h-4 text-[#0284C7]" />
+                      <span className="text-[10px] font-bold text-[#0284C7] uppercase tracking-widest">Recommendation</span>
                     </div>
-                    <p className="text-sm text-white leading-snug">{site.recommendation}</p>
+                    <p className="text-sm text-slate-900 leading-snug">{site.recommendation}</p>
                   </div>
 
-                  <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-4">
+                  <div className="rounded-lg border border-[#E2E8F0] bg-white p-4">
                     <div className="flex items-center gap-1.5 mb-3">
                       <ShieldAlert className="w-4 h-4 text-[#F59E0B]" />
-                      <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                         Weather-Sensitive Tasks
                       </span>
                     </div>
@@ -235,9 +235,9 @@ export default function Weather() {
                         return (
                           <div
                             key={task}
-                            className="flex items-center justify-between gap-3 rounded border border-[#1C253B] bg-[#0F1830] px-3 py-2"
+                            className="flex items-center justify-between gap-3 rounded border border-[#E2E8F0] bg-white px-3 py-2"
                           >
-                            <span className={`text-sm ${isDone ? "text-[#8A96B0] line-through" : "text-white"}`}>{task}</span>
+                            <span className={`text-sm ${isDone ? "text-slate-500 line-through" : "text-slate-900"}`}>{task}</span>
                             {isDone ? (
                               <span className="text-[9px] font-bold uppercase tracking-widest text-[#F59E0B] bg-[#F59E0B]/10 px-1.5 py-0.5 rounded whitespace-nowrap">
                                 Rescheduled
@@ -245,7 +245,7 @@ export default function Weather() {
                             ) : (
                               <button
                                 onClick={() => handleReschedule(site.jobName, task)}
-                                className="text-[10px] font-semibold text-[#38BDF8] hover:text-white transition-colors whitespace-nowrap flex items-center gap-1"
+                                className="text-[10px] font-semibold text-[#0284C7] hover:text-slate-900 transition-colors whitespace-nowrap flex items-center gap-1"
                               >
                                 <CalendarClock className="w-3 h-3" />
                                 Reschedule
@@ -263,9 +263,9 @@ export default function Weather() {
         </div>
 
         {/* Guardrail note */}
-        <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3 flex items-center gap-2">
-          <Info className="w-3.5 h-3.5 text-[#8A96B0] shrink-0" />
-          <p className="text-[11px] text-[#8A96B0]">
+        <div className="rounded-lg border border-[#E2E8F0] bg-white p-3 flex items-center gap-2">
+          <Info className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+          <p className="text-[11px] text-slate-500">
             Forecast data is decision-support guidance only. Projections require user verification before committing crews or
             equipment.
           </p>

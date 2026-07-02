@@ -29,16 +29,16 @@ const TYPE_META: Record<
   ScheduleType,
   { label: string; color: string; bg: string; border: string; icon: typeof Users }
 > = {
-  Crew: { label: "Crew", color: "#38BDF8", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.35)", icon: Users },
+  Crew: { label: "Crew", color: "#0EA5E9", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.35)", icon: Users },
   Sub: { label: "Sub", color: "#A78BFA", bg: "rgba(167,139,250,0.10)", border: "rgba(167,139,250,0.35)", icon: HardHat },
   Inspection: { label: "Inspection", color: "#22C55E", bg: "rgba(34,197,94,0.10)", border: "rgba(34,197,94,0.35)", icon: ClipboardCheck },
   Permit: { label: "Permit", color: "#F59E0B", bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.35)", icon: FileCheck2 },
-  Delivery: { label: "Delivery", color: "#8A96B0", bg: "rgba(138,150,176,0.10)", border: "rgba(138,150,176,0.35)", icon: Truck },
+  Delivery: { label: "Delivery", color: "#64748B", bg: "rgba(138,150,176,0.10)", border: "rgba(138,150,176,0.35)", icon: Truck },
   "Weather-Sensitive": { label: "Weather-Sensitive", color: "#0BA3A8", bg: "rgba(11,163,168,0.12)", border: "rgba(11,163,168,0.40)", icon: CloudRain },
 };
 
 const STATUS_META: Record<ScheduleStatus, { color: string; bg: string }> = {
-  Scheduled: { color: "#38BDF8", bg: "rgba(56,189,248,0.12)" },
+  Scheduled: { color: "#0EA5E9", bg: "rgba(56,189,248,0.12)" },
   "At Risk": { color: "#F59E0B", bg: "rgba(245,158,11,0.12)" },
   Rescheduled: { color: "#A78BFA", bg: "rgba(167,139,250,0.12)" },
   Complete: { color: "#22C55E", bg: "rgba(34,197,94,0.12)" },
@@ -88,26 +88,26 @@ export default function Scheduling() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
-              <CalendarDays className="w-7 h-7 text-[#38BDF8]" />
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <CalendarDays className="w-7 h-7 text-[#0284C7]" />
               Scheduling
             </h1>
-            <p className="text-[#8A96B0] mt-1">
+            <p className="text-slate-500 mt-1">
               Weekly operations calendar — {verticalConfig.name}. Crews, subs, inspections, permits, and weather-sensitive work in one view.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="rounded-lg border border-[#1C253B] bg-[#0F1830] px-4 py-2 text-center">
+            <div className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-2 text-center">
               <div className="text-lg font-bold text-[#F59E0B]">{atRiskCount}</div>
-              <div className="text-[10px] uppercase tracking-widest text-[#8A96B0]">At Risk</div>
+              <div className="text-[10px] uppercase tracking-widest text-slate-500">At Risk</div>
             </div>
-            <div className="rounded-lg border border-[#1C253B] bg-[#0F1830] px-4 py-2 text-center">
+            <div className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-2 text-center">
               <div className="text-lg font-bold text-[#A78BFA]">{rescheduledCount}</div>
-              <div className="text-[10px] uppercase tracking-widest text-[#8A96B0]">Rescheduled</div>
+              <div className="text-[10px] uppercase tracking-widest text-slate-500">Rescheduled</div>
             </div>
-            <div className="rounded-lg border border-[#1C253B] bg-[#0F1830] px-4 py-2 text-center">
+            <div className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-2 text-center">
               <div className="text-lg font-bold text-[#EF4444]">{criticalEvents.length}</div>
-              <div className="text-[10px] uppercase tracking-widest text-[#8A96B0]">Critical Path</div>
+              <div className="text-[10px] uppercase tracking-widest text-slate-500">Critical Path</div>
             </div>
           </div>
         </div>
@@ -118,20 +118,20 @@ export default function Scheduling() {
             <div className="flex items-start gap-3">
               <ShieldAlert className="w-5 h-5 text-[#EF4444] mt-0.5 shrink-0" />
               <div className="flex-1">
-                <div className="text-sm font-bold text-white flex items-center gap-2">
+                <div className="text-sm font-bold text-slate-900 flex items-center gap-2">
                   Critical-path watch
                   <span className="text-[10px] font-bold uppercase tracking-widest text-[#EF4444] bg-[#EF4444]/10 px-2 py-0.5 rounded">
                     {criticalEvents.length} events
                   </span>
                 </div>
-                <p className="text-xs text-[#8A96B0] mt-1 leading-relaxed">
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                   {criticalEvents
                     .slice(0, 3)
                     .map((e) => `${e.title} (${scheduleDays[e.dayIndex]?.split(" ").slice(0, 2).join(" ")})`)
                     .join("  ·  ")}
                   {criticalEvents.length > 3 ? `  ·  +${criticalEvents.length - 3} more` : ""}
                 </p>
-                <p className="text-[11px] text-[#8A96B0]/70 mt-2 italic">
+                <p className="text-[11px] text-slate-500/70 mt-2 italic">
                   Decision-support guidance only. Confirm go/no-go with field leads before rescheduling.
                 </p>
               </div>
@@ -140,14 +140,14 @@ export default function Scheduling() {
         )}
 
         {/* Legend + Filter */}
-        <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-4 flex flex-wrap items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0] mr-1">Filter</span>
+        <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-4 flex flex-wrap items-center gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mr-1">Filter</span>
           <button
             onClick={() => setActiveType("All")}
             className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
               activeType === "All"
-                ? "border-[#38BDF8] text-white bg-[#38BDF8]/10"
-                : "border-[#2A3756] text-[#8A96B0] hover:text-white hover:border-[#38BDF8]/50"
+                ? "border-[#0284C7] text-[#0284C7] bg-sky-50"
+                : "border-[#CBD5E1] text-slate-500 hover:text-slate-900 hover:border-[#0284C7]/50"
             }`}
           >
             All
@@ -162,8 +162,8 @@ export default function Scheduling() {
                 onClick={() => setActiveType(type)}
                 className="text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors flex items-center gap-1.5"
                 style={{
-                  borderColor: active ? meta.color : "#2A3756",
-                  color: active ? "#fff" : meta.color,
+                  borderColor: active ? meta.color : "#CBD5E1",
+                  color: meta.color,
                   backgroundColor: active ? meta.bg : "transparent",
                 }}
               >
@@ -175,27 +175,27 @@ export default function Scheduling() {
         </div>
 
         {/* Weekly grid */}
-        <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] overflow-hidden">
+        <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <div className="min-w-[1120px]">
               {/* Day headers */}
-              <div className="grid grid-cols-7 border-b border-[#1C253B]">
+              <div className="grid grid-cols-7 border-b border-[#E2E8F0]">
                 {scheduleDays.map((day, idx) => {
                   const [dow, ...rest] = day.split(" ");
                   const isToday = idx === 1;
                   return (
                     <div
                       key={day}
-                      className={`px-3 py-3 text-center border-r border-[#1C253B] last:border-r-0 ${
-                        isToday ? "bg-[#38BDF8]/[0.06]" : "bg-[#111A2E]"
+                      className={`px-3 py-3 text-center border-r border-[#E2E8F0] last:border-r-0 ${
+                        isToday ? "bg-[#38BDF8]/[0.06]" : "bg-white"
                       }`}
                     >
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">{dow}</div>
-                      <div className={`text-sm font-bold mt-0.5 ${isToday ? "text-[#38BDF8]" : "text-white"}`}>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{dow}</div>
+                      <div className={`text-sm font-bold mt-0.5 ${isToday ? "text-[#0284C7]" : "text-slate-900"}`}>
                         {rest.join(" ")}
                       </div>
                       {isToday && (
-                        <div className="text-[9px] font-bold uppercase tracking-widest text-[#38BDF8] mt-0.5">Today</div>
+                        <div className="text-[9px] font-bold uppercase tracking-widest text-[#0284C7] mt-0.5">Today</div>
                       )}
                     </div>
                   );
@@ -212,12 +212,12 @@ export default function Scheduling() {
                   return (
                     <div
                       key={day}
-                      className={`min-h-[360px] border-r border-[#1C253B] last:border-r-0 p-2 space-y-2 ${
+                      className={`min-h-[360px] border-r border-[#E2E8F0] last:border-r-0 p-2 space-y-2 ${
                         isToday ? "bg-[#38BDF8]/[0.02]" : ""
                       }`}
                     >
                       {dayEvents.length === 0 && (
-                        <div className="text-[10px] text-[#8A96B0]/50 text-center pt-6">No events</div>
+                        <div className="text-[10px] text-slate-500/50 text-center pt-6">No events</div>
                       )}
                       {dayEvents.map((event) => {
                         const meta = TYPE_META[event.type];
@@ -228,13 +228,13 @@ export default function Scheduling() {
                         return (
                           <div
                             key={event.id}
-                            className="rounded-lg border p-2.5 bg-[#0F1830]"
+                            className="rounded-lg border p-2.5 bg-white"
                             style={{ borderColor: meta.border, borderLeftWidth: 3, borderLeftColor: meta.color }}
                           >
                             <div className="flex items-start justify-between gap-1.5">
                               <div className="flex items-center gap-1.5 min-w-0">
                                 <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: meta.color }} />
-                                <span className="text-xs font-semibold text-white leading-tight truncate">
+                                <span className="text-xs font-semibold text-slate-900 leading-tight truncate">
                                   {event.title}
                                 </span>
                               </div>
@@ -243,15 +243,15 @@ export default function Scheduling() {
                               )}
                             </div>
 
-                            <div className="mt-1.5 flex items-center gap-1 text-[10px] text-[#8A96B0]">
+                            <div className="mt-1.5 flex items-center gap-1 text-[10px] text-slate-500">
                               <Clock className="w-3 h-3" />
                               {event.startTime}–{event.endTime}
                             </div>
-                            <div className="mt-0.5 flex items-center gap-1 text-[10px] text-[#8A96B0]">
+                            <div className="mt-0.5 flex items-center gap-1 text-[10px] text-slate-500">
                               <MapPin className="w-3 h-3" />
                               <span className="truncate">{event.jobName}</span>
                             </div>
-                            <div className="mt-0.5 text-[10px] text-[#8A96B0] truncate">{event.assignee}</div>
+                            <div className="mt-0.5 text-[10px] text-slate-500 truncate">{event.assignee}</div>
 
                             <div className="mt-2 flex flex-wrap items-center gap-1">
                               <span
@@ -280,7 +280,7 @@ export default function Scheduling() {
                             {canReschedule && (
                               <button
                                 onClick={() => handleReschedule(event)}
-                                className="mt-2 w-full flex items-center justify-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded border border-[#2A3756] text-[#8A96B0] hover:text-white hover:border-[#0BA3A8]/60 hover:bg-[#0BA3A8]/[0.06] transition-colors"
+                                className="mt-2 w-full flex items-center justify-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded border border-[#CBD5E1] text-slate-500 hover:text-slate-900 hover:border-[#0BA3A8]/60 hover:bg-[#0BA3A8]/[0.06] transition-colors"
                               >
                                 <CloudLightning className="w-3 h-3" />
                                 Rain delay / reschedule
@@ -303,7 +303,7 @@ export default function Scheduling() {
           </div>
         </div>
 
-        <p className="text-[11px] text-[#8A96B0]/70 italic">
+        <p className="text-[11px] text-slate-500/70 italic">
           Weather-driven schedule changes are decision-support only. Review before sending client-facing updates.
         </p>
       </div>

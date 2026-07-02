@@ -52,7 +52,7 @@ const moneyFull = (n: number) => `$${n.toLocaleString()}`;
 
 const STAGE_STYLES: Record<CloseoutStage, string> = {
   "Punch List": "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/30",
-  Documentation: "bg-[#38BDF8]/10 text-[#38BDF8] border-[#38BDF8]/30",
+  Documentation: "bg-[#38BDF8]/10 text-[#0284C7] border-[#38BDF8]/30",
   "Final Billing": "bg-[#A855F7]/10 text-[#A855F7] border-[#A855F7]/30",
   Warranty: "bg-[#0BA3A8]/10 text-[#0BA3A8] border-[#0BA3A8]/30",
   Complete: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30",
@@ -61,34 +61,34 @@ const STAGE_STYLES: Record<CloseoutStage, string> = {
 const PUNCH_STYLES: Record<PunchStatus, string> = {
   Open: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/30",
   "In Progress": "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/30",
-  Verified: "bg-[#38BDF8]/10 text-[#38BDF8] border-[#38BDF8]/30",
+  Verified: "bg-[#38BDF8]/10 text-[#0284C7] border-[#38BDF8]/30",
   Closed: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30",
 };
 
 const RETAINAGE_STYLES: Record<RetainageStatus, string> = {
   Held: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/30",
-  Requested: "bg-[#38BDF8]/10 text-[#38BDF8] border-[#38BDF8]/30",
+  Requested: "bg-[#38BDF8]/10 text-[#0284C7] border-[#38BDF8]/30",
   Released: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30",
 };
 
 const DOC_STYLES: Record<DocStatus, string> = {
   Complete: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30",
-  "In Review": "bg-[#38BDF8]/10 text-[#38BDF8] border-[#38BDF8]/30",
-  Pending: "bg-[#8A96B0]/10 text-[#8A96B0] border-[#8A96B0]/30",
+  "In Review": "bg-[#38BDF8]/10 text-[#0284C7] border-[#38BDF8]/30",
+  Pending: "bg-[#8A96B0]/10 text-slate-500 border-[#8A96B0]/30",
   Blocked: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/30",
 };
 
 const PRIORITY_STYLES: Record<string, string> = {
   High: "text-[#EF4444]",
   Medium: "text-[#F59E0B]",
-  Low: "text-[#8A96B0]",
+  Low: "text-slate-500",
 };
 
 function DocIcon({ status }: { status: DocStatus }) {
   if (status === "Complete") return <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />;
-  if (status === "In Review") return <Clock className="w-3.5 h-3.5 text-[#38BDF8]" />;
+  if (status === "In Review") return <Clock className="w-3.5 h-3.5 text-[#0284C7]" />;
   if (status === "Blocked") return <AlertTriangle className="w-3.5 h-3.5 text-[#EF4444]" />;
-  return <Circle className="w-3.5 h-3.5 text-[#8A96B0]" />;
+  return <Circle className="w-3.5 h-3.5 text-slate-500" />;
 }
 
 export default function Closeout() {
@@ -112,11 +112,11 @@ export default function Closeout() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
-              <ClipboardCheck className="h-7 w-7 text-[#38BDF8]" />
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <ClipboardCheck className="h-7 w-7 text-[#0284C7]" />
               Job Closeout
             </h1>
-            <p className="text-[#8A96B0] mt-1">
+            <p className="text-slate-500 mt-1">
               Punch lists, documentation, final billing, and warranty tracking for
               completing {verticalConfig.name} jobs — every closed job trains future
               estimates.
@@ -139,7 +139,7 @@ export default function Closeout() {
               value: `${stats.jobsInCloseout}`,
               sub: `${closeoutJobs.length} total in the pipeline`,
               icon: ClipboardCheck,
-              color: "#38BDF8",
+              color: "#0EA5E9",
             },
             {
               label: "Punch Items Open",
@@ -165,7 +165,7 @@ export default function Closeout() {
           ].map((kpi) => (
             <Card
               key={kpi.label}
-              className="bg-[#0F1830] border-[#1C253B] relative overflow-hidden group"
+              className="bg-white border-[#E2E8F0] shadow-sm relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                 <kpi.icon className="w-10 h-10" style={{ color: kpi.color }} />
@@ -173,14 +173,14 @@ export default function Closeout() {
               <CardContent className="p-5 relative z-10">
                 <div className="flex items-center gap-2 mb-2">
                   <kpi.icon className="w-4 h-4" style={{ color: kpi.color }} />
-                  <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-wider">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                     {kpi.label}
                   </span>
                 </div>
-                <div className="text-3xl font-bold text-white tracking-tight">
+                <div className="text-3xl font-bold text-slate-900 tracking-tight">
                   {kpi.value}
                 </div>
-                <p className="text-[10px] text-[#8A96B0] mt-1 font-medium tracking-wide">
+                <p className="text-[10px] text-slate-500 mt-1 font-medium tracking-wide">
                   {kpi.sub}
                 </p>
               </CardContent>
@@ -191,10 +191,10 @@ export default function Closeout() {
         {/* Closeout pipeline cards */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wide">
+            <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
               Closeout Pipeline
             </h2>
-            <span className="text-[11px] text-[#8A96B0]">
+            <span className="text-[11px] text-slate-500">
               Select a job to review its punch list and documentation
             </span>
           </div>
@@ -208,19 +208,19 @@ export default function Closeout() {
                 <Card
                   key={job.id}
                   onClick={() => setSelectedJobId(job.id)}
-                  className={`bg-[#0F1830] flex flex-col cursor-pointer transition-colors ${
+                  className={`bg-white shadow-sm flex flex-col cursor-pointer transition-colors ${
                     active
-                      ? "border-[#38BDF8]/50 ring-1 ring-[#38BDF8]/30"
-                      : "border-[#1C253B] hover:border-[#2A3756]"
+                      ? "border-[#0284C7]/50 ring-1 ring-[#0284C7]/20"
+                      : "border-[#E2E8F0] hover:border-[#CBD5E1]"
                   }`}
                 >
-                  <CardHeader className="p-5 border-b border-[#1C253B]">
+                  <CardHeader className="p-5 border-b border-[#E2E8F0]">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <CardTitle className="text-base font-bold text-white truncate">
+                        <CardTitle className="text-base font-bold text-slate-900 truncate">
                           {job.name}
                         </CardTitle>
-                        <div className="flex items-center gap-3 mt-1.5 text-[11px] text-[#8A96B0]">
+                        <div className="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500">
                           <span className="flex items-center gap-1 truncate">
                             <Building2 className="w-3 h-3 shrink-0" />
                             {job.client}
@@ -242,16 +242,16 @@ export default function Closeout() {
                   <CardContent className="p-5 flex-1 flex flex-col gap-4">
                     {/* Metrics */}
                     <div className="grid grid-cols-3 gap-3">
-                      <div className="rounded-lg bg-[#151D2E] border border-[#1C253B] p-3">
-                        <div className="text-[9px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                      <div className="rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] p-3">
+                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
                           Contract
                         </div>
-                        <div className="text-lg font-bold text-white mt-1">
+                        <div className="text-lg font-bold text-slate-900 mt-1">
                           {money(job.contractValue)}
                         </div>
                       </div>
-                      <div className="rounded-lg bg-[#151D2E] border border-[#1C253B] p-3">
-                        <div className="text-[9px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                      <div className="rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] p-3">
+                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
                           Final ROI
                         </div>
                         <div
@@ -267,11 +267,11 @@ export default function Closeout() {
                           )}
                         </div>
                       </div>
-                      <div className="rounded-lg bg-[#151D2E] border border-[#1C253B] p-3">
-                        <div className="text-[9px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                      <div className="rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] p-3">
+                        <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
                           Punch Open
                         </div>
-                        <div className="text-lg font-bold text-white mt-1">
+                        <div className="text-lg font-bold text-slate-900 mt-1">
                           {job.punchItemsRemaining}
                         </div>
                       </div>
@@ -280,10 +280,10 @@ export default function Closeout() {
                     {/* Stage progress */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                           Closeout Stage
                         </span>
-                        <span className="text-[10px] font-semibold text-[#38BDF8]">
+                        <span className="text-[10px] font-semibold text-[#0284C7]">
                           {job.stageIndex + 1}/{CLOSEOUT_STAGES.length}
                         </span>
                       </div>
@@ -293,7 +293,7 @@ export default function Closeout() {
                           const current = i === job.stageIndex;
                           return (
                             <div key={stage} className="flex-1 flex flex-col items-center gap-1">
-                              <div className="h-1.5 w-full rounded-full bg-[#1C253B] overflow-hidden">
+                              <div className="h-1.5 w-full rounded-full bg-[#E2E8F0] overflow-hidden">
                                 <div
                                   className={`h-full rounded-full ${
                                     done
@@ -308,10 +308,10 @@ export default function Closeout() {
                               <span
                                 className={`text-[8px] font-semibold uppercase tracking-wide text-center leading-tight ${
                                   current
-                                    ? "text-[#38BDF8]"
+                                    ? "text-[#0284C7]"
                                     : done
                                     ? "text-[#22C55E]"
-                                    : "text-[#8A96B0]"
+                                    : "text-slate-500"
                                 }`}
                               >
                                 {stage}
@@ -320,7 +320,7 @@ export default function Closeout() {
                           );
                         })}
                       </div>
-                      <div className="mt-3 h-1.5 w-full rounded-full bg-[#1C253B] overflow-hidden">
+                      <div className="mt-3 h-1.5 w-full rounded-full bg-[#E2E8F0] overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-[#0BA3A8] to-[#38BDF8]"
                           style={{ width: `${stageProgress}%` }}
@@ -331,16 +331,16 @@ export default function Closeout() {
                     {/* Footer meta */}
                     <div className="mt-auto pt-1 flex items-center justify-between gap-3 text-[11px]">
                       <div className="flex items-center gap-2">
-                        <span className="text-[#8A96B0]">Retainage</span>
+                        <span className="text-slate-500">Retainage</span>
                         <span
                           className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold border ${RETAINAGE_STYLES[job.retainageStatus]}`}
                         >
                           {job.retainageStatus} · {money(job.retainageAmount)}
                         </span>
                       </div>
-                      <span className="text-[#8A96B0]">
+                      <span className="text-slate-500">
                         Docs{" "}
-                        <span className="text-white font-semibold">
+                        <span className="text-slate-900 font-semibold">
                           {job.docsComplete}/{job.docsTotal}
                         </span>
                       </span>
@@ -355,26 +355,26 @@ export default function Closeout() {
         {/* Punch list + Documentation panels */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* Punch list table */}
-          <Card className="bg-[#0F1830] border-[#1C253B] xl:col-span-2 flex flex-col">
-            <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+          <Card className="bg-white border-[#E2E8F0] shadow-sm xl:col-span-2 flex flex-col">
+            <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
                 <ListChecks className="w-4 h-4 text-[#F59E0B]" />
                 PUNCH LIST — {selectedJob.name}
               </CardTitle>
-              <span className="text-[11px] text-[#8A96B0]">
+              <span className="text-[11px] text-slate-500">
                 {jobPunch.length} items
               </span>
             </CardHeader>
             <CardContent className="p-0">
               {jobPunch.length === 0 ? (
-                <div className="p-6 text-sm text-[#8A96B0]">
+                <div className="p-6 text-sm text-slate-500">
                   No open punch items — this job is clear for the next closeout stage.
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
-                      <tr className="border-b border-[#1C253B] text-[10px] uppercase tracking-widest text-[#8A96B0]">
+                      <tr className="border-b border-[#E2E8F0] text-[10px] uppercase tracking-widest text-slate-500">
                         <th className="px-4 py-3 font-bold">Item</th>
                         <th className="px-4 py-3 font-bold">Trade</th>
                         <th className="px-4 py-3 font-bold">Assignee</th>
@@ -387,15 +387,15 @@ export default function Closeout() {
                       {jobPunch.map((p) => (
                         <tr
                           key={p.id}
-                          className="border-b border-[#1C253B] last:border-0 hover:bg-[#111A2E] transition-colors"
+                          className="border-b border-[#E2E8F0] last:border-0 hover:bg-slate-50 transition-colors"
                         >
-                          <td className="px-4 py-3 text-sm text-white max-w-[280px]">
+                          <td className="px-4 py-3 text-sm text-slate-900 max-w-[280px]">
                             {p.item}
                           </td>
-                          <td className="px-4 py-3 text-[12px] text-[#8A96B0]">
+                          <td className="px-4 py-3 text-[12px] text-slate-500">
                             {p.trade}
                           </td>
-                          <td className="px-4 py-3 text-[12px] text-[#CBD5E1]">
+                          <td className="px-4 py-3 text-[12px] text-slate-700">
                             {p.assignee}
                           </td>
                           <td className="px-4 py-3">
@@ -405,7 +405,7 @@ export default function Closeout() {
                               {p.priority}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-[12px] text-[#8A96B0]">
+                          <td className="px-4 py-3 text-[12px] text-slate-500">
                             {p.dueDate}
                           </td>
                           <td className="px-4 py-3">
@@ -425,10 +425,10 @@ export default function Closeout() {
           </Card>
 
           {/* Documentation checklist panel */}
-          <Card className="bg-[#0F1830] border-[#1C253B] flex flex-col">
-            <CardHeader className="p-4 border-b border-[#1C253B]">
-              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[#38BDF8]" />
+          <Card className="bg-white border-[#E2E8F0] shadow-sm flex flex-col">
+            <CardHeader className="p-4 border-b border-[#E2E8F0]">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
+                <FileText className="w-4 h-4 text-[#0284C7]" />
                 CLOSEOUT DOCUMENTATION
               </CardTitle>
             </CardHeader>
@@ -438,7 +438,7 @@ export default function Closeout() {
                 return (
                   <div
                     key={item.id}
-                    className="rounded-lg border border-[#1C253B] bg-[#151D2E] p-3"
+                    className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-start gap-2 min-w-0">
@@ -446,10 +446,10 @@ export default function Closeout() {
                           <DocIcon status={status} />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-[13px] font-semibold text-white">
+                          <div className="text-[13px] font-semibold text-slate-900">
                             {item.requirement}
                           </div>
-                          <div className="text-[11px] text-[#8A96B0] mt-0.5">
+                          <div className="text-[11px] text-slate-500 mt-0.5">
                             {item.description}
                           </div>
                         </div>
@@ -470,7 +470,7 @@ export default function Closeout() {
                     description: `Compiling the closeout binder for ${selectedJob.name}. Review before releasing to the client.`,
                   })
                 }
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#1C253B] hover:bg-[#2A3756] text-white text-xs font-semibold px-3 py-2.5 transition-colors mt-1"
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#E2E8F0] hover:bg-[#CBD5E1] text-slate-900 text-xs font-semibold px-3 py-2.5 transition-colors mt-1"
               >
                 Compile closeout binder
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -480,10 +480,10 @@ export default function Closeout() {
         </div>
 
         {/* Feeds Bid DNA */}
-        <Card className="bg-[#0F1830] border-[#A855F7]/30">
-          <CardHeader className="p-5 border-b border-[#1C253B]">
+        <Card className="bg-white border-[#A855F7]/30">
+          <CardHeader className="p-5 border-b border-[#E2E8F0]">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
                 <Dna className="w-4 h-4 text-[#A855F7]" />
                 FEEDS BID DNA — EVERY CLOSED JOB TRAINS FUTURE ESTIMATES
               </CardTitle>
@@ -500,12 +500,12 @@ export default function Closeout() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Chart */}
               <div>
-                <div className="flex items-center gap-2 mb-2 text-[11px] text-[#8A96B0]">
+                <div className="flex items-center gap-2 mb-2 text-[11px] text-slate-500">
                   <Sparkles className="w-3.5 h-3.5 text-[#A855F7]" />
                   Projected vs final ROI across recently closed jobs
                 </div>
                 <div className="flex gap-4 mb-3 text-[10px] font-bold uppercase tracking-widest">
-                  <div className="flex items-center gap-1.5 text-[#8A96B0]">
+                  <div className="flex items-center gap-1.5 text-slate-500">
                     <span className="w-2 h-2 rounded-full bg-[#8A96B0]" />
                     Projected
                   </div>
@@ -520,16 +520,16 @@ export default function Closeout() {
                       data={bidDnaFeedSeries}
                       margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1C253B" vertical={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
                       <XAxis
                         dataKey="name"
-                        stroke="#8A96B0"
+                        stroke="#64748B"
                         fontSize={10}
                         tickLine={false}
                         axisLine={false}
                       />
                       <YAxis
-                        stroke="#8A96B0"
+                        stroke="#64748B"
                         fontSize={10}
                         tickLine={false}
                         axisLine={false}
@@ -537,13 +537,13 @@ export default function Closeout() {
                       />
                       <RechartsTooltip
                         contentStyle={{
-                          backgroundColor: "#0F1830",
-                          borderColor: "#1C253B",
+                          backgroundColor: "#FFFFFF",
+                          borderColor: "#E2E8F0",
                           fontSize: "12px",
                         }}
                         formatter={(v: number) => `${v}%`}
                       />
-                      <Bar dataKey="projected" fill="#8A96B0" radius={[3, 3, 0, 0]} />
+                      <Bar dataKey="projected" fill="#64748B" radius={[3, 3, 0, 0]} />
                       <Bar dataKey="final" radius={[3, 3, 0, 0]}>
                         {bidDnaFeedSeries.map((d) => (
                           <Cell
@@ -558,11 +558,11 @@ export default function Closeout() {
               </div>
 
               {/* Selected job learnings */}
-              <div className="rounded-lg border border-[#1C253B] bg-[#151D2E] p-4">
-                <div className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest">
+              <div className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4">
+                <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                   Learning Snapshot — {selectedJob.name}
                 </div>
-                <p className="text-sm text-white mt-2 leading-relaxed">
+                <p className="text-sm text-slate-900 mt-2 leading-relaxed">
                   {selectedJob.feedsBidDna.headline}
                 </p>
 
@@ -572,13 +572,13 @@ export default function Closeout() {
                     return (
                       <div
                         key={row.label}
-                        className="flex items-center justify-between gap-3 rounded-md border border-[#1C253B] bg-[#111A2E] px-3 py-2"
+                        className="flex items-center justify-between gap-3 rounded-md border border-[#E2E8F0] bg-white px-3 py-2"
                       >
-                        <span className="text-[12px] text-[#CBD5E1] truncate">
+                        <span className="text-[12px] text-slate-700 truncate">
                           {row.label}
                         </span>
                         <div className="flex items-center gap-3 shrink-0 text-[11px]">
-                          <span className="text-[#8A96B0]">
+                          <span className="text-slate-500">
                             {money(row.estimated)} → {money(row.actual)}
                           </span>
                           <span
@@ -603,7 +603,7 @@ export default function Closeout() {
                   {selectedJob.feedsBidDna.learnings.map((l, i) => (
                     <li
                       key={i}
-                      className="flex items-start gap-2 text-[12px] text-[#8A96B0]"
+                      className="flex items-start gap-2 text-[12px] text-slate-500"
                     >
                       <Dna className="w-3.5 h-3.5 text-[#A855F7] mt-0.5 shrink-0" />
                       {l}
@@ -613,7 +613,7 @@ export default function Closeout() {
               </div>
             </div>
 
-            <p className="text-[11px] text-[#8A96B0] italic mt-5">
+            <p className="text-[11px] text-slate-500 italic mt-5">
               Estimate-versus-actual insights are decision-support only. The Bid DNA engine
               surfaces patterns from closed jobs to inform — not replace — estimator
               judgment, and implies no guaranteed outcomes on future bids.
@@ -621,7 +621,7 @@ export default function Closeout() {
           </CardContent>
         </Card>
 
-        <p className="text-[11px] text-[#8A96B0] italic">
+        <p className="text-[11px] text-slate-500 italic">
           Decision-support guidance only. ROI, retainage, and closeout figures require user
           verification before client-facing use.
         </p>

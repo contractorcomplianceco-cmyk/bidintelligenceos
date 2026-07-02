@@ -160,47 +160,47 @@ export default function PackageBuilder() {
 
   return (
     <Layout>
-      <div className="h-full flex flex-col -m-4 lg:-m-6 bg-slate-950">
+      <div className="h-full flex flex-col -m-4 lg:-m-6 bg-[#F8FAFC]">
         
         {/* Top Header */}
-        <div className="bg-slate-900 border-b border-slate-800 p-4 lg:px-6 flex justify-between items-center shrink-0 shadow-sm z-10 relative">
+        <div className="bg-white border-b border-[#E2E8F0] p-4 lg:px-6 flex justify-between items-center shrink-0 shadow-sm z-10 relative">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-md bg-teal-900/50 flex items-center justify-center border border-teal-800/50">
-              <FileText className="w-5 h-5 text-teal-400" />
+            <div className="w-10 h-10 rounded-md bg-teal-50 flex items-center justify-center border border-teal-200">
+              <FileText className="w-5 h-5 text-[#0A8A8F]" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white tracking-tight leading-tight">Bid Package Builder</h2>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <ShieldCheck className="w-3.5 h-3.5 text-teal-500" />
+              <h2 className="text-lg font-semibold text-slate-900 tracking-tight leading-tight">Bid Package Builder</h2>
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#0A8A8F]" />
                 <span>Client-Facing Document Environment</span>
               </div>
             </div>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 mr-4 bg-slate-800/50 rounded-full px-3 py-1.5 border border-slate-700/50">
+            <div className="hidden md:flex items-center gap-2 mr-4 bg-slate-100 rounded-full px-3 py-1.5 border border-slate-200">
                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-               <span className="text-xs font-medium text-slate-300">Draft Saved</span>
+               <span className="text-xs font-medium text-slate-600">Draft Saved</span>
             </div>
             <Button 
               variant="outline" 
-              className="border-slate-700 hover:bg-slate-800 text-slate-300 bg-slate-900 h-9"
+              className="border-[#E2E8F0] hover:bg-slate-50 text-slate-700 bg-white h-9"
               onClick={() => handleExport("DOCX")}
             >
               <DownloadCloud className="w-4 h-4 mr-2" />
               DOCX
             </Button>
             <Button 
-              className="bg-teal-600 hover:bg-teal-700 text-white h-9"
+              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white h-9"
               onClick={() => handleExport("PDF")}
             >
               <Download className="w-4 h-4 mr-2" />
               Export PDF
             </Button>
-            <div className="w-px h-6 bg-slate-800 mx-1"></div>
+            <div className="w-px h-6 bg-[#E2E8F0] mx-1"></div>
             <Button 
               variant={reviewed ? "secondary" : "default"} 
-              className={reviewed ? "bg-slate-800 text-teal-400 hover:bg-slate-700 h-9" : "bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 h-9"}
+              className={reviewed ? "bg-teal-50 text-[#0A8A8F] hover:bg-teal-100 border border-teal-200 h-9" : "bg-white text-slate-700 hover:bg-slate-50 border border-[#E2E8F0] h-9"}
               onClick={() => setReviewed(!reviewed)}
             >
               {reviewed ? <CheckSquare className="w-4 h-4 mr-2" /> : <Check className="w-4 h-4 mr-2" />}
@@ -213,18 +213,18 @@ export default function PackageBuilder() {
         <div className="flex-1 flex overflow-hidden">
           
           {/* LEFT RAIL - BUILDER CONTROLS */}
-          <div className="w-[400px] shrink-0 border-r border-slate-800 bg-slate-900/80 flex flex-col overflow-y-auto">
+          <div className="w-[400px] shrink-0 border-r border-[#E2E8F0] bg-white flex flex-col overflow-y-auto">
             
-            <div className="p-5 border-b border-slate-800 space-y-4">
+            <div className="p-5 border-b border-[#E2E8F0] space-y-4">
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Select Package Template</Label>
+                <Label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Select Package Template</Label>
                 <Select value={selectedPkgId} onValueChange={handleSelectPackage}>
-                  <SelectTrigger className="w-full bg-slate-950 border-slate-800 text-slate-200">
+                  <SelectTrigger className="w-full bg-white border-[#E2E8F0] text-slate-900">
                     <SelectValue placeholder="Select a package..." />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-slate-800">
+                  <SelectContent className="bg-white border-[#E2E8F0]">
                     {samplePackages.map(pkg => (
-                      <SelectItem key={pkg.id} value={pkg.id} className="text-slate-200 focus:bg-slate-800 focus:text-white">
+                      <SelectItem key={pkg.id} value={pkg.id} className="text-slate-700 focus:bg-slate-100 focus:text-slate-900">
                         {pkg.name}
                       </SelectItem>
                     ))}
@@ -233,39 +233,39 @@ export default function PackageBuilder() {
               </div>
             </div>
 
-            <div className="p-5 border-b border-slate-800 space-y-4">
-              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                <Settings2 className="w-4 h-4 text-slate-400" />
+            <div className="p-5 border-b border-[#E2E8F0] space-y-4">
+              <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                <Settings2 className="w-4 h-4 text-slate-500" />
                 Package Metadata
               </h3>
               
               <div className="space-y-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-slate-400">Contractor</Label>
-                  <Input readOnly value={selectedPkg.contractor} className="h-8 bg-slate-950/50 border-slate-800 text-slate-300" />
+                  <Label className="text-xs text-slate-500">Contractor</Label>
+                  <Input readOnly value={selectedPkg.contractor} className="h-8 bg-slate-50 border-[#E2E8F0] text-slate-700" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-slate-400">Recipient</Label>
-                  <Input readOnly value={selectedPkg.recipient} className="h-8 bg-slate-950/50 border-slate-800 text-slate-300" />
+                  <Label className="text-xs text-slate-500">Recipient</Label>
+                  <Input readOnly value={selectedPkg.recipient} className="h-8 bg-slate-50 border-[#E2E8F0] text-slate-700" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs text-slate-400">Project</Label>
-                  <Input readOnly value={selectedPkg.project} className="h-8 bg-slate-950/50 border-slate-800 text-slate-300" />
+                  <Label className="text-xs text-slate-500">Project</Label>
+                  <Input readOnly value={selectedPkg.project} className="h-8 bg-slate-50 border-[#E2E8F0] text-slate-700" />
                 </div>
               </div>
             </div>
 
-            <div className="p-5 border-b border-slate-800 flex-1">
+            <div className="p-5 border-b border-[#E2E8F0] flex-1">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                  <CheckSquare className="w-4 h-4 text-slate-400" />
+                <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                  <CheckSquare className="w-4 h-4 text-slate-500" />
                   Included Sections
                 </h3>
               </div>
               
               <div className="space-y-1">
                 {selectedPkg.sections.map(section => (
-                  <div key={section.id} className="flex items-center justify-between p-2 rounded-md hover:bg-slate-800/50 transition-colors group">
+                  <div key={section.id} className="flex items-center justify-between p-2 rounded-md hover:bg-slate-50 transition-colors group">
                     <div className="flex items-center gap-3">
                       <Switch 
                         checked={enabledSections[`${selectedPkg.id}-${section.id}`] ?? true}
@@ -273,9 +273,9 @@ export default function PackageBuilder() {
                         disabled={section.required}
                         className="data-[state=checked]:bg-teal-600"
                       />
-                      <Label className={`text-sm cursor-pointer ${enabledSections[`${selectedPkg.id}-${section.id}`] !== false ? 'text-slate-200' : 'text-slate-500 line-through'}`}>
+                      <Label className={`text-sm cursor-pointer ${enabledSections[`${selectedPkg.id}-${section.id}`] !== false ? 'text-slate-700' : 'text-slate-400 line-through'}`}>
                         {section.title}
-                        {section.required && <span className="ml-2 text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">Required</span>}
+                        {section.required && <span className="ml-2 text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">Required</span>}
                       </Label>
                     </div>
                   </div>
@@ -283,36 +283,36 @@ export default function PackageBuilder() {
               </div>
 
               {missingRequired && (
-                <div className="mt-4 p-3 bg-red-950/30 border border-red-900/50 rounded-md flex items-start gap-2">
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start gap-2">
                   <ShieldAlert className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                  <p className="text-xs text-red-200">Required sections are missing. Package may be incomplete.</p>
+                  <p className="text-xs text-red-700">Required sections are missing. Package may be incomplete.</p>
                 </div>
               )}
             </div>
 
-            <div className="p-5 bg-slate-950/50">
-              <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-teal-500" />
+            <div className="p-5 bg-[#F8FAFC]">
+              <h3 className="text-sm font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#0A8A8F]" />
                 Compliance Guardrails
               </h3>
               <div className="space-y-2">
                 <div className="flex items-start gap-2">
-                  <Checkbox checked={true} disabled className="mt-0.5 border-slate-700 bg-slate-800 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600" />
+                  <Checkbox checked={true} disabled className="mt-0.5 border-slate-300 bg-white data-[state=checked]:bg-[#2563EB] data-[state=checked]:border-[#2563EB]" />
                   <div className="space-y-0.5">
-                    <Label className="text-xs font-medium text-slate-300">Internal Notes Hidden</Label>
+                    <Label className="text-xs font-medium text-slate-700">Internal Notes Hidden</Label>
                     <p className="text-[10px] text-slate-500 leading-tight">Client-facing package only. Internal strategy, margin logic, bid confidence, and competitor intelligence are excluded.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Checkbox checked={reviewed} onCheckedChange={(c) => setReviewed(c === true)} className="mt-0.5 border-slate-700 bg-slate-900 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600" />
+                  <Checkbox checked={reviewed} onCheckedChange={(c) => setReviewed(c === true)} className="mt-0.5 border-slate-300 bg-white data-[state=checked]:bg-[#2563EB] data-[state=checked]:border-[#2563EB]" />
                   <div className="space-y-0.5">
-                    <Label className="text-xs font-medium text-slate-300 cursor-pointer">Pricing summary reviewed</Label>
+                    <Label className="text-xs font-medium text-slate-700 cursor-pointer">Pricing summary reviewed</Label>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Checkbox checked={reviewed} onCheckedChange={(c) => setReviewed(c === true)} className="mt-0.5 border-slate-700 bg-slate-900 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600" />
+                  <Checkbox checked={reviewed} onCheckedChange={(c) => setReviewed(c === true)} className="mt-0.5 border-slate-300 bg-white data-[state=checked]:bg-[#2563EB] data-[state=checked]:border-[#2563EB]" />
                   <div className="space-y-0.5">
-                    <Label className="text-xs font-medium text-slate-300 cursor-pointer">Ready for contractor approval</Label>
+                    <Label className="text-xs font-medium text-slate-700 cursor-pointer">Ready for contractor approval</Label>
                   </div>
                 </div>
               </div>
@@ -320,10 +320,10 @@ export default function PackageBuilder() {
           </div>
 
           {/* RIGHT RAIL - PREVIEW */}
-          <div className="flex-1 bg-slate-950 flex flex-col relative overflow-hidden p-6 md:p-8">
+          <div className="flex-1 bg-[#F1F5F9] flex flex-col relative overflow-hidden p-6 md:p-8">
             
             {/* Background grid effect */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#E2E8F0_1px,transparent_1px),linear-gradient(to_bottom,#E2E8F0_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-60 pointer-events-none"></div>
 
             <div className="w-full max-w-4xl mx-auto flex flex-col h-full relative z-10">
               
@@ -339,11 +339,11 @@ export default function PackageBuilder() {
                         px-4 py-2 text-sm font-medium rounded-t-md border-b-0 transition-all whitespace-nowrap
                         flex items-center gap-2
                         ${isActive 
-                          ? 'bg-white text-slate-900 border-white shadow-[0_-2px_10px_rgba(0,0,0,0.1)]' 
-                          : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700 hover:text-slate-200'}
+                          ? 'bg-white text-slate-900 border-[#E2E8F0] shadow-sm' 
+                          : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 hover:text-slate-700'}
                       `}
                     >
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded ${isActive ? 'bg-slate-100 text-slate-500' : 'bg-slate-900 text-slate-500'}`}>
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded ${isActive ? 'bg-slate-100 text-slate-500' : 'bg-slate-200 text-slate-500'}`}>
                         {String(idx + 1).padStart(2, '0')}
                       </span>
                       {section.title}

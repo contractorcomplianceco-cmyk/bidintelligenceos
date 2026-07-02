@@ -18,11 +18,11 @@ import {
 } from "lucide-react";
 
 const STATUS_STYLES: Record<JobStatus, string> = {
-  Mobilizing: "bg-[#38BDF8]/10 text-[#38BDF8] border-[#38BDF8]/20",
-  "In Progress": "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20",
-  "On Hold": "bg-[#8A96B0]/10 text-[#8A96B0] border-[#8A96B0]/20",
-  Delayed: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20",
-  Completed: "bg-[#0BA3A8]/10 text-[#0BA3A8] border-[#0BA3A8]/20",
+  Mobilizing: "bg-sky-50 text-sky-700 border-sky-200",
+  "In Progress": "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "On Hold": "bg-slate-100 text-slate-600 border-slate-200",
+  Delayed: "bg-red-50 text-red-700 border-red-200",
+  Completed: "bg-teal-50 text-[#0A8A8F] border-teal-200",
 };
 
 function money(n: number) {
@@ -65,18 +65,18 @@ export default function WonJobs() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
               <Trophy className="h-7 w-7 text-[#22C55E]" />
               Won Jobs
             </h1>
-            <p className="text-[#8A96B0] mt-1">
+            <p className="text-slate-500 mt-1">
               Awarded {verticalConfig.name} bids that have converted into active job
               deployments.
             </p>
           </div>
           <button
             onClick={handleConvert}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#0BA3A8] hover:bg-[#0BA3A8]/85 text-white text-sm font-semibold px-4 py-2.5 transition-colors shadow-lg shadow-[#0BA3A8]/10"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#0BA3A8] hover:bg-[#0BA3A8]/85 text-white text-sm font-semibold px-4 py-2.5 transition-colors shadow-sm"
           >
             <Sparkles className="w-4 h-4" />
             Convert won bid to job
@@ -86,8 +86,8 @@ export default function WonJobs() {
         {converted && (
           <div className="rounded-xl border border-[#0BA3A8]/30 bg-[#0BA3A8]/5 p-4 flex items-start gap-3">
             <CheckCircle2 className="w-5 h-5 text-[#0BA3A8] mt-0.5 shrink-0" />
-            <div className="text-sm text-[#CBD5E1]">
-              <span className="font-semibold text-white">Bid to job lifecycle initiated.</span>{" "}
+            <div className="text-sm text-slate-700">
+              <span className="font-semibold text-slate-900">Bid to job lifecycle initiated.</span>{" "}
               The system drafted a job deployment with a proposed schedule, crew and sub
               assignments, permit tracking, and a weather watch. Decision-support guidance
               only &mdash; review before activating client-facing output.
@@ -97,61 +97,61 @@ export default function WonJobs() {
 
         {/* KPI Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="bg-[#0F1830] border-[#1C253B] relative overflow-hidden group">
+          <Card className="bg-white border-[#E2E8F0] relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
               <DollarSign className="w-10 h-10 text-[#22C55E]" />
             </div>
             <CardContent className="p-5 relative z-10">
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="w-4 h-4 text-[#22C55E]" />
-                <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                   Total Won Contract Value
                 </span>
               </div>
-              <div className="text-3xl font-bold text-white tracking-tight">
+              <div className="text-3xl font-bold text-slate-900 tracking-tight">
                 {money(kpis.totalValue)}
               </div>
-              <p className="text-[10px] text-[#8A96B0] mt-1 font-medium tracking-wide">
+              <p className="text-[10px] text-slate-500 mt-1 font-medium tracking-wide">
                 Across all active deployments
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#0F1830] border-[#1C253B] relative overflow-hidden group">
+          <Card className="bg-white border-[#E2E8F0] relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Trophy className="w-10 h-10 text-[#38BDF8]" />
+              <Trophy className="w-10 h-10 text-[#0284C7]" />
             </div>
             <CardContent className="p-5 relative z-10">
               <div className="flex items-center gap-2 mb-2">
-                <Trophy className="w-4 h-4 text-[#38BDF8]" />
-                <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-wider">
+                <Trophy className="w-4 h-4 text-[#0284C7]" />
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                   Jobs Won
                 </span>
               </div>
-              <div className="text-3xl font-bold text-white tracking-tight">
+              <div className="text-3xl font-bold text-slate-900 tracking-tight">
                 {kpis.count}
               </div>
-              <p className="text-[10px] text-[#8A96B0] mt-1 font-medium tracking-wide">
+              <p className="text-[10px] text-slate-500 mt-1 font-medium tracking-wide">
                 Bids advanced to deployment
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-[#0F1830] border-[#1C253B] relative overflow-hidden group">
+          <Card className="bg-white border-[#E2E8F0] relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
               <TrendingUp className="w-10 h-10 text-[#0BA3A8]" />
             </div>
             <CardContent className="p-5 relative z-10">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-4 h-4 text-[#0BA3A8]" />
-                <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                   Average Projected ROI
                 </span>
               </div>
-              <div className="text-3xl font-bold text-white tracking-tight">
+              <div className="text-3xl font-bold text-slate-900 tracking-tight">
                 {kpis.avgRoi.toFixed(1)}%
               </div>
-              <p className="text-[10px] text-[#8A96B0] mt-1 font-medium tracking-wide">
+              <p className="text-[10px] text-slate-500 mt-1 font-medium tracking-wide">
                 Projections require user verification
               </p>
             </CardContent>
@@ -159,10 +159,10 @@ export default function WonJobs() {
         </div>
 
         {/* Lifecycle strip */}
-        <Card className="bg-[#0F1830] border-[#1C253B]">
-          <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center gap-2">
-            <Route className="w-4 h-4 text-[#38BDF8]" />
-            <CardTitle className="text-sm font-bold text-white tracking-wide">
+        <Card className="bg-white border-[#E2E8F0]">
+          <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+            <Route className="w-4 h-4 text-[#0284C7]" />
+            <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
               BID TO JOB LIFECYCLE
             </CardTitle>
           </CardHeader>
@@ -176,13 +176,13 @@ export default function WonJobs() {
                       className={`text-[10px] font-semibold px-2 py-1 rounded border ${
                         isWonMarker
                           ? "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30"
-                          : "bg-[#151D2E] text-[#8A96B0] border-[#1C253B]"
+                          : "bg-[#F1F5F9] text-slate-500 border-[#E2E8F0]"
                       }`}
                     >
                       {stage}
                     </span>
                     {i < BID_LIFECYCLE.length - 1 && (
-                      <ArrowRight className="w-3 h-3 text-[#2A3756] shrink-0" />
+                      <ArrowRight className="w-3 h-3 text-slate-700 shrink-0" />
                     )}
                   </div>
                 );
@@ -200,15 +200,15 @@ export default function WonJobs() {
             return (
               <Card
                 key={job.id}
-                className="bg-[#0F1830] border-[#1C253B] flex flex-col hover:border-[#2A3756] transition-colors"
+                className="bg-white border-[#E2E8F0] flex flex-col hover:border-[#CBD5E1] transition-colors"
               >
-                <CardHeader className="p-5 border-b border-[#1C253B]">
+                <CardHeader className="p-5 border-b border-[#E2E8F0]">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <CardTitle className="text-base font-bold text-white truncate">
+                      <CardTitle className="text-base font-bold text-slate-900 truncate">
                         {job.name}
                       </CardTitle>
-                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-[#8A96B0]">
+                      <div className="flex items-center gap-3 mt-1.5 text-[11px] text-slate-500">
                         <span className="flex items-center gap-1 truncate">
                           <Building2 className="w-3 h-3 shrink-0" />
                           {job.client}
@@ -230,27 +230,27 @@ export default function WonJobs() {
                 <CardContent className="p-5 flex-1 flex flex-col gap-4">
                   {/* Metrics */}
                   <div className="grid grid-cols-3 gap-3">
-                    <div className="rounded-lg bg-[#151D2E] border border-[#1C253B] p-3">
-                      <div className="text-[9px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                    <div className="rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] p-3">
+                      <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
                         Contract Value
                       </div>
-                      <div className="text-lg font-bold text-white mt-1">
+                      <div className="text-lg font-bold text-slate-900 mt-1">
                         {money(job.contractValue)}
                       </div>
                     </div>
-                    <div className="rounded-lg bg-[#151D2E] border border-[#1C253B] p-3">
-                      <div className="text-[9px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                    <div className="rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] p-3">
+                      <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
                         Projected ROI
                       </div>
                       <div className="text-lg font-bold text-[#22C55E] mt-1">
                         {job.projectedRoi.toFixed(1)}%
                       </div>
                     </div>
-                    <div className="rounded-lg bg-[#151D2E] border border-[#1C253B] p-3">
-                      <div className="text-[9px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                    <div className="rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] p-3">
+                      <div className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
                         Completion
                       </div>
-                      <div className="text-lg font-bold text-white mt-1">
+                      <div className="text-lg font-bold text-slate-900 mt-1">
                         {job.completion}%
                       </div>
                     </div>
@@ -259,15 +259,15 @@ export default function WonJobs() {
                   {/* Completion bar */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                         Field Progress
                       </span>
-                      <span className="text-[10px] font-semibold text-[#8A96B0]">
+                      <span className="text-[10px] font-semibold text-slate-500">
                         {job.currentPhase} &middot; Phase {job.phaseIndex + 1} of{" "}
                         {job.totalPhases}
                       </span>
                     </div>
-                    <div className="h-2 w-full rounded-full bg-[#1C253B] overflow-hidden">
+                    <div className="h-2 w-full rounded-full bg-[#E2E8F0] overflow-hidden">
                       <div
                         className="h-full rounded-full bg-gradient-to-r from-[#0BA3A8] to-[#38BDF8]"
                         style={{ width: `${job.completion}%` }}
@@ -276,22 +276,22 @@ export default function WonJobs() {
                   </div>
 
                   {/* Lifecycle stage */}
-                  <div className="rounded-lg bg-[#151D2E] border border-[#1C253B] p-3">
+                  <div className="rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] p-3">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                         Current Lifecycle Stage
                       </span>
-                      <span className="text-[10px] font-semibold text-[#38BDF8]">
+                      <span className="text-[10px] font-semibold text-[#0284C7]">
                         {stageIndex + 1}/{BID_LIFECYCLE.length}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-semibold bg-[#38BDF8]/10 text-[#38BDF8] border border-[#38BDF8]/20">
+                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-semibold bg-[#38BDF8]/10 text-[#0284C7] border border-[#38BDF8]/20">
                         <CheckCircle2 className="w-3 h-3" />
                         {job.stage}
                       </span>
                     </div>
-                    <div className="h-1.5 w-full rounded-full bg-[#1C253B] overflow-hidden mt-2.5">
+                    <div className="h-1.5 w-full rounded-full bg-[#E2E8F0] overflow-hidden mt-2.5">
                       <div
                         className="h-full rounded-full bg-[#38BDF8]"
                         style={{ width: `${stageProgress}%` }}
@@ -301,9 +301,9 @@ export default function WonJobs() {
 
                   {/* Footer */}
                   <div className="mt-auto pt-1 flex items-center justify-between gap-3">
-                    <div className="text-[11px] text-[#8A96B0]">
+                    <div className="text-[11px] text-slate-500">
                       Next:{" "}
-                      <span className="text-white font-medium">
+                      <span className="text-slate-900 font-medium">
                         {job.nextMilestone}
                       </span>{" "}
                       &middot; {job.nextMilestoneDate}
@@ -311,7 +311,7 @@ export default function WonJobs() {
                     <Link
                       href="/deployment"
                       onClick={() => handleOpen(job)}
-                      className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-[#1C253B] hover:bg-[#2A3756] text-white text-xs font-semibold px-3 py-2 transition-colors"
+                      className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-[#E2E8F0] hover:bg-[#CBD5E1] text-slate-900 text-xs font-semibold px-3 py-2 transition-colors"
                     >
                       Open Job Deployment
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -323,7 +323,7 @@ export default function WonJobs() {
           })}
         </div>
 
-        <p className="text-[11px] text-[#8A96B0] italic">
+        <p className="text-[11px] text-slate-500 italic">
           Decision-support guidance only. Projected ROI and completion figures require user
           verification and imply no guaranteed outcomes.
         </p>

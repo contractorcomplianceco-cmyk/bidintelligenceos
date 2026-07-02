@@ -27,6 +27,9 @@ import IndustryUseCases from "@/pages/industry-use-cases";
 import Analytics from "@/pages/analytics";
 import CompetitorWatch from "@/pages/competitor-watch";
 import BidDna from "@/pages/bid-dna";
+import AddOns from "@/pages/add-ons";
+import VideoConnect from "@/pages/video-connect";
+import MarketWatch from "@/pages/market-watch";
 import Risk from "@/pages/risk";
 import Closeout from "@/pages/closeout";
 import BusinessProfile from "@/pages/business-profile";
@@ -80,6 +83,11 @@ function Router() {
       <Route path="/analytics" component={Analytics} />
       <Route path="/competitor-watch" component={CompetitorWatch} />
       <Route path="/bid-dna" component={BidDna} />
+
+      {/* Add-Ons */}
+      <Route path="/add-ons" component={AddOns} />
+      <Route path="/video-connect" component={VideoConnect} />
+      <Route path="/market-watch" component={MarketWatch} />
 
       {/* Account */}
       <Route path="/business-profile" component={BusinessProfile} />

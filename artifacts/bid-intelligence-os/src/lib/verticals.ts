@@ -9,6 +9,8 @@ export type VerticalId =
   | "concrete"
   | "landscaping"
   | "specialty"
+  | "insurance"
+  | "engineering"
   | "custom";
 
 export interface VerticalConfig {
@@ -219,6 +221,58 @@ export const VERTICALS: VerticalConfig[] = [
     proposalSections: ["Executive Summary", "Scope of Work", "Schedule", "Assumptions & Exclusions", "Pricing", "Terms"],
     alertTypes: ["Material lead times", "Inspection holds", "Access constraints", "Labor conflicts"],
     bidFields: ["Scope Type", "Quantity", "Building Type", "Bid Due Date", "Bond Required"],
+  },
+  {
+    id: "insurance",
+    name: "Insurance Restoration & Claims",
+    short: "Insurance",
+    tagline: "Claim-driven restoration with supplement and adjuster workflows.",
+    jobPhases: [
+      "First Notice of Loss",
+      "Inspection & Scope",
+      "Estimate & Claim",
+      "Mitigation",
+      "Rebuild",
+      "Supplement",
+      "Adjuster Approval",
+      "Closeout",
+    ],
+    costCategories: ["Labor", "Materials", "Subcontractors", "Supplements", "Equipment", "Content Handling", "Change Orders"],
+    laborCategories: ["Project Manager", "Estimator", "Mitigation Tech", "Carpenter", "Content Specialist"],
+    subCategories: ["Abatement", "Electrical", "Plumbing", "HVAC", "Flooring", "Contents / Pack-Out"],
+    permitNeeds: ["Claim Documentation", "Scope of Loss Approval", "Adjuster Notes", "Building Permit", "Certificate of Insurance"],
+    weatherSensitive: true,
+    weatherNote: "Emergency mitigation and exterior repairs are driven by ongoing weather events.",
+    roiMetrics: ["Gross Margin", "Projected ROI", "Supplement Recovery", "Cycle Time", "Claim Approval Rate"],
+    proposalSections: ["Executive Summary", "Scope of Loss", "Mitigation Plan", "Rebuild Scope", "Supplement Detail", "Pricing", "Terms"],
+    alertTypes: ["Supplement pending", "Adjuster approval", "Mitigation window", "Documentation gaps", "Deadline risk"],
+    bidFields: ["Loss Type", "Claim Number", "Carrier", "Date of Loss", "Deductible", "Adjuster"],
+  },
+  {
+    id: "engineering",
+    name: "Engineering & Design-Build",
+    short: "Engineering",
+    tagline: "Design-build delivery with civil scope and permit sequencing.",
+    jobPhases: [
+      "Concept & Feasibility",
+      "Design Development",
+      "Permitting",
+      "Mobilization",
+      "Sitework & Earthwork",
+      "Construction",
+      "Commissioning",
+      "Closeout",
+    ],
+    costCategories: ["Design & Engineering", "Labor", "Subcontractors", "Materials", "Equipment", "Permits & Fees", "Change Orders"],
+    laborCategories: ["Project Engineer", "Design Lead", "Superintendent", "Field Engineer", "Surveyor", "Operator"],
+    subCategories: ["Civil / Earthwork", "Structural", "MEP", "Geotechnical", "Testing & Inspection", "Utilities"],
+    permitNeeds: ["Building Permit", "Grading & Site Permit", "Environmental Approval", "Engineered Drawings", "Inspection Approvals"],
+    weatherSensitive: true,
+    weatherNote: "Earthwork, foundations, and site utilities are highly weather- and soil-sensitive.",
+    roiMetrics: ["Gross Margin", "Projected ROI", "Design Fee Recovery", "Schedule Variance", "Change Order Recovery"],
+    proposalSections: ["Executive Summary", "Design Approach", "Scope of Work", "Schedule", "Assumptions & Exclusions", "Pricing", "Terms"],
+    alertTypes: ["Permit sequencing", "Design revisions", "Weather delays", "Geotech surprises", "Cost overruns"],
+    bidFields: ["Project Type", "Delivery Method", "Site Acreage", "Bid Due Date", "Bond Required", "Design Basis"],
   },
   {
     id: "custom",

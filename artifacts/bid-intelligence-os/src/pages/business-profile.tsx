@@ -42,17 +42,17 @@ interface FieldProps {
 function ProfileField({ label, value, editing, accent }: FieldProps) {
   return (
     <div className="space-y-1.5">
-      <label className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest">
+      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
         {label}
       </label>
       <input
         readOnly={!editing}
         defaultValue={value}
-        className={`w-full rounded-lg border bg-[#0A0E1A] px-3 py-2 text-sm font-medium text-white outline-none transition-colors ${
+        className={`w-full rounded-lg border bg-[#F1F5F9] px-3 py-2 text-sm font-medium text-slate-900 outline-none transition-colors ${
           editing
             ? "border-[#38BDF8]/50 focus:border-[#38BDF8]"
-            : "border-[#1C253B] cursor-default"
-        } ${accent ? "text-[#38BDF8]" : ""}`}
+            : "border-[#E2E8F0] cursor-default"
+        } ${accent ? "text-[#0284C7]" : ""}`}
       />
     </div>
   );
@@ -154,16 +154,16 @@ export default function BusinessProfile() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#1C253B] bg-[#0F1830] shrink-0">
-              <Building2 className="h-7 w-7 text-[#38BDF8]" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#E2E8F0] bg-white shrink-0">
+              <Building2 className="h-7 w-7 text-[#0284C7]" />
             </div>
             <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
                 Cornerstone Contracting Alliance
               </h1>
-              <p className="text-[#8A96B0] mt-1">
+              <p className="text-slate-500 mt-1">
                 Company profile powering bid-fit for the{" "}
-                <span className="text-[#38BDF8] font-semibold">{verticalConfig.name}</span> workflow.
+                <span className="text-[#0284C7] font-semibold">{verticalConfig.name}</span> workflow.
               </p>
             </div>
           </div>
@@ -199,21 +199,21 @@ export default function BusinessProfile() {
           ].map((kpi) => (
             <div
               key={kpi.label}
-              className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-4 relative overflow-hidden group"
+              className="rounded-xl border border-[#E2E8F0] bg-white p-4 relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                 <kpi.icon className="w-9 h-9" style={{ color: kpi.color }} />
               </div>
               <div className="flex items-center gap-2 mb-2 relative z-10">
                 <kpi.icon className="w-3.5 h-3.5" style={{ color: kpi.color }} />
-                <span className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                   {kpi.label}
                 </span>
               </div>
-              <div className="text-2xl font-bold text-white tracking-tight relative z-10">
+              <div className="text-2xl font-bold text-slate-900 tracking-tight relative z-10">
                 {kpi.value}
               </div>
-              <p className="text-[10px] text-[#8A96B0] mt-1 relative z-10">{kpi.note}</p>
+              <p className="text-[10px] text-slate-500 mt-1 relative z-10">{kpi.note}</p>
             </div>
           ))}
         </div>
@@ -222,10 +222,10 @@ export default function BusinessProfile() {
           {/* Left column: identity + capacity + differentiators */}
           <div className="lg:col-span-2 space-y-6">
             {/* Company identity */}
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center gap-2">
-                <Building2 className="w-4 h-4 text-[#38BDF8]" />
-                <CardTitle className="text-sm font-bold text-white tracking-wide">
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <Building2 className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
                   COMPANY IDENTITY
                 </CardTitle>
               </CardHeader>
@@ -242,10 +242,10 @@ export default function BusinessProfile() {
             </Card>
 
             {/* Verticals served */}
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center gap-2">
-                <Layers className="w-4 h-4 text-[#38BDF8]" />
-                <CardTitle className="text-sm font-bold text-white tracking-wide">
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <Layers className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
                   VERTICALS SERVED
                 </CardTitle>
               </CardHeader>
@@ -258,8 +258,8 @@ export default function BusinessProfile() {
                         key={v.id}
                         className={`px-3 py-2 rounded-lg border text-xs font-semibold flex items-center gap-2 ${
                           isActive
-                            ? "border-[#38BDF8]/50 bg-[#38BDF8]/10 text-[#38BDF8]"
-                            : "border-[#1C253B] bg-[#0A0E1A] text-[#8A96B0]"
+                            ? "border-[#38BDF8]/50 bg-[#38BDF8]/10 text-[#0284C7]"
+                            : "border-[#E2E8F0] bg-[#F1F5F9] text-slate-500"
                         }`}
                       >
                         {isActive && <BadgeCheck className="w-3.5 h-3.5" />}
@@ -273,7 +273,7 @@ export default function BusinessProfile() {
                     );
                   })}
                 </div>
-                <p className="text-[11px] text-[#8A96B0] mt-4 leading-relaxed">
+                <p className="text-[11px] text-slate-500 mt-4 leading-relaxed">
                   Cornerstone self-performs {verticalConfig.name.toLowerCase()} work with{" "}
                   {verticalConfig.laborCategories.slice(0, 3).join(", ")} crews and partners on{" "}
                   {verticalConfig.subCategories.slice(0, 3).join(", ")} scopes.
@@ -282,10 +282,10 @@ export default function BusinessProfile() {
             </Card>
 
             {/* Crew / capacity */}
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center gap-2">
-                <Users className="w-4 h-4 text-[#38BDF8]" />
-                <CardTitle className="text-sm font-bold text-white tracking-wide">
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <Users className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
                   CREW &amp; CAPACITY
                 </CardTitle>
               </CardHeader>
@@ -297,20 +297,20 @@ export default function BusinessProfile() {
                     { label: "Concurrent Jobs", value: "6-8", sub: "Typical load" },
                     { label: "Bonding Capacity", value: "$25M", sub: "Aggregate" },
                   ].map((c) => (
-                    <div key={c.label} className="rounded-lg border border-[#1C253B] bg-[#0A0E1A] p-4">
-                      <div className="text-2xl font-bold text-white">{c.value}</div>
-                      <div className="text-[11px] font-semibold text-white mt-1">{c.label}</div>
-                      <div className="text-[10px] text-[#8A96B0] mt-0.5">{c.sub}</div>
+                    <div key={c.label} className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4">
+                      <div className="text-2xl font-bold text-slate-900">{c.value}</div>
+                      <div className="text-[11px] font-semibold text-slate-900 mt-1">{c.label}</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">{c.sub}</div>
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 rounded-lg border border-[#1C253B] bg-[#0A0E1A] p-4 flex items-start gap-3">
+                <div className="mt-4 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 flex items-start gap-3">
                   <Landmark className="w-4 h-4 text-[#F59E0B] shrink-0 mt-0.5" />
                   <div>
-                    <div className="text-xs font-semibold text-white">
+                    <div className="text-xs font-semibold text-slate-900">
                       Bonding capacity: $5M single / $25M aggregate
                     </div>
-                    <p className="text-[11px] text-[#8A96B0] mt-1 leading-relaxed">
+                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
                       Surety line held through Meridian Surety Group. Figures indicative only and
                       require broker verification per project; capacity does not imply any guaranteed
                       bonding or award outcome.
@@ -321,10 +321,10 @@ export default function BusinessProfile() {
             </Card>
 
             {/* Differentiators */}
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center gap-2">
-                <Star className="w-4 h-4 text-[#38BDF8]" />
-                <CardTitle className="text-sm font-bold text-white tracking-wide">
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <Star className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
                   KEY DIFFERENTIATORS
                 </CardTitle>
               </CardHeader>
@@ -332,14 +332,14 @@ export default function BusinessProfile() {
                 {differentiators.map((d) => (
                   <div
                     key={d.title}
-                    className="rounded-lg border border-[#1C253B] bg-[#0A0E1A] p-4 flex items-start gap-3"
+                    className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 flex items-start gap-3"
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#38BDF8]/10 shrink-0">
-                      <d.icon className="w-4 h-4 text-[#38BDF8]" />
+                      <d.icon className="w-4 h-4 text-[#0284C7]" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-white">{d.title}</div>
-                      <p className="text-[11px] text-[#8A96B0] mt-1 leading-relaxed">{d.detail}</p>
+                      <div className="text-xs font-bold text-slate-900">{d.title}</div>
+                      <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">{d.detail}</p>
                     </div>
                   </div>
                 ))}
@@ -350,10 +350,10 @@ export default function BusinessProfile() {
           {/* Right column: licenses, certs, service areas, leadership */}
           <div className="space-y-6">
             {/* Licenses */}
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#38BDF8]" />
-                <CardTitle className="text-sm font-bold text-white tracking-wide">
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
                   LICENSES
                 </CardTitle>
               </CardHeader>
@@ -361,17 +361,17 @@ export default function BusinessProfile() {
                 {licenses.map((l) => (
                   <div
                     key={l.id}
-                    className="rounded-lg border border-[#1C253B] bg-[#0A0E1A] p-3"
+                    className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3"
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-white">{l.name}</span>
+                      <span className="text-xs font-semibold text-slate-900">{l.name}</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-[#22C55E]/10 text-[#22C55E]">
                         {l.status}
                       </span>
                     </div>
                     <div className="flex items-center justify-between mt-1.5">
-                      <span className="text-[10px] text-[#8A96B0]">{l.id}</span>
-                      <span className="text-[10px] text-[#8A96B0]">Exp {l.expires}</span>
+                      <span className="text-[10px] text-slate-500">{l.id}</span>
+                      <span className="text-[10px] text-slate-500">Exp {l.expires}</span>
                     </div>
                   </div>
                 ))}
@@ -379,10 +379,10 @@ export default function BusinessProfile() {
             </Card>
 
             {/* Certifications */}
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center gap-2">
-                <Award className="w-4 h-4 text-[#38BDF8]" />
-                <CardTitle className="text-sm font-bold text-white tracking-wide">
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <Award className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
                   CERTIFICATIONS
                 </CardTitle>
               </CardHeader>
@@ -391,7 +391,7 @@ export default function BusinessProfile() {
                   {certifications.map((c) => (
                     <span
                       key={c}
-                      className="px-2.5 py-1 rounded-lg border border-[#1C253B] bg-[#0A0E1A] text-[11px] font-medium text-[#8A96B0] flex items-center gap-1.5"
+                      className="px-2.5 py-1 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] text-[11px] font-medium text-slate-500 flex items-center gap-1.5"
                     >
                       <BadgeCheck className="w-3 h-3 text-[#22C55E]" />
                       {c}
@@ -402,10 +402,10 @@ export default function BusinessProfile() {
             </Card>
 
             {/* Service areas */}
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center gap-2">
-                <MapPin className="w-4 h-4 text-[#38BDF8]" />
-                <CardTitle className="text-sm font-bold text-white tracking-wide">
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
                   SERVICE AREAS
                 </CardTitle>
               </CardHeader>
@@ -414,7 +414,7 @@ export default function BusinessProfile() {
                   {serviceAreas.map((a) => (
                     <span
                       key={a}
-                      className="px-2.5 py-1 rounded-lg bg-[#38BDF8]/10 text-[11px] font-medium text-[#38BDF8] flex items-center gap-1.5"
+                      className="px-2.5 py-1 rounded-lg bg-[#38BDF8]/10 text-[11px] font-medium text-[#0284C7] flex items-center gap-1.5"
                     >
                       <MapPin className="w-3 h-3" />
                       {a}
@@ -425,10 +425,10 @@ export default function BusinessProfile() {
             </Card>
 
             {/* Leadership */}
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-5 border-b border-[#1C253B] flex flex-row items-center gap-2">
-                <Users className="w-4 h-4 text-[#38BDF8]" />
-                <CardTitle className="text-sm font-bold text-white tracking-wide">
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <Users className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
                   LEADERSHIP
                 </CardTitle>
               </CardHeader>
@@ -439,10 +439,10 @@ export default function BusinessProfile() {
                       {p.initials}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold text-white truncate">{p.name}</div>
-                      <div className="text-[10px] text-[#8A96B0]">{p.role}</div>
+                      <div className="text-xs font-semibold text-slate-900 truncate">{p.name}</div>
+                      <div className="text-[10px] text-slate-500">{p.role}</div>
                     </div>
-                    <span className="text-[10px] text-[#8A96B0] shrink-0">{p.tenure}</span>
+                    <span className="text-[10px] text-slate-500 shrink-0">{p.tenure}</span>
                   </div>
                 ))}
               </CardContent>
@@ -451,9 +451,9 @@ export default function BusinessProfile() {
         </div>
 
         {/* Guardrail note */}
-        <div className="rounded-xl border border-[#1C253B] bg-[#111A2E] p-4 flex items-start gap-3">
-          <Info className="w-4 h-4 text-[#8A96B0] shrink-0 mt-0.5" />
-          <p className="text-[11px] text-[#8A96B0] leading-relaxed">
+        <div className="rounded-xl border border-[#E2E8F0] bg-[#F1F5F9] p-4 flex items-start gap-3">
+          <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+          <p className="text-[11px] text-slate-500 leading-relaxed">
             Decision-support guidance only. Bonding, licensing, insurance, and performance figures
             shown here are prototype values that require independent verification before inclusion in
             any client-facing or prequalification submission. Nothing here implies a guaranteed

@@ -42,6 +42,8 @@ export const VERTICAL_TO_USE_CASE: Record<string, string> = {
   concrete: "engineering",
   landscaping: "engineering",
   specialty: "custom",
+  insurance: "insurance",
+  engineering: "engineering",
   custom: "custom",
 };
 

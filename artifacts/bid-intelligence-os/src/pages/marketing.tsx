@@ -30,6 +30,10 @@ import {
   ShieldAlert,
   Dna,
   RotateCcw,
+  Video,
+  BarChart3,
+  ScanEye,
+  Camera,
   type LucideIcon,
 } from "lucide-react";
 import { CCACrest } from "@/components/cca-crest";
@@ -191,6 +195,28 @@ const TRUST = [
   { value: "11", label: "Trade Verticals" },
   { value: "AI + Human", label: "Reviewed Execution" },
 ];
+
+/**
+ * MarketWatchOS — Coming Soon add-on content.
+ * Framed strictly around lawful, public, and published market data.
+ */
+const MARKETWATCH = {
+  name: "MarketWatchOS",
+  status: "Coming Soon",
+  tagline: "Read market pricing and demand signals from public data.",
+  shortDescription:
+    "An upcoming market-intelligence add-on that reads pricing movement and demand signals from lawful, public data — so you can time bids, benchmark realistic pricing bands, and put estimating effort where the work actually is.",
+  features: [
+    { title: "Public pricing benchmarks", description: "Track material and labor pricing bands from public and published sources." },
+    { title: "Demand signals by trade & region", description: "See where demand is rising or cooling before you commit bid resources." },
+    { title: "Public bid-volume trends", description: "Follow public bid activity to time your pursuits with the market." },
+    { title: "Pricing pressure indicators", description: "Read directional market pressure to time bids and protect margin." },
+    { title: "Seasonality patterns", description: "Anticipate seasonal swings in demand and pricing pressure." },
+    { title: "Market benchmark ranges", description: "Compare your assumptions against public market ranges before you submit." },
+  ],
+  guardrail:
+    "MarketWatchOS uses lawful, public, and published market data only. It does not access private company systems, confidential pricing, or non-public bid information.",
+};
 
 export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }) {
   const playerRef = useRef<HTMLDivElement | null>(null);
@@ -690,42 +716,171 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
           ))}
         </div>
 
-        {/* VoiceConnect as integration framing */}
-        <div className="mt-8 rounded-2xl border border-[#5eead4]/20 bg-gradient-to-br from-[#0F1830] to-[#0B1F1C] p-8 lg:p-10">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
-            <div className="shrink-0 w-14 h-14 rounded-2xl bg-[#5eead4]/10 border border-[#5eead4]/30 flex items-center justify-center shadow-[0_0_28px_rgba(94,234,212,0.25)]">
-              <Mic className="w-6 h-6 text-[#5eead4]" />
-            </div>
-            <div className="flex-1">
-              <span className="text-xs font-semibold uppercase tracking-widest text-[#5eead4]">
-                VoiceConnect — Integrated, Not Bolted On
+        {/* Add-On Marketplace — flagship integrations */}
+        <div className="mt-10">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-5">
+            <div>
+              <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#38BDF8]">
+                <Sparkles className="w-3.5 h-3.5" />
+                Add-On Marketplace
               </span>
               <h3 className="mt-1.5 text-xl lg:text-2xl font-bold text-white tracking-tight">
-                Your field voice layer, wired into every module
+                Separate products, wired into the OS
               </h3>
-              <p className="mt-2 text-sm text-[#a9b7d1] leading-relaxed max-w-2xl">
-                VoiceConnect isn't a standalone app — it's the hands-free capture layer that
-                feeds the whole platform. Walkthrough notes flow into bid drafts, field
-                observations into change orders, and site updates into client
-                communications. Ask, listen, act — and the intelligence follows the work.
+              <p className="mt-2 text-sm text-[#8A96B0] leading-relaxed max-w-xl">
+                Flagship add-ons are standalone products that connect to
+                BidIntelligenceOS — not features locked inside it. Turn each on and
+                the intelligence flows straight into your bids and jobs.
               </p>
             </div>
-            <a
-              href="#voiceconnect"
-              className="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-[#5eead4]/30 bg-[#5eead4]/10 text-[#7fe3d8] font-semibold text-sm hover:bg-[#5eead4]/20 transition-colors"
-            >
-              Explore VoiceConnect
-              <ArrowRight className="w-4 h-4" />
-            </a>
+            {/* Marketplace badge row */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#5eead4]/30 bg-[#5eead4]/10 text-[11px] font-semibold text-[#7fe3d8]">
+                <Mic className="w-3 h-3" />
+                VoiceConnect
+                <span className="ml-1 inline-flex items-center gap-1 text-[#5eead4]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#5eead4]" />
+                  Connected
+                </span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#7C3AED]/40 bg-[#7C3AED]/15 text-[11px] font-semibold text-[#c4b5fd]">
+                <Video className="w-3 h-3" />
+                VideoConnect
+                <span className="ml-1 inline-flex items-center gap-1 text-[#a78bfa]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#a78bfa]" />
+                  Connected
+                </span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#a5b4fc]/30 bg-[#a5b4fc]/10 text-[11px] font-semibold text-[#c7d2fe]">
+                <Radar className="w-3 h-3" />
+                CompetitorWatchOS
+                <span className="ml-1 inline-flex items-center gap-1 text-[#8A96B0]">
+                  <Lock className="w-2.5 h-2.5" />
+                  Soon
+                </span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#5e9bf8]/30 bg-[#5e9bf8]/10 text-[11px] font-semibold text-[#bcd6ff]">
+                <BarChart3 className="w-3 h-3" />
+                MarketWatchOS
+                <span className="ml-1 inline-flex items-center gap-1 text-[#8A96B0]">
+                  <Lock className="w-2.5 h-2.5" />
+                  Soon
+                </span>
+              </span>
+            </div>
           </div>
+
+          <div className="grid lg:grid-cols-2 gap-5">
+            {/* VoiceConnect — flagship add-on */}
+            <div className="relative rounded-2xl border border-[#5eead4]/20 bg-gradient-to-br from-[#0F1830] to-[#0B1F1C] p-7">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#5eead4]/10 border border-[#5eead4]/30 flex items-center justify-center shadow-[0_0_28px_rgba(94,234,212,0.25)]">
+                  <Mic className="w-6 h-6 text-[#5eead4]" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold uppercase tracking-widest text-[#5eead4]">
+                    Flagship Add-On · Connected
+                  </span>
+                  <h4 className="text-lg font-bold text-white tracking-tight">VoiceConnect</h4>
+                </div>
+              </div>
+              <p className="text-sm text-[#a9b7d1] leading-relaxed">
+                A separate field-voice product that connects to BidIntelligenceOS.
+                Walkthrough notes flow into bid drafts, field observations into change
+                orders, and site updates into client communications — hands-free. Ask,
+                listen, act, and the intelligence follows the work.
+              </p>
+              <ul className="mt-4 grid sm:grid-cols-2 gap-2">
+                {[
+                  "Hands-free field capture",
+                  "Walkthrough-to-bid",
+                  "Field observations",
+                  "Voice-to-change-order",
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-xs text-[#94a3b8]">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#5eead4] mt-0.5 shrink-0" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="#voiceconnect"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#7fe3d8] hover:text-white transition-colors"
+              >
+                Explore VoiceConnect
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+
+            {/* VideoConnect — flagship add-on */}
+            <div className="relative rounded-2xl border border-[#7C3AED]/25 bg-gradient-to-br from-[#0F1830] to-[#160B2E] p-7">
+              <span className="absolute top-5 right-5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#7C3AED]/40 bg-[#7C3AED]/15 text-[10px] font-semibold uppercase tracking-wider text-[#c4b5fd]">
+                <Sparkles className="w-2.5 h-2.5" />
+                New
+              </span>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#7C3AED]/15 border border-[#7C3AED]/40 flex items-center justify-center shadow-[0_0_28px_rgba(124,58,237,0.3)]">
+                  <Video className="w-6 h-6 text-[#a78bfa]" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold uppercase tracking-widest text-[#a78bfa]">
+                    Flagship Add-On · Connected
+                  </span>
+                  <h4 className="text-lg font-bold text-white tracking-tight">VideoConnect</h4>
+                </div>
+              </div>
+              <p className="text-sm text-[#a9b7d1] leading-relaxed">
+                A separate visual-intelligence product that connects to
+                BidIntelligenceOS. Capture a video walkthrough on site and it becomes
+                structured visual context — surfacing conditions, potential damage, and
+                scope so the walkthrough turns into a bid-ready draft you review.
+              </p>
+              <ul className="mt-4 grid sm:grid-cols-2 gap-2">
+                {[
+                  { icon: Camera, label: "Video walkthrough capture" },
+                  { icon: ScanEye, label: "Visual intelligence" },
+                  { icon: ShieldAlert, label: "Damage detection" },
+                  { icon: PackageCheck, label: "Walkthrough-to-bid" },
+                ].map((f) => (
+                  <li key={f.label} className="flex items-start gap-2 text-xs text-[#94a3b8]">
+                    <f.icon className="w-3.5 h-3.5 text-[#a78bfa] mt-0.5 shrink-0" />
+                    <span>{f.label}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="/video-connect"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#c4b5fd] hover:text-white transition-colors"
+              >
+                Explore VideoConnect
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+          <p className="mt-4 text-center text-xs text-[#6B7794]">
+            Add-ons provide decision-support you review — not guaranteed outcomes.
+          </p>
         </div>
       </section>
 
-      {/* CompetitorWatchOS — coming soon */}
+      {/* Coming-soon locked add-ons — CompetitorWatchOS + MarketWatchOS */}
       <section
         id="competitorwatch"
-        className="max-w-6xl mx-auto px-6 lg:px-8 pb-16 scroll-mt-24"
+        className="max-w-6xl mx-auto px-6 lg:px-8 pb-16 scroll-mt-24 space-y-6"
       >
+        <div className="text-center">
+          <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#a5b4fc]">
+            <Lock className="w-3.5 h-3.5" />
+            On The Roadmap
+          </span>
+          <h2 className="mt-2 text-3xl lg:text-5xl font-bold tracking-tight bg-gradient-to-b from-white to-[#c7d2fe] bg-clip-text text-transparent">
+            Intelligence add-ons in development
+          </h2>
+          <p className="mt-3 text-[#8A96B0] max-w-2xl mx-auto">
+            Two more standalone add-ons are coming to the marketplace — each built on
+            lawful, public, and contractor-provided data only.
+          </p>
+        </div>
         <div className="relative overflow-hidden rounded-2xl border border-[#a5b4fc]/25 bg-gradient-to-br from-[#0F1830] to-[#141033] p-8 lg:p-12">
           <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
           <div
@@ -765,6 +920,59 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
                   <Lock className="absolute top-3 right-3 w-3.5 h-3.5 text-[#4A5678]" />
                   <div className="flex items-center gap-2 mb-1.5 pr-5">
                     <Eye className="w-3.5 h-3.5 text-[#a5b4fc] shrink-0" />
+                    <h3 className="text-xs font-semibold text-white leading-tight">
+                      {feat.title}
+                    </h3>
+                  </div>
+                  <p className="text-[11px] text-[#8A96B0] leading-relaxed">
+                    {feat.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* MarketWatchOS — coming soon (locked) */}
+        <div className="relative overflow-hidden rounded-2xl border border-[#5e9bf8]/25 bg-gradient-to-br from-[#0F1830] to-[#0B1B33] p-8 lg:p-12">
+          <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
+          <div
+            className="absolute -top-32 left-0 w-[500px] h-[500px] rounded-full opacity-25 blur-2xl"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(94,155,248,0.35) 0%, rgba(94,155,248,0) 60%)",
+            }}
+            aria-hidden="true"
+          />
+          <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="lg:order-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#5e9bf8]/30 bg-[#5e9bf8]/10 text-[#bcd6ff] text-xs font-semibold tracking-wide mb-5">
+                <BarChart3 className="w-3.5 h-3.5" />
+                {MARKETWATCH.status}
+              </div>
+              <h2 className="text-2xl lg:text-4xl font-bold tracking-tight bg-gradient-to-b from-white to-[#bcd6ff] bg-clip-text text-transparent">
+                {MARKETWATCH.name}
+              </h2>
+              <p className="mt-2 text-[#bcd6ff] font-medium">{MARKETWATCH.tagline}</p>
+              <p className="mt-4 text-sm text-[#8A96B0] leading-relaxed">
+                {MARKETWATCH.shortDescription}
+              </p>
+              <div className="mt-5 flex items-start gap-2 rounded-lg border border-[#5e9bf8]/20 bg-[#0B1122]/60 p-3.5">
+                <ShieldCheck className="w-4 h-4 text-[#5e9bf8] mt-0.5 shrink-0" />
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  {MARKETWATCH.guardrail}
+                </p>
+              </div>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-3 lg:order-1">
+              {MARKETWATCH.features.slice(0, 6).map((feat) => (
+                <div
+                  key={feat.title}
+                  className="relative rounded-xl border border-[#1C253B] bg-[#0B1122]/60 p-4"
+                >
+                  <Lock className="absolute top-3 right-3 w-3.5 h-3.5 text-[#4A5678]" />
+                  <div className="flex items-center gap-2 mb-1.5 pr-5">
+                    <TrendingUp className="w-3.5 h-3.5 text-[#5e9bf8] shrink-0" />
                     <h3 className="text-xs font-semibold text-white leading-tight">
                       {feat.title}
                     </h3>

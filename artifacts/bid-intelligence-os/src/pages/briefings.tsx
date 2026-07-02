@@ -30,8 +30,8 @@ import {
 const severityStyles: Record<AlertSeverity, { text: string; bg: string; border: string; dot: string }> = {
   Critical: { text: "text-[#EF4444]", bg: "bg-[#EF4444]/10", border: "border-[#EF4444]/30", dot: "bg-[#EF4444]" },
   High: { text: "text-[#F59E0B]", bg: "bg-[#F59E0B]/10", border: "border-[#F59E0B]/30", dot: "bg-[#F59E0B]" },
-  Medium: { text: "text-[#38BDF8]", bg: "bg-[#38BDF8]/10", border: "border-[#38BDF8]/30", dot: "bg-[#38BDF8]" },
-  Info: { text: "text-[#8A96B0]", bg: "bg-[#8A96B0]/10", border: "border-[#8A96B0]/30", dot: "bg-[#8A96B0]" },
+  Medium: { text: "text-[#0284C7]", bg: "bg-[#38BDF8]/10", border: "border-[#38BDF8]/30", dot: "bg-[#38BDF8]" },
+  Info: { text: "text-slate-500", bg: "bg-[#8A96B0]/10", border: "border-[#8A96B0]/30", dot: "bg-[#8A96B0]" },
 };
 
 const categoryIcon: Record<AlertCategory, typeof CloudRain> = {
@@ -126,17 +126,17 @@ export default function Briefings() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
-              <Sunrise className="h-7 w-7 text-[#38BDF8]" />
+            <h2 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <Sunrise className="h-7 w-7 text-[#0284C7]" />
               Daily Intelligent Briefing
             </h2>
-            <p className="text-[#8A96B0] mt-1">
+            <p className="text-slate-500 mt-1">
               Your automated morning brief for the {verticalConfig.name} operation. Decision-support guidance only.
             </p>
           </div>
           <button
             onClick={handleGenerate}
-            className="inline-flex items-center gap-2 bg-[#38BDF8] hover:bg-[#38BDF8]/90 text-[#06121F] text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors"
+            className="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#2563EB]/90 text-white text-sm font-semibold rounded-lg px-4 py-2.5 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Generate today's briefing
@@ -144,31 +144,31 @@ export default function Briefings() {
         </div>
 
         {/* Hero briefing card */}
-        <Card className="bg-gradient-to-br from-[#0F1830] to-[#111A2E] border-[#1C253B] overflow-hidden relative">
+        <Card className="bg-white border-[#E2E8F0] overflow-hidden relative">
           <div className="absolute top-0 right-0 p-6 opacity-[0.06] pointer-events-none">
-            <Sparkles className="w-40 h-40 text-[#38BDF8]" />
+            <Sparkles className="w-40 h-40 text-[#0284C7]" />
           </div>
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#38BDF8]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-[#0284C7]">
                 {dailyBriefing.date}
               </span>
               {generatedAt && (
-                <span className="text-[10px] font-medium text-[#8A96B0]">· refreshed {generatedAt}</span>
+                <span className="text-[10px] font-medium text-slate-500">· refreshed {generatedAt}</span>
               )}
             </div>
-            <h3 className="text-2xl font-bold text-white tracking-tight">{dailyBriefing.greeting}</h3>
-            <p className="text-[#8A96B0] mt-2 max-w-3xl leading-relaxed">{dailyBriefing.summary}</p>
+            <h3 className="text-2xl font-bold text-slate-900 tracking-tight">{dailyBriefing.greeting}</h3>
+            <p className="text-slate-500 mt-2 max-w-3xl leading-relaxed">{dailyBriefing.summary}</p>
 
             {/* Stat chips */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5">
               {dailyBriefing.stats.map((stat) => (
                 <div
                   key={stat.label}
-                  className="rounded-xl border border-[#1C253B] bg-[#0A0E1A]/60 px-4 py-3"
+                  className="rounded-xl border border-[#E2E8F0] bg-[#F1F5F9] px-4 py-3"
                 >
-                  <div className="text-2xl font-bold text-white tracking-tight">{stat.value}</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0] mt-0.5">
+                  <div className="text-2xl font-bold text-slate-900 tracking-tight">{stat.value}</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-0.5">
                     {stat.label}
                   </div>
                 </div>
@@ -188,24 +188,24 @@ export default function Briefings() {
         {/* Priority items + summary rail */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Items list */}
-          <Card className="lg:col-span-2 bg-[#0F1830] border-[#1C253B] flex flex-col">
-            <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center justify-between">
-              <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+          <Card className="lg:col-span-2 bg-white border-[#E2E8F0] flex flex-col">
+            <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
                 TODAY'S PRIORITY ITEMS
               </CardTitle>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
                 {dailyBriefing.items.length} items · {criticalCount} critical
               </span>
             </CardHeader>
-            <CardContent className="p-0 divide-y divide-[#1C253B]">
+            <CardContent className="p-0 divide-y divide-[#E2E8F0]">
               {dailyBriefing.items.map((item, idx) => {
                 const style = severityStyles[item.priority];
                 const Icon = categoryIcon[item.category];
                 return (
-                  <div key={item.id} className="p-4 hover:bg-[#151D2E] transition-colors group">
+                  <div key={item.id} className="p-4 hover:bg-[#F1F5F9] transition-colors group">
                     <div className="flex items-start gap-3">
                       <div className="flex flex-col items-center pt-0.5">
-                        <span className="text-[10px] font-bold text-[#8A96B0] tabular-nums">
+                        <span className="text-[10px] font-bold text-slate-500 tabular-nums">
                           {String(idx + 1).padStart(2, "0")}
                         </span>
                       </div>
@@ -214,18 +214,18 @@ export default function Briefings() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="text-sm font-semibold text-white">{item.headline}</h4>
+                          <h4 className="text-sm font-semibold text-slate-900">{item.headline}</h4>
                           <span
                             className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${style.bg} ${style.text} border ${style.border}`}
                           >
                             <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
                             {item.priority}
                           </span>
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-[#1C253B] text-[#8A96B0]">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-[#E2E8F0] text-slate-500">
                             {item.category}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#8A96B0] mt-1 leading-relaxed">{item.detail}</p>
+                        <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">{item.detail}</p>
                         <div className="flex items-center gap-3 mt-3">
                           <button
                             onClick={() => handleAction(item)}
@@ -236,7 +236,7 @@ export default function Briefings() {
                           </button>
                           <Link
                             href={categoryLink[item.category]}
-                            className="text-[11px] font-medium text-[#8A96B0] hover:text-[#38BDF8] transition-colors flex items-center gap-1"
+                            className="text-[11px] font-medium text-slate-500 hover:text-[#0284C7] transition-colors flex items-center gap-1"
                           >
                             Open module <ChevronRight className="w-3 h-3" />
                           </Link>
@@ -251,22 +251,22 @@ export default function Briefings() {
 
           {/* Right rail: guardrail + quick links */}
           <div className="space-y-6">
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-4 border-b border-[#1C253B]">
-                <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-[#38BDF8]" />
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-4 border-b border-[#E2E8F0]">
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#0284C7]" />
                   HOW THIS BRIEF IS BUILT
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3">
-                <p className="text-[11px] text-[#8A96B0] leading-relaxed">
+                <p className="text-[11px] text-slate-500 leading-relaxed">
                   Signals are synthesized from active bids, job deployments, permits, weather, labor
                   utilization, and cost tracking, then ranked by operational impact for the{" "}
-                  <span className="text-white font-medium">{verticalConfig.name}</span> workflow.
+                  <span className="text-slate-900 font-medium">{verticalConfig.name}</span> workflow.
                 </p>
-                <div className="rounded-lg border border-[#1C253B] bg-[#0A0E1A]/60 p-3 flex items-start gap-2">
+                <div className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3 flex items-start gap-2">
                   <ShieldCheck className="w-4 h-4 text-[#0BA3A8] shrink-0 mt-0.5" />
-                  <p className="text-[10px] text-[#8A96B0] leading-relaxed">
+                  <p className="text-[10px] text-slate-500 leading-relaxed">
                     Decision-support guidance only. Projections require user verification and imply no
                     guaranteed bid, schedule, or award outcomes. Review before sending any client-facing
                     output.
@@ -275,9 +275,9 @@ export default function Briefings() {
               </CardContent>
             </Card>
 
-            <Card className="bg-[#0F1830] border-[#1C253B]">
-              <CardHeader className="p-4 border-b border-[#1C253B]">
-                <CardTitle className="text-sm font-bold text-white tracking-wide">JUMP TO MODULE</CardTitle>
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-4 border-b border-[#E2E8F0]">
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">JUMP TO MODULE</CardTitle>
               </CardHeader>
               <CardContent className="p-3">
                 <div className="grid grid-cols-2 gap-2">
@@ -290,10 +290,10 @@ export default function Briefings() {
                     <Link
                       key={m.href}
                       href={m.href}
-                      className="flex items-center gap-2 rounded-lg border border-[#1C253B] bg-[#0A0E1A]/40 px-3 py-2.5 hover:border-[#2A3756] hover:bg-[#151D2E] transition-colors group"
+                      className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] px-3 py-2.5 hover:border-[#CBD5E1] hover:bg-[#F1F5F9] transition-colors group"
                     >
-                      <m.icon className="w-4 h-4 text-[#38BDF8]" />
-                      <span className="text-xs font-medium text-white group-hover:text-[#38BDF8] transition-colors">
+                      <m.icon className="w-4 h-4 text-[#0284C7]" />
+                      <span className="text-xs font-medium text-slate-900 group-hover:text-[#0284C7] transition-colors">
                         {m.label}
                       </span>
                     </Link>
@@ -305,35 +305,35 @@ export default function Briefings() {
         </div>
 
         {/* Archive */}
-        <Card className="bg-[#0F1830] border-[#1C253B]">
-          <CardHeader className="p-4 border-b border-[#1C253B] flex flex-row items-center justify-between">
-            <CardTitle className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
-              <Archive className="w-4 h-4 text-[#8A96B0]" />
+        <Card className="bg-white border-[#E2E8F0]">
+          <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
+            <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
+              <Archive className="w-4 h-4 text-slate-500" />
               BRIEFING ARCHIVE
             </CardTitle>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
               Prior mornings
             </span>
           </CardHeader>
-          <CardContent className="p-0 divide-y divide-[#1C253B]">
+          <CardContent className="p-0 divide-y divide-[#E2E8F0]">
             {briefingArchive.map((brief) => {
               const style = severityStyles[brief.highlight];
               return (
                 <div
                   key={brief.id}
-                  className="p-4 flex items-start gap-3 hover:bg-[#151D2E] transition-colors"
+                  className="p-4 flex items-start gap-3 hover:bg-[#F1F5F9] transition-colors"
                 >
                   <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${style.dot}`} />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-semibold text-white">{brief.date}</span>
+                      <span className="text-xs font-semibold text-slate-900">{brief.date}</span>
                       <span
                         className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${style.bg} ${style.text} border ${style.border}`}
                       >
                         {brief.highlight}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#8A96B0] mt-1 leading-relaxed">{brief.summary}</p>
+                    <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">{brief.summary}</p>
                   </div>
                 </div>
               );

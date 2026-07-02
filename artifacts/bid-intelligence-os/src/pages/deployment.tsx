@@ -38,7 +38,7 @@ const moneyM = (n: number) => `$${(n / 1000000).toFixed(2)}M`;
 function statusStyles(status: JobStatus) {
   switch (status) {
     case "In Progress":
-      return "bg-[#38BDF8]/10 text-[#38BDF8] border-[#38BDF8]/30";
+      return "bg-[#38BDF8]/10 text-[#0284C7] border-[#38BDF8]/30";
     case "Delayed":
       return "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/30";
     case "On Hold":
@@ -48,7 +48,7 @@ function statusStyles(status: JobStatus) {
     case "Completed":
       return "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/30";
     default:
-      return "bg-[#1C253B] text-[#8A96B0] border-[#2A3756]";
+      return "bg-[#E2E8F0] text-slate-500 border-[#CBD5E1]";
   }
 }
 
@@ -69,9 +69,9 @@ function permitStatusStyles(status: PermitStatus) {
       return "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/30";
     case "Requested":
     case "Submitted":
-      return "bg-[#38BDF8]/10 text-[#38BDF8] border-[#38BDF8]/30";
+      return "bg-[#38BDF8]/10 text-[#0284C7] border-[#38BDF8]/30";
     default:
-      return "bg-[#1C253B] text-[#8A96B0] border-[#2A3756]";
+      return "bg-[#E2E8F0] text-slate-500 border-[#CBD5E1]";
   }
 }
 
@@ -109,32 +109,32 @@ export default function Deployment() {
         {/* Page header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
-              <Rocket className="w-7 h-7 text-[#38BDF8]" />
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <Rocket className="w-7 h-7 text-[#0284C7]" />
               Job Deployment
             </h1>
-            <p className="text-[#8A96B0] mt-1.5">
+            <p className="text-slate-500 mt-1.5">
               Field operations command for every won job in production. Select a
               deployment to review crew, budget, permits, and milestones.
             </p>
           </div>
-          <div className="flex items-center gap-3 rounded-xl border border-[#1C253B] bg-[#0F1830] px-4 py-2.5">
+          <div className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white shadow-sm px-4 py-2.5">
             <div className="text-center">
-              <div className="text-lg font-bold text-white leading-none">
+              <div className="text-lg font-bold text-slate-900 leading-none">
                 {jobDeployments.length}
               </div>
-              <div className="text-[10px] uppercase tracking-widest text-[#8A96B0] mt-1">
+              <div className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">
                 Active Jobs
               </div>
             </div>
-            <div className="h-8 w-px bg-[#1C253B]" />
+            <div className="h-8 w-px bg-[#E2E8F0]" />
             <div className="text-center">
               <div className="text-lg font-bold text-[#22C55E] leading-none">
                 {moneyM(
                   jobDeployments.reduce((s, j) => s + j.contractValue, 0)
                 )}
               </div>
-              <div className="text-[10px] uppercase tracking-widest text-[#8A96B0] mt-1">
+              <div className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">
                 In Production
               </div>
             </div>
@@ -144,7 +144,7 @@ export default function Deployment() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: selectable job list */}
           <div className="lg:col-span-1 space-y-3">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-[#8A96B0] px-1">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1">
               Deployments
             </div>
             {jobDeployments.map((j) => {
@@ -156,16 +156,16 @@ export default function Deployment() {
                   aria-pressed={active}
                   className={`w-full text-left rounded-xl border p-4 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#38BDF8] ${
                     active
-                      ? "border-[#38BDF8]/50 bg-[#111A2E] ring-1 ring-[#38BDF8]/30"
-                      : "border-[#1C253B] bg-[#0F1830] hover:bg-[#111A2E] hover:border-[#2A3756]"
+                      ? "border-[#0284C7]/50 bg-sky-50 ring-1 ring-[#0284C7]/20"
+                      : "border-[#E2E8F0] bg-white shadow-sm hover:bg-slate-50 hover:border-[#CBD5E1]"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="font-semibold text-white text-sm truncate">
+                      <div className="font-semibold text-slate-900 text-sm truncate">
                         {j.name}
                       </div>
-                      <div className="text-[11px] text-[#8A96B0] mt-0.5 truncate">
+                      <div className="text-[11px] text-slate-500 mt-0.5 truncate">
                         {j.client}
                       </div>
                     </div>
@@ -178,14 +178,14 @@ export default function Deployment() {
                     </span>
                   </div>
                   <div className="mt-3 flex items-center justify-between text-[10px]">
-                    <span className="text-[#8A96B0] uppercase tracking-widest">
+                    <span className="text-slate-500 uppercase tracking-widest">
                       {j.currentPhase}
                     </span>
-                    <span className="text-white font-semibold">
+                    <span className="text-slate-900 font-semibold">
                       {j.completion}%
                     </span>
                   </div>
-                  <div className="mt-1.5 h-1.5 w-full rounded-full bg-[#1C253B] overflow-hidden">
+                  <div className="mt-1.5 h-1.5 w-full rounded-full bg-[#E2E8F0] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[#38BDF8]"
                       style={{ width: `${j.completion}%` }}
@@ -199,11 +199,11 @@ export default function Deployment() {
           {/* Right: detail */}
           <div className="lg:col-span-2 space-y-6">
             {/* Overview card */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-6">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-6">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-xl font-bold text-white">{job.name}</h2>
+                    <h2 className="text-xl font-bold text-slate-900">{job.name}</h2>
                     <span
                       className={`inline-flex px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${statusStyles(
                         job.status
@@ -212,23 +212,23 @@ export default function Deployment() {
                       {job.status}
                     </span>
                     {job.weatherSensitive && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#38BDF8]">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border border-[#38BDF8]/30 bg-[#38BDF8]/10 text-[#0284C7]">
                         <CloudRain className="w-3 h-3" /> Weather Sensitive
                       </span>
                     )}
                   </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[13px] text-[#8A96B0]">
+                  <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[13px] text-slate-500">
                     <span className="flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5 text-[#8A96B0]" />
+                      <Building2 className="w-3.5 h-3.5 text-slate-500" />
                       {job.client}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#8A96B0]" />
+                      <MapPin className="w-3.5 h-3.5 text-slate-500" />
                       {job.location}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="text-[#8A96B0]">Stage:</span>
-                      <span className="text-white font-medium">
+                      <span className="text-slate-500">Stage:</span>
+                      <span className="text-slate-900 font-medium">
                         {job.stage}
                       </span>
                     </span>
@@ -241,7 +241,7 @@ export default function Deployment() {
                       description: `Requested a status update from ${job.projectManager} on ${job.name}.`,
                     })
                   }
-                  className="shrink-0 inline-flex items-center gap-2 rounded-lg bg-[#1C253B] hover:bg-[#2A3756] text-white text-xs font-semibold px-4 py-2 transition-colors"
+                  className="shrink-0 inline-flex items-center gap-2 rounded-lg bg-[#E2E8F0] hover:bg-[#CBD5E1] text-slate-900 text-xs font-semibold px-4 py-2 transition-colors"
                 >
                   Request field update
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -250,56 +250,56 @@ export default function Deployment() {
 
               {/* Meta grid */}
               <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+                <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <DollarSign className="w-3.5 h-3.5" /> Contract
                   </div>
-                  <div className="mt-1 text-base font-bold text-white">
+                  <div className="mt-1 text-base font-bold text-slate-900">
                     {money(job.contractValue)}
                   </div>
                 </div>
-                <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+                <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <TrendingUp className="w-3.5 h-3.5" /> Projected ROI
                   </div>
                   <div className="mt-1 text-base font-bold text-[#22C55E]">
                     {job.projectedRoi}%
                   </div>
                 </div>
-                <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+                <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <CalendarDays className="w-3.5 h-3.5" /> Start
                   </div>
-                  <div className="mt-1 text-sm font-semibold text-white">
+                  <div className="mt-1 text-sm font-semibold text-slate-900">
                     {job.startDate}
                   </div>
                 </div>
-                <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+                <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <Flag className="w-3.5 h-3.5" /> Target
                   </div>
-                  <div className="mt-1 text-sm font-semibold text-white">
+                  <div className="mt-1 text-sm font-semibold text-slate-900">
                     {job.targetCompletion}
                   </div>
                 </div>
-                <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+                <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <UserCog className="w-3.5 h-3.5" /> Project Manager
                   </div>
-                  <div className="mt-1 text-sm font-semibold text-white">
+                  <div className="mt-1 text-sm font-semibold text-slate-900">
                     {job.projectManager}
                   </div>
                 </div>
-                <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+                <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <HardHat className="w-3.5 h-3.5" /> Crew Lead
                   </div>
-                  <div className="mt-1 text-sm font-semibold text-white">
+                  <div className="mt-1 text-sm font-semibold text-slate-900">
                     {job.crewLead}
                   </div>
                 </div>
-                <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+                <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <AlertTriangle className="w-3.5 h-3.5" /> Risk Level
                   </div>
                   <div
@@ -310,11 +310,11 @@ export default function Deployment() {
                     {job.riskLevel}
                   </div>
                 </div>
-                <div className="rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+                <div className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <CheckCircle2 className="w-3.5 h-3.5" /> Completion
                   </div>
-                  <div className="mt-1 text-base font-bold text-white">
+                  <div className="mt-1 text-base font-bold text-slate-900">
                     {job.completion}%
                   </div>
                 </div>
@@ -322,14 +322,14 @@ export default function Deployment() {
             </div>
 
             {/* Phase stepper */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-6">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-6">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wide">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
                   Phase Progress
                 </h3>
-                <span className="text-[11px] text-[#8A96B0]">
+                <span className="text-[11px] text-slate-500">
                   Phase {job.phaseIndex + 1} of {job.totalPhases} —{" "}
-                  <span className="text-[#38BDF8] font-semibold">
+                  <span className="text-[#0284C7] font-semibold">
                     {job.currentPhase}
                   </span>
                 </span>
@@ -346,28 +346,28 @@ export default function Deployment() {
                       {i < phases.length - 1 && (
                         <div
                           className={`absolute top-3 left-1/2 w-full h-0.5 ${
-                            done ? "bg-[#22C55E]" : "bg-[#1C253B]"
+                            done ? "bg-[#22C55E]" : "bg-[#E2E8F0]"
                           }`}
                         />
                       )}
-                      <div className="relative z-10 bg-[#0F1830] px-1">
+                      <div className="relative z-10 bg-white px-1">
                         {done ? (
                           <CheckCircle2 className="w-6 h-6 text-[#22C55E]" />
                         ) : current ? (
                           <div className="w-6 h-6 rounded-full bg-[#38BDF8]/20 border-2 border-[#38BDF8] flex items-center justify-center">
-                            <Clock className="w-3 h-3 text-[#38BDF8]" />
+                            <Clock className="w-3 h-3 text-[#0284C7]" />
                           </div>
                         ) : (
-                          <Circle className="w-6 h-6 text-[#2A3756]" />
+                          <Circle className="w-6 h-6 text-[#CBD5E1]" />
                         )}
                       </div>
                       <span
                         className={`mt-2 text-[10px] text-center leading-tight px-1 ${
                           current
-                            ? "text-[#38BDF8] font-bold"
+                            ? "text-[#0284C7] font-bold"
                             : done
-                            ? "text-white"
-                            : "text-[#8A96B0]"
+                            ? "text-slate-900"
+                            : "text-slate-500"
                         }`}
                       >
                         {phase}
@@ -380,29 +380,29 @@ export default function Deployment() {
 
             {/* Budget + milestone */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-6">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wide mb-4">
+              <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-6">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">
                   Budget vs Cost-to-Date
                 </h3>
                 <div className="flex items-end justify-between mb-2">
                   <div>
-                    <div className="text-[10px] uppercase tracking-widest text-[#8A96B0]">
+                    <div className="text-[10px] uppercase tracking-widest text-slate-500">
                       Cost to Date
                     </div>
-                    <div className="text-lg font-bold text-white">
+                    <div className="text-lg font-bold text-slate-900">
                       {money(job.costToDate)}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-[10px] uppercase tracking-widest text-[#8A96B0]">
+                    <div className="text-[10px] uppercase tracking-widest text-slate-500">
                       Budget
                     </div>
-                    <div className="text-lg font-bold text-[#8A96B0]">
+                    <div className="text-lg font-bold text-slate-500">
                       {money(job.budget)}
                     </div>
                   </div>
                 </div>
-                <div className="h-3 w-full rounded-full bg-[#1C253B] overflow-hidden">
+                <div className="h-3 w-full rounded-full bg-[#E2E8F0] overflow-hidden">
                   <div
                     className={`h-full rounded-full ${
                       budgetPct > 90
@@ -415,39 +415,39 @@ export default function Deployment() {
                   />
                 </div>
                 <div className="mt-2 flex items-center justify-between text-[11px]">
-                  <span className="text-[#8A96B0]">
+                  <span className="text-slate-500">
                     {budgetPct}% of budget consumed
                   </span>
-                  <span className="text-white font-medium">
+                  <span className="text-slate-900 font-medium">
                     {money(job.budget - job.costToDate)} remaining
                   </span>
                 </div>
-                <div className="mt-4 rounded-lg border border-[#1C253B] bg-[#111A2E] p-3">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#8A96B0]">
+                <div className="mt-4 rounded-lg border border-[#E2E8F0] bg-white p-3">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                     <TrendingUp className="w-3.5 h-3.5" /> Projected ROI
                   </div>
                   <div className="mt-1 text-base font-bold text-[#22C55E]">
                     {job.projectedRoi}%
                   </div>
-                  <p className="mt-1 text-[11px] text-[#8A96B0]">
+                  <p className="mt-1 text-[11px] text-slate-500">
                     Decision-support guidance only. Projections require user
                     verification.
                   </p>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-6 flex flex-col">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wide mb-4">
+              <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-6 flex flex-col">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4">
                   Next Milestone
                 </h3>
                 <div className="rounded-lg border border-[#38BDF8]/30 bg-[#38BDF8]/5 p-4">
-                  <div className="flex items-center gap-2 text-[#38BDF8]">
+                  <div className="flex items-center gap-2 text-[#0284C7]">
                     <Flag className="w-4 h-4" />
-                    <span className="font-semibold text-white text-sm">
+                    <span className="font-semibold text-slate-900 text-sm">
                       {job.nextMilestone}
                     </span>
                   </div>
-                  <div className="mt-2 flex items-center gap-1.5 text-[12px] text-[#8A96B0]">
+                  <div className="mt-2 flex items-center gap-1.5 text-[12px] text-slate-500">
                     <CalendarDays className="w-3.5 h-3.5" />
                     Target: {job.nextMilestoneDate}
                   </div>
@@ -468,7 +468,7 @@ export default function Deployment() {
                       description: `${job.nextMilestone} flagged for review on ${job.nextMilestoneDate}.`,
                     })
                   }
-                  className="mt-auto pt-4 self-start text-xs text-[#38BDF8] hover:text-white transition-colors flex items-center gap-1 font-medium"
+                  className="mt-auto pt-4 self-start text-xs text-[#0284C7] hover:text-slate-900 transition-colors flex items-center gap-1 font-medium"
                 >
                   Schedule milestone review
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -478,10 +478,10 @@ export default function Deployment() {
 
             {/* Crew + Subs */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-6">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wide mb-4 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-[#38BDF8]" /> Crew Assigned
-                  <span className="text-[#8A96B0] font-normal">
+              <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-6">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-[#0284C7]" /> Crew Assigned
+                  <span className="text-slate-500 font-normal">
                     ({job.crew.length})
                   </span>
                 </h3>
@@ -489,18 +489,18 @@ export default function Deployment() {
                   {job.crew.map((name) => (
                     <div
                       key={name}
-                      className="flex items-center gap-3 rounded-lg border border-[#1C253B] bg-[#111A2E] px-3 py-2"
+                      className="flex items-center gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2"
                     >
-                      <div className="w-7 h-7 rounded-full bg-[#1C253B] flex items-center justify-center text-[10px] font-bold text-[#38BDF8]">
+                      <div className="w-7 h-7 rounded-full bg-[#E2E8F0] flex items-center justify-center text-[10px] font-bold text-[#0284C7]">
                         {name
                           .split(" ")
                           .map((p) => p[0])
                           .join("")
                           .slice(0, 2)}
                       </div>
-                      <span className="text-sm text-white">{name}</span>
+                      <span className="text-sm text-slate-900">{name}</span>
                       {name === job.crewLead && (
-                        <span className="ml-auto text-[9px] font-bold uppercase tracking-widest text-[#38BDF8]">
+                        <span className="ml-auto text-[9px] font-bold uppercase tracking-widest text-[#0284C7]">
                           Lead
                         </span>
                       )}
@@ -509,10 +509,10 @@ export default function Deployment() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-6">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wide mb-4 flex items-center gap-2">
+              <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-6">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4 flex items-center gap-2">
                   <Truck className="w-4 h-4 text-[#0BA3A8]" /> Subcontractors
-                  <span className="text-[#8A96B0] font-normal">
+                  <span className="text-slate-500 font-normal">
                     ({job.subs.length})
                   </span>
                 </h3>
@@ -520,12 +520,12 @@ export default function Deployment() {
                   {job.subs.map((name) => (
                     <div
                       key={name}
-                      className="flex items-center gap-3 rounded-lg border border-[#1C253B] bg-[#111A2E] px-3 py-2"
+                      className="flex items-center gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2"
                     >
                       <div className="w-7 h-7 rounded-full bg-[#0BA3A8]/15 flex items-center justify-center">
                         <Truck className="w-3.5 h-3.5 text-[#0BA3A8]" />
                       </div>
-                      <span className="text-sm text-white">{name}</span>
+                      <span className="text-sm text-slate-900">{name}</span>
                     </div>
                   ))}
                 </div>
@@ -533,16 +533,16 @@ export default function Deployment() {
             </div>
 
             {/* Permits */}
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-6">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wide mb-4 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#38BDF8]" /> Permits &
+            <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-6">
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#0284C7]" /> Permits &
                 Documents
-                <span className="text-[#8A96B0] font-normal">
+                <span className="text-slate-500 font-normal">
                   ({jobPermits.length})
                 </span>
               </h3>
               {jobPermits.length === 0 ? (
-                <p className="text-[13px] text-[#8A96B0]">
+                <p className="text-[13px] text-slate-500">
                   No permits or documents tracked for this deployment.
                 </p>
               ) : (
@@ -552,12 +552,12 @@ export default function Deployment() {
                     return (
                       <div
                         key={p.id}
-                        className="flex items-center gap-3 rounded-lg border border-[#1C253B] bg-[#111A2E] px-3 py-2.5"
+                        className="flex items-center gap-3 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2.5"
                       >
-                        <Icon className="w-4 h-4 text-[#8A96B0] shrink-0" />
+                        <Icon className="w-4 h-4 text-slate-500 shrink-0" />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-white truncate">
+                            <span className="text-sm font-medium text-slate-900 truncate">
                               {p.name}
                             </span>
                             {p.critical && (
@@ -566,7 +566,7 @@ export default function Deployment() {
                               </span>
                             )}
                           </div>
-                          <div className="text-[11px] text-[#8A96B0] mt-0.5">
+                          <div className="text-[11px] text-slate-500 mt-0.5">
                             {p.kind}
                             {p.submittedDate && ` · Submitted ${p.submittedDate}`}
                             {p.expirationDate && ` · Expires ${p.expirationDate}`}
@@ -587,7 +587,7 @@ export default function Deployment() {
                   })}
                 </div>
               )}
-              <p className="mt-4 text-[11px] text-[#8A96B0]">
+              <p className="mt-4 text-[11px] text-slate-500">
                 Review before sending client-facing output.
               </p>
             </div>

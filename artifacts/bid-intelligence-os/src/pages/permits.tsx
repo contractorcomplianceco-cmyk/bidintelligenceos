@@ -37,9 +37,9 @@ const STATUS_STYLES: Record<PermitStatus, { text: string; bg: string; border: st
   Expiring: { text: "#F59E0B", bg: "rgba(245,158,11,0.10)", border: "rgba(245,158,11,0.30)", dot: "#F59E0B" },
   Blocked: { text: "#EF4444", bg: "rgba(239,68,68,0.10)", border: "rgba(239,68,68,0.30)", dot: "#EF4444" },
   Needed: { text: "#EF4444", bg: "rgba(239,68,68,0.10)", border: "rgba(239,68,68,0.30)", dot: "#EF4444" },
-  Requested: { text: "#38BDF8", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.30)", dot: "#38BDF8" },
-  Submitted: { text: "#38BDF8", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.30)", dot: "#38BDF8" },
-  "Not Required": { text: "#8A96B0", bg: "rgba(138,150,176,0.10)", border: "rgba(138,150,176,0.30)", dot: "#8A96B0" },
+  Requested: { text: "#0EA5E9", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.30)", dot: "#0EA5E9" },
+  Submitted: { text: "#0EA5E9", bg: "rgba(56,189,248,0.10)", border: "rgba(56,189,248,0.30)", dot: "#0EA5E9" },
+  "Not Required": { text: "#64748B", bg: "rgba(138,150,176,0.10)", border: "rgba(138,150,176,0.30)", dot: "#64748B" },
 };
 
 function KindIcon({ kind, className }: { kind: PermitItem["kind"]; className?: string }) {
@@ -138,18 +138,18 @@ export default function Permits() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
           <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white flex items-center gap-3">
-              <FileCheck2 className="w-7 h-7 text-[#38BDF8]" />
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <FileCheck2 className="w-7 h-7 text-[#0284C7]" />
               Permits &amp; Documents
             </h1>
-            <p className="text-[#8A96B0] mt-2">
+            <p className="text-slate-500 mt-2">
               Compliance and approval tracking for active {verticalConfig.name} jobs. Decision-support guidance only.
             </p>
           </div>
-          <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] px-5 py-3 flex items-center gap-4">
+          <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm px-5 py-3 flex items-center gap-4">
             <div className="relative w-12 h-12 shrink-0">
               <svg className="w-12 h-12 transform -rotate-90">
-                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="5" fill="transparent" className="text-[#1C253B]" />
+                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="5" fill="transparent" className="text-[#E2E8F0]" />
                 <circle
                   cx="24"
                   cy="24"
@@ -159,15 +159,15 @@ export default function Permits() {
                   fill="transparent"
                   strokeDasharray={126}
                   strokeDashoffset={126 - (126 * readiness) / 100}
-                  className="text-[#38BDF8]"
+                  className="text-[#0284C7]"
                   strokeLinecap="round"
                 />
               </svg>
-              <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white">{readiness}%</span>
+              <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-slate-900">{readiness}%</span>
             </div>
             <div>
-              <div className="text-[10px] font-bold text-[#8A96B0] uppercase tracking-widest">Compliance Readiness</div>
-              <div className="text-sm text-white font-semibold mt-0.5">
+              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Compliance Readiness</div>
+              <div className="text-sm text-slate-900 font-semibold mt-0.5">
                 {approvedCount} of {total} items approved
               </div>
             </div>
@@ -183,8 +183,8 @@ export default function Permits() {
               <button
                 key={s}
                 onClick={() => setStatusFilter(active ? "All" : s)}
-                className="rounded-xl border bg-[#0F1830] p-3 text-left transition-colors hover:bg-[#151D2E]"
-                style={{ borderColor: active ? style.text : "#1C253B" }}
+                className="rounded-xl border bg-white p-3 text-left transition-colors hover:bg-[#F1F5F9]"
+                style={{ borderColor: active ? style.text : "#E2E8F0" }}
               >
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: style.dot }} />
@@ -192,7 +192,7 @@ export default function Permits() {
                     {s}
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-white">{counts[s] ?? 0}</div>
+                <div className="text-2xl font-bold text-slate-900">{counts[s] ?? 0}</div>
               </button>
             );
           })}
@@ -203,25 +203,25 @@ export default function Permits() {
           <div className="rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/[0.06] p-5">
             <div className="flex items-center gap-2 mb-3">
               <AlertTriangle className="w-4 h-4 text-[#EF4444]" />
-              <h2 className="text-sm font-bold text-white uppercase tracking-wide">Critical Permit Alerts</h2>
+              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Critical Permit Alerts</h2>
               <span className="text-[10px] font-bold text-[#EF4444] bg-[#EF4444]/10 px-1.5 py-0.5 rounded uppercase tracking-widest">
                 {criticalAlerts.length} Active
               </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
               {criticalAlerts.map((p) => (
-                <div key={p.id} className="rounded-lg border border-[#1C253B] bg-[#0F1830] p-3">
+                <div key={p.id} className="rounded-lg border border-[#E2E8F0] bg-white p-3">
                   <div className="flex items-start justify-between gap-2 mb-1.5">
                     <div className="flex items-center gap-2 min-w-0">
                       <ShieldAlert className="w-4 h-4 text-[#EF4444] shrink-0" />
-                      <span className="text-xs font-semibold text-white truncate">{p.name}</span>
+                      <span className="text-xs font-semibold text-slate-900 truncate">{p.name}</span>
                     </div>
                     <StatusBadge status={p.status} />
                   </div>
-                  <div className="text-[11px] text-[#8A96B0]">{p.jobName}</div>
+                  <div className="text-[11px] text-slate-500">{p.jobName}</div>
                   {p.dependency && <div className="text-[11px] text-[#F59E0B] mt-1">{p.dependency}</div>}
                   {p.expirationDate && (
-                    <div className="text-[10px] text-[#8A96B0] mt-1 flex items-center gap-1">
+                    <div className="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
                       <Calendar className="w-3 h-3" /> Expires {p.expirationDate}
                     </div>
                   )}
@@ -233,14 +233,14 @@ export default function Permits() {
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2 text-[#8A96B0]">
+          <div className="flex items-center gap-2 text-slate-500">
             <Filter className="w-4 h-4" />
             <span className="text-[10px] font-bold uppercase tracking-widest">Filter</span>
           </div>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as PermitStatus | "All")}
-            className="bg-[#0F1830] border border-[#2A3756] text-[#8A96B0] text-xs font-medium rounded px-3 py-2 outline-none focus:border-[#38BDF8]"
+            className="bg-white border border-[#CBD5E1] text-slate-500 text-xs font-medium rounded px-3 py-2 outline-none focus:border-[#38BDF8]"
           >
             <option value="All">All Statuses</option>
             {STATUS_ORDER.map((s) => (
@@ -252,7 +252,7 @@ export default function Permits() {
           <select
             value={jobFilter}
             onChange={(e) => setJobFilter(e.target.value)}
-            className="bg-[#0F1830] border border-[#2A3756] text-[#8A96B0] text-xs font-medium rounded px-3 py-2 outline-none focus:border-[#38BDF8]"
+            className="bg-white border border-[#CBD5E1] text-slate-500 text-xs font-medium rounded px-3 py-2 outline-none focus:border-[#38BDF8]"
           >
             <option value="All">All Jobs</option>
             {jobs.map(([id, name]) => (
@@ -267,12 +267,12 @@ export default function Permits() {
                 setStatusFilter("All");
                 setJobFilter("All");
               }}
-              className="text-xs text-[#38BDF8] hover:text-white transition-colors font-medium"
+              className="text-xs text-[#0284C7] hover:text-slate-900 transition-colors font-medium"
             >
               Clear filters
             </button>
           )}
-          <span className="text-[11px] text-[#8A96B0] sm:ml-auto">
+          <span className="text-[11px] text-slate-500 sm:ml-auto">
             {filtered.length} of {total} items
           </span>
         </div>
@@ -281,46 +281,46 @@ export default function Permits() {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <div className="xl:col-span-2 space-y-6">
             {grouped.length === 0 && (
-              <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-10 text-center text-[#8A96B0] text-sm">
+              <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-10 text-center text-slate-500 text-sm">
                 No items match the current filters.
               </div>
             )}
             {grouped.map(([jobName, jobItems]) => {
               const job = jobDeployments.find((j) => j.name.startsWith(jobName.split(" ")[0]) || j.name === jobName);
               return (
-                <div key={jobName} className="rounded-xl border border-[#1C253B] bg-[#0F1830] overflow-hidden">
-                  <div className="p-4 border-b border-[#1C253B] flex items-center justify-between">
+                <div key={jobName} className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm overflow-hidden">
+                  <div className="p-4 border-b border-[#E2E8F0] flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-white tracking-wide">{jobName}</span>
-                      <span className="text-[10px] text-[#8A96B0] bg-[#1C253B] px-1.5 py-0.5 rounded font-bold uppercase tracking-widest">
+                      <span className="text-sm font-bold text-slate-900 tracking-wide">{jobName}</span>
+                      <span className="text-[10px] text-slate-500 bg-[#E2E8F0] px-1.5 py-0.5 rounded font-bold uppercase tracking-widest">
                         {jobItems.length} items
                       </span>
                     </div>
                     {job && (
-                      <span className="text-[11px] text-[#8A96B0]">{job.location}</span>
+                      <span className="text-[11px] text-slate-500">{job.location}</span>
                     )}
                   </div>
-                  <div className="divide-y divide-[#1C253B]">
+                  <div className="divide-y divide-[#E2E8F0]">
                     {jobItems.map((p) => (
-                      <div key={p.id} className="p-4 hover:bg-[#151D2E] transition-colors">
+                      <div key={p.id} className="p-4 hover:bg-[#F1F5F9] transition-colors">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-start gap-3 min-w-0">
-                            <div className="mt-0.5 w-8 h-8 rounded-lg bg-[#151D2E] border border-[#1C253B] flex items-center justify-center shrink-0">
-                              <KindIcon kind={p.kind} className="w-4 h-4 text-[#38BDF8]" />
+                            <div className="mt-0.5 w-8 h-8 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center shrink-0">
+                              <KindIcon kind={p.kind} className="w-4 h-4 text-[#0284C7]" />
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="text-sm font-semibold text-white">{p.name}</span>
+                                <span className="text-sm font-semibold text-slate-900">{p.name}</span>
                                 {p.critical && (
                                   <span className="text-[9px] font-bold text-[#EF4444] bg-[#EF4444]/10 px-1.5 py-0.5 rounded uppercase tracking-widest">
                                     Critical
                                   </span>
                                 )}
-                                <span className="text-[9px] font-bold text-[#8A96B0] bg-[#1C253B] px-1.5 py-0.5 rounded uppercase tracking-widest">
+                                <span className="text-[9px] font-bold text-slate-500 bg-[#E2E8F0] px-1.5 py-0.5 rounded uppercase tracking-widest">
                                   {p.kind}
                                 </span>
                               </div>
-                              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-[11px] text-[#8A96B0]">
+                              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-[11px] text-slate-500">
                                 {p.submittedDate && (
                                   <span className="flex items-center gap-1">
                                     <Calendar className="w-3 h-3" /> Submitted {p.submittedDate}
@@ -348,7 +348,7 @@ export default function Permits() {
                             <StatusBadge status={p.status} />
                             <button
                               onClick={() => cycleStatus(p)}
-                              className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#38BDF8] hover:text-white transition-colors bg-[#151D2E] border border-[#2A3756] rounded px-2 py-1"
+                              className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#0284C7] hover:text-slate-900 transition-colors bg-[#F1F5F9] border border-[#CBD5E1] rounded px-2 py-1"
                             >
                               <RefreshCw className="w-3 h-3" /> Advance
                             </button>
@@ -364,14 +364,14 @@ export default function Permits() {
 
           {/* Vertical needs sidebar */}
           <div className="space-y-6">
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-5">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-5">
               <div className="flex items-center gap-2 mb-3">
                 <ListChecks className="w-4 h-4 text-[#0BA3A8]" />
-                <h2 className="text-sm font-bold text-white uppercase tracking-wide">
+                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
                   {verticalConfig.short} Permit &amp; Doc Needs
                 </h2>
               </div>
-              <p className="text-[11px] text-[#8A96B0] mb-4">
+              <p className="text-[11px] text-slate-500 mb-4">
                 Typical compliance items for {verticalConfig.name} scopes.
               </p>
               <div className="space-y-2">
@@ -384,9 +384,9 @@ export default function Permits() {
                   return (
                     <div
                       key={need}
-                      className="flex items-center justify-between rounded-lg border border-[#1C253B] bg-[#151D2E] px-3 py-2"
+                      className="flex items-center justify-between rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] px-3 py-2"
                     >
-                      <span className="text-xs text-white">{need}</span>
+                      <span className="text-xs text-slate-900">{need}</span>
                       {covered ? (
                         <span className="flex items-center gap-1 text-[10px] font-bold text-[#22C55E] uppercase tracking-widest">
                           <ShieldCheck className="w-3.5 h-3.5" /> Tracked
@@ -402,9 +402,9 @@ export default function Permits() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-5">
-              <h2 className="text-sm font-bold text-white uppercase tracking-wide mb-3">Compliance Note</h2>
-              <p className="text-[11px] text-[#8A96B0] leading-relaxed">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-5">
+              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wide mb-3">Compliance Note</h2>
+              <p className="text-[11px] text-slate-500 leading-relaxed">
                 Permit and inspection statuses are decision-support guidance only and do not guarantee approval,
                 bonding, or compliance outcomes. Verify current status with the issuing authority before scheduling
                 dependent work or sending client-facing output.

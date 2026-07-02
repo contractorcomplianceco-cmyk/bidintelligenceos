@@ -79,26 +79,26 @@ export default function VoiceConnect() {
     <Layout>
       <div className="space-y-8">
         {/* Header */}
-        <div className="relative overflow-hidden rounded-2xl border border-[#0BA3A8]/25 bg-gradient-to-br from-[#0F1830] to-[#111A2E] p-6 lg:p-8">
-          <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
+        <div className="relative overflow-hidden rounded-2xl border border-[#0BA3A8]/25 bg-white shadow-sm p-6 lg:p-8">
           <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-5">
             <div>
               <div className="flex items-center gap-3 flex-wrap">
-                <VoiceConnectWordmark textClassName="text-xl" markClassName="h-7 w-auto text-white" />
+                <VoiceConnectWordmark textClassName="text-xl" markClassName="h-7 w-auto text-slate-900" />
                 <span
-                  className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full"
-                  style={{ color: TEAL, background: "rgba(11,163,168,0.12)", border: "1px solid rgba(11,163,168,0.4)" }}
+                  className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full"
+                  style={{ color: TEAL, background: "rgba(11,163,168,0.1)", border: "1px solid rgba(11,163,168,0.35)" }}
                 >
-                  Premium Add-On
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: TEAL }} />
+                  Connected add-on
                 </span>
               </div>
-              <p className="mt-3 text-lg text-white font-semibold tracking-tight">
+              <p className="mt-3 text-lg text-slate-900 font-semibold tracking-tight">
                 Capture it. Connect it. Build it.
               </p>
-              <p className="mt-1.5 text-sm text-[#8A96B0] max-w-xl leading-relaxed">
-                The voice-first field companion for CCA BidIntelligenceOS. Walk a site,
-                talk through what you see, and let VoiceConnect transcribe, tag, and hand
-                it off as a draft bid — no typing required.
+              <p className="mt-1.5 text-sm text-slate-500 max-w-xl leading-relaxed">
+                A connected field companion for CCA BidIntelligenceOS. Walk a site,
+                talk through what you see, and VoiceConnect transcribes, tags, and
+                feeds field data into BidIntelligenceOS as a draft bid — no typing required.
               </p>
             </div>
             <div
@@ -107,11 +107,11 @@ export default function VoiceConnect() {
             >
               <Headphones className="w-5 h-5" style={{ color: TEAL }} />
               <div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-white">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-900">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: TEAL }} />
                   Connected
                 </div>
-                <div className="text-[10px] text-[#8A96B0]">Jabra Elite 8 Active · 100%</div>
+                <div className="text-[10px] text-slate-500">Jabra Elite 8 Active · 100%</div>
               </div>
             </div>
           </div>
@@ -120,18 +120,18 @@ export default function VoiceConnect() {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {STATS.map((s) => (
-            <div key={s.label} className="rounded-xl border border-[#1C253B] bg-[#0F1830] p-5">
-              <div className="text-[11px] uppercase tracking-widest text-[#5b6680]">{s.label}</div>
-              <div className="mt-1 text-3xl font-bold text-white">{s.value}</div>
+            <div key={s.label} className="rounded-xl border border-[#E2E8F0] bg-white p-5">
+              <div className="text-[11px] uppercase tracking-widest text-slate-400">{s.label}</div>
+              <div className="mt-1 text-3xl font-bold text-slate-900">{s.value}</div>
             </div>
           ))}
         </div>
 
         {/* Recent captures + featured report */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-2 rounded-xl border border-[#1C253B] bg-[#0F1830] overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#1C253B]">
-              <h3 className="text-sm font-semibold text-white">Recent Field Captures</h3>
+          <div className="lg:col-span-2 rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E2E8F0]">
+              <h3 className="text-sm font-semibold text-slate-900">Recent Field Captures</h3>
               <Sparkles className="w-4 h-4" style={{ color: TEAL }} />
             </div>
             {CAPTURES.map((c) => {
@@ -147,16 +147,16 @@ export default function VoiceConnect() {
                 role="button"
                 tabIndex={0}
                 aria-label={c.done ? `Open captured bid ${c.title}` : `Capture ${c.title} is still processing`}
-                className="flex items-center gap-3 px-5 py-3.5 border-b border-[#151D2E] last:border-0 hover:bg-[#151D2E]/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#0BA3A8]"
+                className="flex items-center gap-3 px-5 py-3.5 border-b border-[#E2E8F0] last:border-0 hover:bg-[#F1F5F9]/50 transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#0BA3A8]"
               >
                 <div className="w-9 h-9 rounded-lg bg-[#0BA3A8]/10 border border-[#0BA3A8]/20 flex items-center justify-center shrink-0">
                   <c.icon className="w-4 h-4" style={{ color: TEAL }} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm text-white truncate">{c.title}</div>
-                  <div className="text-xs text-[#8A96B0] truncate">{c.meta}</div>
+                  <div className="text-sm text-slate-900 truncate">{c.title}</div>
+                  <div className="text-xs text-slate-500 truncate">{c.meta}</div>
                 </div>
-                <div className="hidden sm:block text-xs text-[#5b6680] shrink-0">{c.date}</div>
+                <div className="hidden sm:block text-xs text-slate-400 shrink-0">{c.date}</div>
                 <span
                   className="shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium border"
                   style={
@@ -174,16 +174,16 @@ export default function VoiceConnect() {
           </div>
 
           {/* Featured draft report */}
-          <div className="rounded-xl border border-[#0BA3A8]/25 bg-[#0F1830] p-5 flex flex-col">
+          <div className="rounded-xl border border-[#0BA3A8]/25 bg-white p-5 flex flex-col">
             <div className="flex items-center gap-2 mb-4">
               <FileText className="w-4 h-4" style={{ color: TEAL }} />
-              <span className="text-sm font-semibold text-white">Draft Site Report</span>
+              <span className="text-sm font-semibold text-slate-900">Draft Site Report</span>
             </div>
 
             <div className="flex items-center gap-4 mb-4">
               <div className="relative w-24 h-24 shrink-0">
                 <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
-                  <circle cx="60" cy="60" r={R} fill="none" stroke="#1C253B" strokeWidth="10" />
+                  <circle cx="60" cy="60" r={R} fill="none" stroke="#E2E8F0" strokeWidth="10" />
                   <circle
                     cx="60"
                     cy="60"
@@ -197,11 +197,11 @@ export default function VoiceConnect() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-white leading-none">{readiness}%</span>
-                  <span className="text-[8px] uppercase tracking-widest text-[#5b6680] mt-0.5">Ready</span>
+                  <span className="text-2xl font-bold text-slate-900 leading-none">{readiness}%</span>
+                  <span className="text-[8px] uppercase tracking-widest text-slate-400 mt-0.5">Ready</span>
                 </div>
               </div>
-              <p className="text-xs text-[#8A96B0] leading-relaxed">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Good start. Address missing info and risk flags to improve readiness before
                 building the bid.
               </p>
@@ -211,10 +211,10 @@ export default function VoiceConnect() {
               {REPORT_STATS.map((s) => (
                 <div
                   key={s.label}
-                  className="flex items-center gap-2 rounded-lg border border-[#1C253B] bg-[#0B1222] px-3 py-2"
+                  className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] px-3 py-2"
                 >
                   <s.icon className="w-4 h-4 shrink-0" style={{ color: s.color }} />
-                  <span className="text-xs text-[#c2cad6] flex-1">{s.label}</span>
+                  <span className="text-xs text-slate-700 flex-1">{s.label}</span>
                   <span className="text-sm font-bold" style={{ color: s.color }}>
                     {s.value}
                   </span>
@@ -236,14 +236,14 @@ export default function VoiceConnect() {
               Create Draft Bid Profile
               <ArrowRight className="w-4 h-4" />
             </button>
-            <p className="mt-2 text-[10px] text-[#5b6680] text-center">
+            <p className="mt-2 text-[10px] text-slate-400 text-center">
               Review required before the bid is used or exported.
             </p>
           </div>
         </div>
 
-        {/* Phone showcase */}
-        <div className="rounded-2xl border border-[#1C253B] bg-[#0B1222] p-6 lg:p-8">
+        {/* Phone showcase — dark brand showcase panel */}
+        <div className="rounded-2xl border border-white/10 bg-[#0B1220] p-6 lg:p-8">
           <div className="text-center mb-8">
             <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: TEAL }}>
               In the field
@@ -251,7 +251,7 @@ export default function VoiceConnect() {
             <h3 className="mt-2 text-2xl font-bold text-white tracking-tight">
               From walkthrough to draft bid
             </h3>
-            <p className="mt-2 text-sm text-[#8A96B0] max-w-md mx-auto">
+            <p className="mt-2 text-sm text-slate-300 max-w-md mx-auto">
               Choose a capture type, record hands-free, and hand the result off to
               BidIntelligenceOS.
             </p>
@@ -259,11 +259,13 @@ export default function VoiceConnect() {
           <PhoneShowcase />
         </div>
 
-        {/* Pillars */}
-        <FeaturePillars />
+        {/* Pillars — dark brand showcase panel */}
+        <div className="rounded-2xl border border-white/10 bg-[#0B1220] p-6 lg:p-8">
+          <FeaturePillars />
+        </div>
 
         {/* Footer note */}
-        <div className="flex items-center gap-2 text-xs text-[#8A96B0]">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
           <ShieldCheck className="w-3.5 h-3.5" style={{ color: TEAL }} />
           VoiceConnect output is a draft for demonstration and requires review before any bid is built or exported.
         </div>
