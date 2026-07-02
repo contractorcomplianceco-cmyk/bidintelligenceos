@@ -34,6 +34,7 @@ import BuildConnect from "@/pages/build-connect";
 import ComplianceConnect from "@/pages/compliance-connect";
 import Government from "@/pages/government";
 import Risk from "@/pages/risk";
+import RoseOs from "@/pages/roseos";
 import Closeout from "@/pages/closeout";
 import BusinessProfile from "@/pages/business-profile";
 import Settings from "@/pages/settings";
@@ -81,6 +82,7 @@ function Router() {
       <Route path="/closeout" component={Closeout} />
 
       {/* Intelligence */}
+      <Route path="/roseos" component={RoseOs} />
       <Route path="/voice-connect" component={VoiceConnect} />
       <Route path="/industry-use-cases" component={IndustryUseCases} />
       <Route path="/analytics" component={Analytics} />

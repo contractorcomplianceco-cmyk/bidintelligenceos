@@ -35,6 +35,7 @@ import {
   Globe,
   Network,
   Landmark,
+  Compass,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
@@ -100,6 +101,7 @@ const navGroups: NavGroup[] = [
   {
     title: "Intelligence",
     items: [
+      { href: "/roseos", label: "ROSEOS Intelligence", icon: Compass, badge: "AI" },
       { href: "/bid-dna", label: "Bid DNA", icon: Dna },
       { href: "/industry-use-cases", label: "Industry Use Cases", icon: Factory },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },

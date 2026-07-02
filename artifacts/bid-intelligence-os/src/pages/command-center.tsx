@@ -23,6 +23,8 @@ import {
   type RiskBand,
 } from "@/lib/operations";
 import { radarAlerts } from "@/lib/market-watch";
+import { executiveSummary, roseStats, roseInsights, VERDICT_META, type Verdict } from "@/lib/roseos";
+import { RoseOsMark, RoseOsBadge, VerdictBadge, ROSE_COLOR, ROSE_COLOR_DARK } from "@/components/roseos/brand";
 import { Link } from "wouter";
 import {
   AreaChart,
@@ -319,6 +321,91 @@ export default function CommandCenter() {
             );
           })}
         </div>
+
+        {/* ROSEOS Intelligence — executive decision layer */}
+        <Card className="bg-white border-[#E2E8F0] shadow-sm overflow-hidden">
+          <div
+            className="h-[3px] w-full"
+            style={{ background: `linear-gradient(90deg, ${ROSE_COLOR}, #FDA4AF, transparent)` }}
+          />
+          <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-[#FFF1F2] border border-[#FECDD3] flex-shrink-0">
+                <RoseOsMark size={18} />
+              </span>
+              <div className="min-w-0">
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2 flex-wrap">
+                  ROSEOS INTELLIGENCE
+                  <RoseOsBadge />
+                </CardTitle>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  Executive verdicts across all connected modules
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/roseos"
+              className="text-xs hover:text-slate-900 transition-colors flex items-center gap-1 font-medium flex-shrink-0"
+              style={{ color: ROSE_COLOR_DARK }}
+            >
+              Open ROSEOS <ArrowRight className="w-3 h-3" />
+            </Link>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <VerdictBadge verdict={executiveSummary.posture} size="sm" />
+                  <p className="text-xs font-semibold text-slate-900 leading-snug">
+                    {executiveSummary.headline}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {(["green", "yellow", "red"] as Verdict[]).map((v) => (
+                  <span
+                    key={v}
+                    className="inline-flex items-center gap-1.5 text-[10px] font-bold tabular-nums px-2 py-1 rounded-md"
+                    style={{
+                      color: VERDICT_META[v].color,
+                      backgroundColor: VERDICT_META[v].bg,
+                      border: `1px solid ${VERDICT_META[v].border}`,
+                    }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: VERDICT_META[v].color }} />
+                    {roseStats[v]} {VERDICT_META[v].label}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+              {roseInsights
+                .filter((i) => i.verdict !== "green")
+                .slice(0, 3)
+                .map((item) => (
+                  <Link key={item.id} href="/roseos">
+                    <div className="h-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3 hover:border-[#FDA4AF] transition-colors cursor-pointer">
+                      <div className="flex items-start justify-between gap-2 mb-1.5">
+                        <VerdictBadge verdict={item.verdict} size="sm" />
+                        <span className="text-[9px] text-slate-500 flex-shrink-0">{item.detectedAgo}</span>
+                      </div>
+                      <p className="text-[11px] font-semibold text-slate-900 leading-snug line-clamp-2">
+                        {item.title}
+                      </p>
+                      <p className="text-[9px] font-bold uppercase tracking-widest mt-2" style={{ color: ROSE_COLOR_DARK }}>
+                        via {item.sourceModule}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+            </div>
+            <p className="text-[10px] text-slate-500 mt-3 flex items-center gap-1.5">
+              <ShieldCheck className="w-3 h-3 text-[#0284C7]" />
+              ROSEOS provides intelligence, not execution — every verdict is flagged for human
+              review and no outcome is guaranteed.
+            </p>
+          </CardContent>
+        </Card>
 
         {/* Row: Active Bids Intelligence + Follow-Up Queue */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
