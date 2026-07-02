@@ -78,3 +78,69 @@ id = "UVokzSyxJTnSr9knFR5zv"
 uri = "file://artifacts/promo-video/public/audio/bg_music.mp3"
 type = "audio"
 title = "background music"
+
+[[outputs]]
+id = "yeYE1UWgDmmyDyltyzKk0"
+uri = "file://attached_assets/generated_audio/vo_s2_voiceconnect.mp3"
+type = "audio"
+title = "s2_voiceconnect"
+
+[[outputs]]
+id = "abhUuHKETpnvYp5Biq10U"
+uri = "file://attached_assets/generated_audio/vo_s1_hook.mp3"
+type = "audio"
+title = "s1_hook"
+
+[[outputs]]
+id = "TCMS5ksNXOC_xVESzZiTK"
+uri = "file://attached_assets/generated_audio/vo_s3_bidintel.mp3"
+type = "audio"
+title = "s3_bidintel"
+
+[[outputs]]
+id = "Y3aQJc17XxvXvwglPque8"
+uri = "file://attached_assets/generated_audio/vo_s4_package.mp3"
+type = "audio"
+title = "s4_package"
+
+[[outputs]]
+id = "BWuex114XYN2eNMrwdQPx"
+uri = "file://attached_assets/generated_audio/vo_s5_deployment.mp3"
+type = "audio"
+title = "s5_deployment"
+
+[[outputs]]
+id = "s0LCGWVrHbl7bKltyYOcM"
+uri = "file://attached_assets/generated_audio/vo_s6_execution.mp3"
+type = "audio"
+title = "s6_execution"
+
+[[outputs]]
+id = "lV9u8AtL7g1spLpQUzHfo"
+uri = "file://attached_assets/generated_audio/vo_s7_briefings.mp3"
+type = "audio"
+title = "s7_briefings"
+
+[[outputs]]
+id = "2TiBvPGwJHbe84vPKhOfH"
+uri = "file://attached_assets/generated_audio/vo_s8_industry.mp3"
+type = "audio"
+title = "s8_industry"
+
+[[outputs]]
+id = "ZVy5Mi_TFRD2U_c6Gnovw"
+uri = "file://attached_assets/generated_audio/vo_s9_competitor.mp3"
+type = "audio"
+title = "s9_competitor"
+
+[[outputs]]
+id = "oKc_br01Zm6rimGD81n46"
+uri = "file://attached_assets/generated_audio/vo_s10_closing.mp3"
+type = "audio"
+title = "s10_closing"
+
+[[outputs]]
+id = "CqEEeGjPO7Fg4WEkggjIg"
+uri = "file://attached_assets/generated_audio/bios_music_bed.mp3"
+type = "audio"
+title = "bios walkthrough music bed"

@@ -1,82 +1,137 @@
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import bidLogo from '@assets/BidIntelligenceOS_1781626679949.png';
+import { EASE, CYAN, GREEN, PANEL2, BORDER, MUTED, DIM, Kicker, AppFrame } from './shared';
+
+const SECTIONS = [
+  { title: 'Executive Summary', lines: 3 },
+  { title: 'Scope of Work', lines: 5 },
+  { title: 'Pricing Summary', lines: 0 },
+  { title: 'Timeline & Milestones', lines: 3 },
+  { title: 'Assumptions & Exclusions', lines: 4 },
+];
+
+const PRICING = [
+  ['Labor', '$148,200'],
+  ['Materials', '$96,450'],
+  ['Equipment', '$31,800'],
+  ['Subcontractors', '$52,300'],
+];
 
 export function Scene4() {
-  const [phase, setPhase] = useState(0);
-
-  useEffect(() => {
-    const timers = [
-      setTimeout(() => setPhase(1), 300),
-      setTimeout(() => setPhase(2), 1200),
-      setTimeout(() => setPhase(3), 2000),
-    ];
-    return () => timers.forEach(t => clearTimeout(t));
-  }, []);
-
   return (
-    <motion.div 
-      className="absolute inset-0 flex items-center justify-end px-[10vw]"
-      initial={{ x: '-100%' }}
-      animate={{ x: 0 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+    <motion.div
+      className="absolute inset-0 flex items-center justify-center gap-[4vw] px-[7vw]"
+      initial={{ opacity: 0, scale: 1.05 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.96 }}
+      transition={{ duration: 0.7, ease: EASE }}
     >
-      <div className="absolute left-0 top-0 bottom-0 w-1/2 flex items-center justify-center px-[5vw]">
-        <motion.div 
-          className="w-full bg-[var(--color-bg-muted)] border border-[var(--color-accent)]/20 rounded-xl p-8"
-          initial={{ opacity: 0, rotateY: -30, x: -50, z: -100 }}
-          animate={phase >= 1 ? { opacity: 1, rotateY: 10, x: 0, z: 0 } : {}}
-          transition={{ duration: 1, ease: 'easeOut' }}
-          style={{ transformPerspective: 1000 }}
+      <div className="w-[30vw] flex flex-col gap-[2.4vh]">
+        <Kicker text="Bid Package Builder" delay={0.3} />
+        <motion.h2
+          className="text-[2.6vw] font-bold text-white leading-tight"
+          initial={{ opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.8, ease: EASE }}
         >
-          <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-            <span className="text-[var(--color-text-secondary)] font-mono text-sm">BID CONFIDENCE</span>
-            <span className="text-[var(--color-success)] font-bold text-2xl">87%</span>
-          </div>
-          <div className="space-y-4">
-            {[90, 60, 75].map((w, i) => (
-              <div key={i} className="h-4 bg-[var(--color-bg-dark)] rounded-full overflow-hidden">
-                <motion.div 
-                  className="h-full bg-[var(--color-accent)]"
-                  initial={{ width: 0 }}
-                  animate={phase >= 2 ? { width: `${w}%` } : {}}
-                  transition={{ duration: 1, delay: i * 0.2, ease: 'easeOut' }}
-                />
-              </div>
-            ))}
-          </div>
+          Client-ready proposals, <span style={{ color: CYAN }}>in minutes</span>
+        </motion.h2>
+        <motion.div
+          className="flex items-center gap-[0.7vw] rounded-xl border px-[1.1vw] py-[1.3vh]"
+          style={{ background: 'rgba(34,197,94,0.07)', borderColor: 'rgba(34,197,94,0.4)' }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 4.6, duration: 0.6, ease: EASE }}
+        >
+          <span className="text-[1vw]" style={{ color: GREEN }}>
+            ✓
+          </span>
+          <span className="text-[0.95vw] text-white/85">
+            Client-safe by design — internal strategy and pricing models stay private
+          </span>
+        </motion.div>
+        <motion.div
+          className="text-[0.95vw]"
+          style={{ color: MUTED }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 5.8, duration: 0.6 }}
+        >
+          Every package is reviewed and approved by you before it ships.
         </motion.div>
       </div>
 
-      <div className="flex flex-col gap-6 z-10 w-1/2 pl-12 text-right items-end">
-        <motion.img 
-          src={bidLogo} 
-          className="h-12 w-auto object-contain brightness-0 invert"
-          initial={{ opacity: 0, x: 20 }}
-          animate={phase >= 1 ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        />
-        
-        <motion.h2 
-          className="text-[4vw] font-bold leading-tight"
-          initial={{ opacity: 0, y: 30 }}
-          animate={phase >= 2 ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-        >
-          Insights you would<br/>
-          have <span className="text-[var(--color-accent)]">never known.</span>
-        </motion.h2>
-        
-        <motion.p
-          className="text-[1.8vw] text-white/60 max-w-lg"
-          initial={{ opacity: 0 }}
-          animate={phase >= 3 ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          Build history to see what works. Uncover the real strategy.
-        </motion.p>
-      </div>
+      <motion.div
+        className="w-[42vw] h-[64vh]"
+        initial={{ opacity: 0, x: 70 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.6, duration: 0.9, ease: EASE }}
+      >
+        <AppFrame label="Bid Package — Northline HVAC Retrofit · Preview">
+          <div className="h-full overflow-hidden flex flex-col gap-[1.1vh]">
+            {SECTIONS.map((s, i) => (
+              <motion.div
+                key={s.title}
+                className="rounded-lg border px-[1vw] py-[0.9vh]"
+                style={{ background: PANEL2, borderColor: BORDER }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.2 + i * 0.7, duration: 0.55, ease: EASE }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[0.85vw] font-semibold text-white/90">{s.title}</span>
+                  <motion.span
+                    className="text-[0.7vw]"
+                    style={{ color: GREEN }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 1.5 + i * 0.7, type: 'spring', stiffness: 380, damping: 16 }}
+                  >
+                    ✓ Ready
+                  </motion.span>
+                </div>
+                {s.title === 'Pricing Summary' ? (
+                  <div className="mt-[0.7vh] grid grid-cols-2 gap-x-[1.4vw] gap-y-[0.4vh]">
+                    {PRICING.map(([k, v], j) => (
+                      <motion.div
+                        key={k}
+                        className="flex items-center justify-between text-[0.72vw]"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 1.7 + i * 0.7 + j * 0.2 }}
+                      >
+                        <span style={{ color: MUTED }}>{k}</span>
+                        <span className="text-white/85 font-medium">{v}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-[0.6vh] flex flex-col gap-[0.4vh]">
+                    {Array.from({ length: s.lines }).map((_, j) => (
+                      <motion.span
+                        key={j}
+                        className="h-[0.7vh] rounded-full"
+                        style={{ background: BORDER, width: `${88 - j * 14}%` }}
+                        initial={{ scaleX: 0, originX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: 1.6 + i * 0.7 + j * 0.15, duration: 0.4, ease: EASE }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            ))}
+            <motion.div
+              className="mt-auto flex items-center justify-between text-[0.72vw] px-[0.4vw]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 5.2 }}
+            >
+              <span style={{ color: DIM }}>Vendor-facing package · no internal strategy included</span>
+              <span style={{ color: CYAN }}>Export preview</span>
+            </motion.div>
+          </div>
+        </AppFrame>
+      </motion.div>
     </motion.div>
   );
 }

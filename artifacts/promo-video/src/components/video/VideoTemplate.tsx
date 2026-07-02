@@ -7,21 +7,36 @@ import { Scene2 } from './video_scenes/Scene2';
 import { Scene3 } from './video_scenes/Scene3';
 import { Scene4 } from './video_scenes/Scene4';
 import { Scene5 } from './video_scenes/Scene5';
+import { Scene6 } from './video_scenes/Scene6';
+import { Scene7 } from './video_scenes/Scene7';
+import { Scene8 } from './video_scenes/Scene8';
+import { Scene9 } from './video_scenes/Scene9';
+import { Scene10 } from './video_scenes/Scene10';
 
 export const SCENE_DURATIONS = {
-  intro: 5600,
-  voice: 5100,
-  flow: 3200,
-  bid: 6100,
-  outro: 3900,
+  hook: 8000,
+  voiceconnect: 13000,
+  bid_intel: 10000,
+  bid_package: 10000,
+  deployment: 10000,
+  execution: 9000,
+  briefings: 8000,
+  industry: 13000,
+  competitor: 8000,
+  closing: 9000,
 };
 
 const SCENE_COMPONENTS: Record<string, ComponentType> = {
-  intro: Scene1,
-  voice: Scene2,
-  flow: Scene3,
-  bid: Scene4,
-  outro: Scene5,
+  hook: Scene1,
+  voiceconnect: Scene2,
+  bid_intel: Scene3,
+  bid_package: Scene4,
+  deployment: Scene5,
+  execution: Scene6,
+  briefings: Scene7,
+  industry: Scene8,
+  competitor: Scene9,
+  closing: Scene10,
 };
 
 const SCENE_START_SEC: Record<string, number> = (() => {
