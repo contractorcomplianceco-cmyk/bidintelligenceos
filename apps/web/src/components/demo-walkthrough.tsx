@@ -25,15 +25,15 @@ export function DemoWalkthrough({
   initialPanel = "promo",
   onEnterPlatform,
   onDismiss,
-  onGoToHub,
+  onReturnToLanding,
 }: {
   allowSound: boolean;
   initialPanel?: Panel;
   onEnterPlatform: () => void;
   /** X button — return to landing page. */
   onDismiss: () => void;
-  /** Video end, backdrop, or time-update fallback — open demo choice hub. */
-  onGoToHub: () => void;
+  /** Video end, backdrop, or time-update fallback — return to landing page. */
+  onReturnToLanding: () => void;
 }) {
   const [panel, setPanel] = useState<Panel>(initialPanel);
   const [promoKey, setPromoKey] = useState(0);
@@ -58,8 +58,8 @@ export function DemoWalkthrough({
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label="Rose Demo"
-      onClick={onGoToHub}
+      aria-label="BidIntelligenceOS demo"
+      onClick={onReturnToLanding}
     >
       <div
         className="relative w-full max-w-4xl rounded-2xl border border-white/10 bg-[#0B1220] shadow-[0_0_80px_rgba(56,189,248,0.2)] overflow-hidden"
@@ -76,10 +76,10 @@ export function DemoWalkthrough({
 
         {panel === "promo" ? (
           <>
-            <PromoMedia allowSound={allowSound} replayKey={promoKey} onFinished={onGoToHub} />
+            <PromoMedia allowSound={allowSound} replayKey={promoKey} onFinished={onReturnToLanding} />
             <div className="p-6 sm:p-8 text-center border-t border-white/5">
               <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#6B7794]">
-                CCA BidIntelligenceOS · Rose Demo
+                CCA BidIntelligenceOS · Interactive Demo
               </span>
               <h2 className="text-2xl font-bold text-white mt-2 mb-2">
                 Research Less, Win More

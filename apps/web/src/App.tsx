@@ -82,6 +82,13 @@ function isRoseDemoLaunch(): boolean {
   return params.has("rose-demo") || params.get("demo") === "rose";
 }
 
+function isDemoDomainLaunch(): boolean {
+  if (typeof window === "undefined") return false;
+  const host = window.location.hostname.toLowerCase();
+  const path = normalizePath(window.location.pathname);
+  return host === "demo.ccabidintelligence.com" && (path === "/" || path === "/demo");
+}
+
 function Router() {
   return (
     <Switch>
@@ -151,6 +158,7 @@ function Router() {
 function App() {
   const [view, setView] = useState<DemoView>(() => {
     if (typeof window === "undefined") return "landing";
+    if (isDemoDomainLaunch()) return "landing";
     if (isDemoHubPath()) return "hub";
     if (sessionStorage.getItem("cca-demo-entered") === "1") return "app";
     return "landing";
@@ -205,7 +213,8 @@ function App() {
   };
 
   useEffect(() => {
-    if (!isRoseDemoLaunch() || !isDemoModeEnabled()) return;
+    if (!(isRoseDemoLaunch() || isDemoDomainLaunch()) || !isDemoModeEnabled()) return;
+    setView("landing");
     openRoseDemo("promo", false);
 
     const url = new URL(window.location.href);
@@ -236,7 +245,7 @@ function App() {
               initialPanel={roseDemoPanel}
               onEnterPlatform={handleRoseDemoEnter}
               onDismiss={handleRoseDemoDismiss}
-              onGoToHub={handleRoseDemoGoToHub}
+              onReturnToLanding={handleRoseDemoDismiss}
             />
           )}
           {view === "app" ? (

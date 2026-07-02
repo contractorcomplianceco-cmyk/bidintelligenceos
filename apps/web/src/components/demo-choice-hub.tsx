@@ -53,7 +53,7 @@ export function DemoChoiceHub({
       <main className="mx-auto max-w-5xl px-5 py-16 lg:px-8 lg:py-24">
         <div className="text-center">
           <span className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#6B7794]">
-            CCA BidIntelligenceOS · Rose Demo
+            CCA BidIntelligenceOS · Interactive Demo
           </span>
           <h1 className="mt-4 text-balance text-4xl font-bold tracking-tight sm:text-5xl">
             Choose your{" "}
@@ -106,7 +106,7 @@ export function DemoChoiceHub({
           <HubCard
             icon={<Clapperboard className="h-5 w-5" />}
             title="Watch Promo"
-            description="Replay the Rose Demo promo film with sound."
+            description="Replay the platform promo film with sound."
             action={
               <button
                 type="button"
@@ -142,14 +142,14 @@ export function DemoChoiceHub({
         </div>
 
         <p className="mt-10 text-center text-sm text-slate-500">
-          Prefer the marketing site?{" "}
+          Want to explore the platform first?{" "}
           <button
             type="button"
             onClick={onReturnHome}
             className="text-[#7dd3fc] hover:underline"
             data-testid="button-hub-return-home"
           >
-            Return to landing page
+            Back to platform overview
           </button>
         </p>
       </main>

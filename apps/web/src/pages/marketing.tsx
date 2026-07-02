@@ -345,7 +345,7 @@ export default function Marketing({
               onClick={onLaunchRoseDemo}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm hover:from-[#5cc6fb] hover:to-[#38a8e0] transition-all shadow-[0_0_24px_rgba(56,189,248,0.35)]"
             >
-              Launch Rose Demo
+              Launch Interactive Demo
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -407,7 +407,7 @@ export default function Marketing({
               onClick={onLaunchRoseDemo}
               className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
             >
-              Launch Rose Demo
+              Launch Interactive Demo
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
             <button
@@ -740,7 +740,7 @@ export default function Marketing({
               onClick={onLaunchRoseDemo}
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-white/15 bg-white/5 text-white font-semibold text-sm hover:bg-white/10 transition-colors backdrop-blur-sm"
             >
-              Launch Rose Demo
+              Launch Interactive Demo
             </button>
           </div>
         </div>
@@ -1287,7 +1287,7 @@ export default function Marketing({
               onClick={onLaunchRoseDemo}
               className="group mt-7 inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg bg-gradient-to-b from-[#4CC4FB] to-[#2A9BD8] text-[#04121F] font-semibold text-sm transition-all shadow-[0_0_36px_rgba(56,189,248,0.4)] hover:shadow-[0_0_48px_rgba(56,189,248,0.6)]"
             >
-              Launch Rose Demo
+              Launch Interactive Demo
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-[#6B7794]">

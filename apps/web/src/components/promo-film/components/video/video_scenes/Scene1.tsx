@@ -5,7 +5,7 @@ import { EASE, TEAL, VIOLET, PANEL2, BORDER, MUTED, DIM, Waveform } from './shar
 function CapturePhone({ label, accent, tag, children }: { label: string; accent: string; tag: string; children: ReactNode }) {
   return (
     <div
-      className="relative h-full aspect-[9/19] rounded-[2vw] border-[0.22vw] overflow-hidden flex flex-col"
+      className="relative h-full max-h-full w-auto aspect-[9/19] rounded-[2vw] border-[0.22vw] overflow-hidden flex flex-col"
       style={{ borderColor: `${accent}88`, background: '#07131d', boxShadow: `0 30px 90px -20px ${accent}55` }}
     >
       <div className="flex items-center justify-between px-[1vw] pt-[0.9vh] pb-[0.5vh] shrink-0">
@@ -24,15 +24,15 @@ function CapturePhone({ label, accent, tag, children }: { label: string; accent:
 export function Scene1() {
   return (
     <motion.div
-      className="absolute inset-0 flex flex-col items-center justify-center gap-[3.4vh] px-[8vw]"
+      className="absolute inset-0 flex flex-col items-center justify-center gap-[2%] px-[6%] py-[2%] overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.05, filter: 'blur(8px)' }}
       transition={{ duration: 0.6, ease: EASE }}
     >
-      <div className="text-center">
+      <div className="shrink-0 text-center">
         <motion.h1
-          className="text-[3.1vw] font-bold text-white leading-tight"
+          className="text-[clamp(1rem,2.6vw,1.85rem)] font-bold text-white leading-tight"
           initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
@@ -40,7 +40,7 @@ export function Scene1() {
           Every job starts in the field
         </motion.h1>
         <motion.p
-          className="mt-[1.2vh] text-[1.5vw]"
+          className="mt-[0.5vh] text-[clamp(0.7rem,1.25vw,0.95rem)]"
           style={{ color: MUTED }}
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -50,10 +50,10 @@ export function Scene1() {
         </motion.p>
       </div>
 
-      <div className="flex items-end justify-center gap-[3vw] h-[52vh]">
+      <div className="flex min-h-0 w-full max-h-[62%] flex-1 items-end justify-center gap-[2.5%]">
         {/* VoiceConnect capture */}
         <motion.div
-          className="h-full"
+          className="h-full max-h-full"
           initial={{ opacity: 0, y: 60, rotate: -3 }}
           animate={{ opacity: 1, y: 0, rotate: -2 }}
           transition={{ duration: 0.8, delay: 0.4, ease: EASE }}
@@ -88,7 +88,7 @@ export function Scene1() {
 
         {/* VideoConnect capture */}
         <motion.div
-          className="h-full"
+          className="h-full max-h-full"
           initial={{ opacity: 0, y: 60, rotate: 3 }}
           animate={{ opacity: 1, y: 0, rotate: 2 }}
           transition={{ duration: 0.8, delay: 0.7, ease: EASE }}
