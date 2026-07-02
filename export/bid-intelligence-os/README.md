@@ -36,11 +36,13 @@ The frontend imports business data via the `@core/*` alias and shared utilities 
 
 ## Demo mode
 
-`VITE_DEMO_MODE` (default: on) shows a 5-step guided walkthrough on first visit:
-what the platform is → what it analyzes → how results are generated → the value → **Enter Platform**.
+`VITE_DEMO_MODE` (default: on) shows a demo entry modal on first visit:
 
-- Clicking **Enter Platform** routes into the live Command Center and permanently disables the modal for that browser (localStorage flag `bios-walkthrough-complete`).
-- Set `VITE_DEMO_MODE=false` in `.env` to turn the walkthrough off entirely.
+- If `VITE_PROMO_FILM_URL` is set, the promo video plays first inside the modal — muted autoplay (YouTube/Vimeo/direct video files are handled automatically); visitors click to enable sound.
+- Two clear choices: **Watch Walkthrough** (opens `VITE_WALKTHROUGH_VIDEO_URL` in a new tab; hidden when unset) and **Enter Platform** (routes into the live Command Center).
+- A secondary "5-step tour" link offers a quick text walkthrough: what the platform is → what it analyzes → how results are generated → the value → Enter Platform.
+- Clicking **Enter Platform** permanently disables the modal for that browser (localStorage flag `bios-walkthrough-complete`).
+- Set `VITE_DEMO_MODE=false` in `.env` to turn the modal off entirely.
 - To see it again during development, clear the localStorage flag in your browser devtools.
 
 ## Environment
