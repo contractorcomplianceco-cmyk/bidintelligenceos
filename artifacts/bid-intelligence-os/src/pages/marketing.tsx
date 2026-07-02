@@ -1,7 +1,8 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   ArrowRight,
   PlayCircle,
+  Film,
   ShieldCheck,
   Search,
   PackageCheck,
@@ -34,9 +35,17 @@ import {
   BarChart3,
   ScanEye,
   Camera,
+  Network,
+  Landmark,
+  FileCheck,
+  BellRing,
+  Gauge,
+  Target,
+  Signal,
   type LucideIcon,
 } from "lucide-react";
 import { CCACrest } from "@/components/cca-crest";
+import { PromoOverlay } from "@/components/promo-overlay";
 import { WalkthroughPlayer } from "@/components/walkthrough/walkthrough-player";
 import { VoiceConnectMarketingSection } from "@/components/voice-connect/marketing-section";
 import { INDUSTRY_USE_CASES, type IndustryIconKey } from "@/lib/industry-use-cases";
@@ -197,25 +206,47 @@ const TRUST = [
 ];
 
 /**
- * MarketWatchOS — Coming Soon add-on content.
- * Framed strictly around lawful, public, and published market data.
+ * MarketWatchOS — LIVE flagship add-on: Opportunity Radar.
+ * Framed strictly around lawful, public, and published signals only.
  */
 const MARKETWATCH = {
   name: "MarketWatchOS",
-  status: "Coming Soon",
-  tagline: "Read market pricing and demand signals from public data.",
+  status: "Now Live",
+  tagline: "Opportunity Radar — find the work before it hits the street.",
   shortDescription:
-    "An upcoming market-intelligence add-on that reads pricing movement and demand signals from lawful, public data — so you can time bids, benchmark realistic pricing bands, and put estimating effort where the work actually is.",
+    "The Opportunity Radar engine is live. MarketWatchOS scans lawful, public signals — storm events, permit spikes, RFP/RFQ releases, and material & labor shifts — and turns them into scored, trade-specific opportunity alerts (0–100) that flow straight into your bid pipeline.",
   features: [
-    { title: "Public pricing benchmarks", description: "Track material and labor pricing bands from public and published sources." },
-    { title: "Demand signals by trade & region", description: "See where demand is rising or cooling before you commit bid resources." },
-    { title: "Public bid-volume trends", description: "Follow public bid activity to time your pursuits with the market." },
-    { title: "Pricing pressure indicators", description: "Read directional market pressure to time bids and protect margin." },
-    { title: "Seasonality patterns", description: "Anticipate seasonal swings in demand and pricing pressure." },
-    { title: "Market benchmark ranges", description: "Compare your assumptions against public market ranges before you submit." },
+    { title: "Job signals", description: "Storm damage, permit spikes, and claim surges surface new work by trade & region." },
+    { title: "Bid signals", description: "Public RFP/RFQ releases and open bid windows tracked as they hit the street." },
+    { title: "Market signals", description: "Material, labor, and sub-availability shifts read from public and published sources." },
+    { title: "Scored opportunity alerts", description: "Every signal is scored 0–100 by fit, trade, and regional demand heat." },
+    { title: "Regional demand heat", description: "See where demand is rising or cooling before you commit bid resources." },
+    { title: "Pipeline handoff", description: "High-opportunity alerts feed the Command Center and your bid pipeline." },
+  ],
+  radarAlerts: [
+    { title: "Hail event — Denver metro", trade: "Roofing", score: 92, tag: "Storm signal" },
+    { title: "School district RFP released", trade: "GC", score: 87, tag: "Bid signal" },
+    { title: "Permit spike — mixed-use core", trade: "Electrical", score: 78, tag: "Job signal" },
+    { title: "Steel pricing easing", trade: "Market", score: 64, tag: "Market signal" },
   ],
   guardrail:
-    "MarketWatchOS uses lawful, public, and published market data only. It does not access private company systems, confidential pricing, or non-public bid information.",
+    "MarketWatchOS uses lawful, public, and published signals only. It does not access private company systems, confidential pricing, or non-public bid information. Scored alerts are decision-support you review — not guaranteed outcomes.",
+};
+
+/**
+ * Government Contracting — built-in module framing (compact strip).
+ * Public registrations & lawful deadline tracking only.
+ */
+const GOVERNMENT = {
+  tagline: "Built-in module for public-sector pursuits.",
+  points: [
+    { icon: FileCheck, title: "SAM / UEI / CAGE tracking", body: "Keep registrations current with status and renewal visibility." },
+    { icon: Target, title: "Set-aside tracking", body: "Track 8(a), SDVOSB, WOSB, and HUBZone eligibility against opportunities." },
+    { icon: Gauge, title: "Readiness score", body: "A single score for how bid-ready your government profile is right now." },
+    { icon: BellRing, title: "Deadline alerts", body: "Proposal and registration deadlines surface before they lapse." },
+  ],
+  guardrail:
+    "Government Contracting tracks your public registrations and lawful, published solicitation data — decision-support you review, not guaranteed awards.",
 };
 
 export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }) {
@@ -224,8 +255,32 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
   const scrollToPlayer = () =>
     playerRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
 
+  const [showPromo, setShowPromo] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("cca-promo-seen") !== "1") {
+        setShowPromo(true);
+      }
+    } catch {
+      /* sessionStorage unavailable — skip autoplay overlay */
+    }
+  }, []);
+
+  const closePromo = () => {
+    try {
+      sessionStorage.setItem("cca-promo-seen", "1");
+    } catch {
+      /* ignore */
+    }
+    setShowPromo(false);
+  };
+
+  const openPromo = () => setShowPromo(true);
+
   return (
     <div className="min-h-[100dvh] bg-[#0A0E1A] text-slate-200 font-sans">
+      {showPromo && <PromoOverlay onClose={closePromo} />}
       {/* Utility strip */}
       <div className="hidden md:block border-b border-white/5 bg-[#080B14]">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 h-9 flex items-center justify-between text-[11px] tracking-wide">
@@ -374,6 +429,14 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             >
               Launch the Live Demo
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+            </button>
+            <button
+              onClick={openPromo}
+              data-testid="button-watch-film"
+              className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-lg border border-[#38BDF8]/40 bg-[#38BDF8]/10 text-[#7dd3fc] font-semibold text-sm hover:bg-[#38BDF8]/20 hover:text-white transition-colors backdrop-blur-sm"
+            >
+              <Film className="w-4 h-4" />
+              Watch the film
             </button>
             <button
               onClick={scrollToPlayer}
@@ -751,17 +814,33 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
                   Connected
                 </span>
               </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#F97316]/40 bg-[#F97316]/15 text-[11px] font-semibold text-[#fdba74]">
+                <Network className="w-3 h-3" />
+                BuildConnect
+                <span className="ml-1 inline-flex items-center gap-1 text-[#fb923c]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#F97316]" />
+                  Connected
+                </span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#10B981]/40 bg-[#10B981]/15 text-[11px] font-semibold text-[#6ee7b7]">
+                <ShieldCheck className="w-3 h-3" />
+                ComplianceConnect
+                <span className="ml-1 inline-flex items-center gap-1 text-[#34d399]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                  Connected
+                </span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#5e9bf8]/40 bg-[#5e9bf8]/15 text-[11px] font-semibold text-[#bcd6ff]">
+                <BarChart3 className="w-3 h-3" />
+                MarketWatchOS
+                <span className="ml-1 inline-flex items-center gap-1 text-[#7dd3fc]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />
+                  Live
+                </span>
+              </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#a5b4fc]/30 bg-[#a5b4fc]/10 text-[11px] font-semibold text-[#c7d2fe]">
                 <Radar className="w-3 h-3" />
                 CompetitorWatchOS
-                <span className="ml-1 inline-flex items-center gap-1 text-[#8A96B0]">
-                  <Lock className="w-2.5 h-2.5" />
-                  Soon
-                </span>
-              </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#5e9bf8]/30 bg-[#5e9bf8]/10 text-[11px] font-semibold text-[#bcd6ff]">
-                <BarChart3 className="w-3 h-3" />
-                MarketWatchOS
                 <span className="ml-1 inline-flex items-center gap-1 text-[#8A96B0]">
                   <Lock className="w-2.5 h-2.5" />
                   Soon
@@ -856,10 +935,236 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
                 <ArrowRight className="w-4 h-4" />
               </a>
             </div>
+
+            {/* BuildConnect — flagship add-on */}
+            <div className="relative rounded-2xl border border-[#F97316]/25 bg-gradient-to-br from-[#0F1830] to-[#2A1206] p-7">
+              <span className="absolute top-5 right-5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#F97316]/40 bg-[#F97316]/15 text-[10px] font-semibold uppercase tracking-wider text-[#fdba74]">
+                <Sparkles className="w-2.5 h-2.5" />
+                New
+              </span>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#F97316]/15 border border-[#F97316]/40 flex items-center justify-center shadow-[0_0_28px_rgba(249,115,22,0.3)]">
+                  <Network className="w-6 h-6 text-[#fb923c]" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold uppercase tracking-widest text-[#fb923c]">
+                    Flagship Add-On · Connected
+                  </span>
+                  <h4 className="text-lg font-bold text-white tracking-tight">BuildConnect</h4>
+                </div>
+              </div>
+              <p className="text-sm text-[#a9b7d1] leading-relaxed">
+                The subcontractor network for BidIntelligenceOS.{" "}
+                <span className="text-[#fdba74] font-medium">You win, the network executes.</span>{" "}
+                Match won jobs to vetted trade subs, track availability and assignments, and
+                score performance and reliability over time — no self-perform required.
+              </p>
+              <ul className="mt-4 grid sm:grid-cols-2 gap-2">
+                {[
+                  { icon: Network, label: "Sub marketplace & trade matching" },
+                  { icon: CalendarClock, label: "Availability & assignments" },
+                  { icon: TrendingUp, label: "Performance & reliability scoring" },
+                  { icon: HardHat, label: "No self-perform required" },
+                ].map((f) => (
+                  <li key={f.label} className="flex items-start gap-2 text-xs text-[#94a3b8]">
+                    <f.icon className="w-3.5 h-3.5 text-[#fb923c] mt-0.5 shrink-0" />
+                    <span>{f.label}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="/build-connect"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#fdba74] hover:text-white transition-colors"
+              >
+                Explore BuildConnect
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
+
+            {/* ComplianceConnect — flagship add-on */}
+            <div className="relative rounded-2xl border border-[#10B981]/25 bg-gradient-to-br from-[#0F1830] to-[#052A1E] p-7">
+              <span className="absolute top-5 right-5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-[#10B981]/40 bg-[#10B981]/15 text-[10px] font-semibold uppercase tracking-wider text-[#6ee7b7]">
+                <Sparkles className="w-2.5 h-2.5" />
+                New
+              </span>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#10B981]/15 border border-[#10B981]/40 flex items-center justify-center shadow-[0_0_28px_rgba(16,185,129,0.3)]">
+                  <ShieldCheck className="w-6 h-6 text-[#34d399]" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-semibold uppercase tracking-widest text-[#34d399]">
+                    Flagship Add-On · Connected
+                  </span>
+                  <h4 className="text-lg font-bold text-white tracking-tight">ComplianceConnect</h4>
+                </div>
+              </div>
+              <p className="text-sm text-[#a9b7d1] leading-relaxed">
+                Licensing, insurance, and bond readiness that keeps your compliance posture
+                bid-ready. Readiness scoring flags gaps before they block a bid, a permit, or
+                an audit — so you never lose work to a lapsed credential.
+              </p>
+              <ul className="mt-4 grid sm:grid-cols-2 gap-2">
+                {[
+                  { icon: ShieldCheck, label: "License & insurance tracking" },
+                  { icon: FileCheck, label: "Bond readiness & capacity" },
+                  { icon: Gauge, label: "Compliance readiness scoring" },
+                  { icon: ClipboardCheck, label: "Audit readiness checklists" },
+                ].map((f) => (
+                  <li key={f.label} className="flex items-start gap-2 text-xs text-[#94a3b8]">
+                    <f.icon className="w-3.5 h-3.5 text-[#34d399] mt-0.5 shrink-0" />
+                    <span>{f.label}</span>
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="/compliance-connect"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#6ee7b7] hover:text-white transition-colors"
+              >
+                Explore ComplianceConnect
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </div>
           </div>
           <p className="mt-4 text-center text-xs text-[#6B7794]">
             Add-ons provide decision-support you review — not guaranteed outcomes.
           </p>
+        </div>
+      </section>
+
+      {/* MarketWatchOS — LIVE flagship: Opportunity Radar */}
+      <section className="max-w-6xl mx-auto px-6 lg:px-8 pb-4 scroll-mt-24">
+        <div className="relative overflow-hidden rounded-2xl border border-[#38BDF8]/30 bg-gradient-to-br from-[#0F1830] to-[#0B1B33] p-8 lg:p-12">
+          <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
+          <div
+            className="absolute -top-32 left-0 w-[500px] h-[500px] rounded-full opacity-25 blur-2xl"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(56,189,248,0.35) 0%, rgba(56,189,248,0) 60%)",
+            }}
+            aria-hidden="true"
+          />
+          <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#38BDF8]/40 bg-[#38BDF8]/10 text-[#7dd3fc] text-xs font-semibold tracking-wide mb-5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />
+                Opportunity Radar — {MARKETWATCH.status}
+              </div>
+              <h2 className="text-2xl lg:text-4xl font-bold tracking-tight bg-gradient-to-b from-white to-[#bcd6ff] bg-clip-text text-transparent">
+                {MARKETWATCH.name}
+              </h2>
+              <p className="mt-2 text-[#7dd3fc] font-medium">{MARKETWATCH.tagline}</p>
+              <p className="mt-4 text-sm text-[#8A96B0] leading-relaxed">
+                {MARKETWATCH.shortDescription}
+              </p>
+              <div className="mt-5 grid sm:grid-cols-2 gap-3">
+                {MARKETWATCH.features.map((feat) => (
+                  <div
+                    key={feat.title}
+                    className="rounded-xl border border-[#1C253B] bg-[#0B1122]/60 p-4"
+                  >
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Signal className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
+                      <h3 className="text-xs font-semibold text-white leading-tight">
+                        {feat.title}
+                      </h3>
+                    </div>
+                    <p className="text-[11px] text-[#8A96B0] leading-relaxed">
+                      {feat.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 flex items-start gap-2 rounded-lg border border-[#38BDF8]/20 bg-[#0B1122]/60 p-3.5">
+                <ShieldCheck className="w-4 h-4 text-[#38BDF8] mt-0.5 shrink-0" />
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  {MARKETWATCH.guardrail}
+                </p>
+              </div>
+            </div>
+
+            {/* Live radar alert feed */}
+            <div className="rounded-2xl border border-[#141C30] bg-[#0B1122] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.8)] overflow-hidden">
+              <div className="flex items-center gap-2 px-4 h-11 border-b border-[#141C30] bg-[#0A0F1E]">
+                <Radar className="w-4 h-4 text-[#38BDF8]" />
+                <span className="text-xs font-semibold text-[#cbd5e1]">
+                  Opportunity Radar — Live Alerts
+                </span>
+                <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] text-[#7dd3fc]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] animate-pulse" />
+                  Scanning public signals
+                </span>
+              </div>
+              <div className="divide-y divide-[#141C30]">
+                {MARKETWATCH.radarAlerts.map((a) => (
+                  <div key={a.title} className="flex items-center gap-3 px-4 py-3.5">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-[#e2e8f0] truncate">{a.title}</p>
+                      <p className="mt-0.5 text-[11px] text-[#6B7794]">
+                        {a.tag} · {a.trade}
+                      </p>
+                    </div>
+                    <div className="shrink-0 flex items-center gap-2">
+                      <div className="h-1.5 w-20 rounded-full bg-[#1C253B] overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-[#38BDF8] to-[#22C55E]"
+                          style={{ width: `${a.score}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-bold text-white w-8 text-right">
+                        {a.score}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="px-4 py-3 border-t border-[#141C30] bg-[#0A0F1E] text-[10px] text-[#6B7794]">
+                Scored 0–100 by fit, trade & regional demand heat · public signals only
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Government Contracting — built-in module strip */}
+      <section className="max-w-6xl mx-auto px-6 lg:px-8 pb-4">
+        <div className="relative overflow-hidden rounded-2xl border border-[#5eead4]/25 bg-gradient-to-br from-[#0F1830] to-[#0B1F1C] p-8 lg:p-10">
+          <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
+          <div className="relative flex flex-col lg:flex-row lg:items-start gap-8">
+            <div className="lg:max-w-xs shrink-0">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#5eead4]/30 bg-[#5eead4]/10 text-[#7fe3d8] text-xs font-semibold tracking-wide mb-4">
+                <Landmark className="w-3.5 h-3.5" />
+                Built-In Module
+              </div>
+              <h2 className="text-2xl lg:text-3xl font-bold tracking-tight bg-gradient-to-b from-white to-[#a9f0e0] bg-clip-text text-transparent">
+                Government Contracting
+              </h2>
+              <p className="mt-2 text-[#7fe3d8] font-medium text-sm">{GOVERNMENT.tagline}</p>
+              <p className="mt-3 text-sm text-[#8A96B0] leading-relaxed">
+                Win in the public sector without the paperwork drag. Registrations,
+                set-asides, readiness, and deadlines — tracked in one built-in module.
+              </p>
+            </div>
+            <div className="flex-1 grid sm:grid-cols-2 gap-3">
+              {GOVERNMENT.points.map((p) => (
+                <div
+                  key={p.title}
+                  className="rounded-xl border border-[#1C253B] bg-[#0B1122]/60 p-4"
+                >
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <p.icon className="w-4 h-4 text-[#5eead4] shrink-0" />
+                    <h3 className="text-sm font-semibold text-white leading-tight">
+                      {p.title}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-[#8A96B0] leading-relaxed">{p.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="relative mt-5 flex items-start gap-2 rounded-lg border border-[#5eead4]/20 bg-[#0B1122]/60 p-3.5">
+            <ShieldCheck className="w-4 h-4 text-[#5eead4] mt-0.5 shrink-0" />
+            <p className="text-xs text-[#94a3b8] leading-relaxed">{GOVERNMENT.guardrail}</p>
+          </div>
         </div>
       </section>
 
@@ -877,8 +1182,8 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
             Intelligence add-ons in development
           </h2>
           <p className="mt-3 text-[#8A96B0] max-w-2xl mx-auto">
-            Two more standalone add-ons are coming to the marketplace — each built on
-            lawful, public, and contractor-provided data only.
+            One more standalone add-on is coming to the marketplace — built on lawful,
+            public, and contractor-provided data only.
           </p>
         </div>
         <div className="relative overflow-hidden rounded-2xl border border-[#a5b4fc]/25 bg-gradient-to-br from-[#0F1830] to-[#141033] p-8 lg:p-12">
@@ -933,58 +1238,6 @@ export default function Marketing({ onLaunchDemo }: { onLaunchDemo: () => void }
           </div>
         </div>
 
-        {/* MarketWatchOS — coming soon (locked) */}
-        <div className="relative overflow-hidden rounded-2xl border border-[#5e9bf8]/25 bg-gradient-to-br from-[#0F1830] to-[#0B1B33] p-8 lg:p-12">
-          <div className="absolute inset-0 blueprint-texture opacity-10" aria-hidden="true" />
-          <div
-            className="absolute -top-32 left-0 w-[500px] h-[500px] rounded-full opacity-25 blur-2xl"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(94,155,248,0.35) 0%, rgba(94,155,248,0) 60%)",
-            }}
-            aria-hidden="true"
-          />
-          <div className="relative grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="lg:order-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#5e9bf8]/30 bg-[#5e9bf8]/10 text-[#bcd6ff] text-xs font-semibold tracking-wide mb-5">
-                <BarChart3 className="w-3.5 h-3.5" />
-                {MARKETWATCH.status}
-              </div>
-              <h2 className="text-2xl lg:text-4xl font-bold tracking-tight bg-gradient-to-b from-white to-[#bcd6ff] bg-clip-text text-transparent">
-                {MARKETWATCH.name}
-              </h2>
-              <p className="mt-2 text-[#bcd6ff] font-medium">{MARKETWATCH.tagline}</p>
-              <p className="mt-4 text-sm text-[#8A96B0] leading-relaxed">
-                {MARKETWATCH.shortDescription}
-              </p>
-              <div className="mt-5 flex items-start gap-2 rounded-lg border border-[#5e9bf8]/20 bg-[#0B1122]/60 p-3.5">
-                <ShieldCheck className="w-4 h-4 text-[#5e9bf8] mt-0.5 shrink-0" />
-                <p className="text-xs text-[#94a3b8] leading-relaxed">
-                  {MARKETWATCH.guardrail}
-                </p>
-              </div>
-            </div>
-            <div className="grid sm:grid-cols-2 gap-3 lg:order-1">
-              {MARKETWATCH.features.slice(0, 6).map((feat) => (
-                <div
-                  key={feat.title}
-                  className="relative rounded-xl border border-[#1C253B] bg-[#0B1122]/60 p-4"
-                >
-                  <Lock className="absolute top-3 right-3 w-3.5 h-3.5 text-[#4A5678]" />
-                  <div className="flex items-center gap-2 mb-1.5 pr-5">
-                    <TrendingUp className="w-3.5 h-3.5 text-[#5e9bf8] shrink-0" />
-                    <h3 className="text-xs font-semibold text-white leading-tight">
-                      {feat.title}
-                    </h3>
-                  </div>
-                  <p className="text-[11px] text-[#8A96B0] leading-relaxed">
-                    {feat.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Walkthrough */}

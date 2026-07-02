@@ -214,7 +214,7 @@ export default function VideoWithControls() {
       <VideoTemplate
         key={mountKey}
         durations={durations}
-        loop
+        loop={false}
         muted={muted}
         onSceneChange={onSceneChange}
       />

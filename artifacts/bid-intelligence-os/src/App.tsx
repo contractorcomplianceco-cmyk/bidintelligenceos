@@ -30,6 +30,9 @@ import BidDna from "@/pages/bid-dna";
 import AddOns from "@/pages/add-ons";
 import VideoConnect from "@/pages/video-connect";
 import MarketWatch from "@/pages/market-watch";
+import BuildConnect from "@/pages/build-connect";
+import ComplianceConnect from "@/pages/compliance-connect";
+import Government from "@/pages/government";
 import Risk from "@/pages/risk";
 import Closeout from "@/pages/closeout";
 import BusinessProfile from "@/pages/business-profile";
@@ -88,6 +91,9 @@ function Router() {
       <Route path="/add-ons" component={AddOns} />
       <Route path="/video-connect" component={VideoConnect} />
       <Route path="/market-watch" component={MarketWatch} />
+      <Route path="/build-connect" component={BuildConnect} />
+      <Route path="/compliance-connect" component={ComplianceConnect} />
+      <Route path="/government" component={Government} />
 
       {/* Account */}
       <Route path="/business-profile" component={BusinessProfile} />

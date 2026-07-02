@@ -144,3 +144,63 @@ id = "CqEEeGjPO7Fg4WEkggjIg"
 uri = "file://attached_assets/generated_audio/bios_music_bed.mp3"
 type = "audio"
 title = "bios walkthrough music bed"
+
+[[outputs]]
+id = "FSMAoas3udaJB7-qqfuTF"
+uri = "file://attached_assets/generated_audio/vo_v3_s1_hook.mp3"
+type = "audio"
+title = "v3 s1_hook"
+
+[[outputs]]
+id = "X7XuwRDZ4z3ElR8bbe08J"
+uri = "file://attached_assets/generated_audio/vo_v3_s2_capture.mp3"
+type = "audio"
+title = "v3 s2_capture"
+
+[[outputs]]
+id = "tJNH4C4JlosD_YUUfHpfP"
+uri = "file://attached_assets/generated_audio/vo_v3_s3_bidintel.mp3"
+type = "audio"
+title = "v3 s3_bidintel"
+
+[[outputs]]
+id = "xnX88zMY24xLwo3isSus7"
+uri = "file://attached_assets/generated_audio/vo_v3_s4_package.mp3"
+type = "audio"
+title = "v3 s4_package"
+
+[[outputs]]
+id = "p7xf2CJurXdUMa11Dg003"
+uri = "file://attached_assets/generated_audio/vo_v3_s5_won.mp3"
+type = "audio"
+title = "v3 s5_won"
+
+[[outputs]]
+id = "8CBjVVJ7d5a0RKbw2fPR2"
+uri = "file://attached_assets/generated_audio/vo_v3_s6_execution.mp3"
+type = "audio"
+title = "v3 s6_execution"
+
+[[outputs]]
+id = "fTFC8hTLjWJYpu8oBTFv8"
+uri = "file://attached_assets/generated_audio/vo_v3_s7_risk.mp3"
+type = "audio"
+title = "v3 s7_risk"
+
+[[outputs]]
+id = "1CBap1DCO_p3kXaUPcSQp"
+uri = "file://attached_assets/generated_audio/vo_v3_s8_gov.mp3"
+type = "audio"
+title = "v3 s8_gov"
+
+[[outputs]]
+id = "wM7EPboPCNWzh31SCRvt-"
+uri = "file://attached_assets/generated_audio/vo_v3_s9_market.mp3"
+type = "audio"
+title = "v3 s9_market"
+
+[[outputs]]
+id = "p2owr6E0JohC8gNOx1QV_"
+uri = "file://attached_assets/generated_audio/vo_v3_s10_closing.mp3"
+type = "audio"
+title = "v3 s10_closing"

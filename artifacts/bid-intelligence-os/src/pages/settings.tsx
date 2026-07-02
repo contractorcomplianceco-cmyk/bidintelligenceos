@@ -8,12 +8,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings as SettingsIcon, User, Bell, DownloadCloud, Building2, MapPin, Wrench, Save, FileCheck, Blocks, Network, ArrowRight, Check } from "lucide-react";
+import { Settings as SettingsIcon, User, Bell, DownloadCloud, Building2, MapPin, Wrench, Save, FileCheck, Blocks, Network, ArrowRight, Check, Palette, Globe, Users, ShieldCheck, Sparkles, UserPlus, Layers } from "lucide-react";
 import { useAppContext } from "@/lib/context";
 import { VERTICALS } from "@/lib/verticals";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import {
+  BRAND_COLORS,
+  ENTERPRISE_LOCATIONS,
+  ENTERPRISE_PERMISSIONS,
+  ENTERPRISE_ROLES,
+} from "@/lib/enterprise";
 
 export default function Settings() {
   const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
+  const { toast } = useToast();
+
+  const [brandColor, setBrandColor] = useState(BRAND_COLORS[0].hex);
+  const [productName, setProductName] = useState("BidIntelligenceOS");
+  const [customDomain, setCustomDomain] = useState("bids.yourcompany.com");
+  const [rollupEnabled, setRollupEnabled] = useState(true);
+  const [regionalSegmentation, setRegionalSegmentation] = useState(false);
 
   return (
     <Layout>
@@ -31,6 +46,7 @@ export default function Settings() {
             <TabsTrigger value="profile" className="data-[state=active]:bg-[#E2E8F0] data-[state=active]:text-slate-900">Company Profile</TabsTrigger>
             <TabsTrigger value="addon" className="data-[state=active]:bg-[#E2E8F0] data-[state=active]:text-slate-900">ContractorConnect</TabsTrigger>
             <TabsTrigger value="preferences" className="data-[state=active]:bg-[#E2E8F0] data-[state=active]:text-slate-900">App Preferences</TabsTrigger>
+            <TabsTrigger value="enterprise" className="data-[state=active]:bg-[#E2E8F0] data-[state=active]:text-slate-900">Enterprise & White Label</TabsTrigger>
           </TabsList>
 
           {/* Company Profile Tab */}
@@ -334,6 +350,318 @@ export default function Settings() {
                       <SelectItem value="90" className="focus:bg-[#E2E8F0] focus:text-slate-900 cursor-pointer">90 Days</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Enterprise & White Label Tab */}
+          <TabsContent value="enterprise" className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+                  <Sparkles className="h-6 w-6 text-[#0284C7]" />
+                  Enterprise & White Label
+                </h3>
+                <p className="text-slate-500 mt-1">
+                  Branding, multi-location rollups, and role-based access. These are prototype controls for
+                  demonstration — decision-support only, with human review before anything ships.
+                </p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 self-start rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
+                <Sparkles className="h-3.5 w-3.5" /> Enterprise plan
+              </span>
+            </div>
+
+            {/* White Labeling */}
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                  <Palette className="h-5 w-5 text-[#0284C7]" />
+                  White Labeling
+                </CardTitle>
+                <CardDescription className="text-slate-500">
+                  Apply your own brand across the workspace and client-facing exports.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6 pt-6">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-3">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Company Logo</Label>
+                    <div className="flex items-center gap-4 rounded-xl border border-[#E2E8F0] bg-[#F1F5F9] p-4">
+                      <div
+                        className="flex h-14 w-14 items-center justify-center rounded-lg text-white font-bold text-lg shrink-0"
+                        style={{ backgroundColor: brandColor }}
+                      >
+                        AC
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-slate-700">Brand mark preview</p>
+                        <p className="text-xs text-slate-500">Mock swatch — upload disabled in prototype.</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="ml-auto border-[#CBD5E1] bg-white text-slate-700 hover:bg-[#F1F5F9]"
+                        onClick={() =>
+                          toast({
+                            title: "Logo upload (prototype)",
+                            description: "Branding assets are illustrative in this demo.",
+                          })
+                        }
+                      >
+                        Upload
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Brand Color</Label>
+                    <div className="flex flex-wrap gap-2 rounded-xl border border-[#E2E8F0] bg-[#F1F5F9] p-4">
+                      {BRAND_COLORS.map((c) => {
+                        const active = c.hex === brandColor;
+                        return (
+                          <button
+                            key={c.id}
+                            title={c.label}
+                            onClick={() => setBrandColor(c.hex)}
+                            className={`h-9 w-9 rounded-full border-2 transition-all ${
+                              active ? "border-slate-900 scale-110 shadow-sm" : "border-white hover:scale-105"
+                            }`}
+                            style={{ backgroundColor: c.hex }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="productName" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      Product Name Override
+                    </Label>
+                    <Input
+                      id="productName"
+                      value={productName}
+                      onChange={(e) => setProductName(e.target.value)}
+                      className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium"
+                    />
+                    <p className="text-xs text-slate-500">Replaces the product name shown to your team and clients.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="customDomain" className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                      <Globe className="w-3.5 h-3.5" /> Custom Domain
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="customDomain"
+                        value={customDomain}
+                        onChange={(e) => setCustomDomain(e.target.value)}
+                        className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium"
+                      />
+                      <Button
+                        className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold shrink-0"
+                        onClick={() =>
+                          toast({
+                            title: "Domain verification queued (prototype)",
+                            description: `We'd check DNS for ${customDomain}. No changes are persisted in this demo.`,
+                          })
+                        }
+                      >
+                        Verify
+                      </Button>
+                    </div>
+                    <p className="text-xs text-slate-500">Mock DNS check — no records are modified.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Multi-location / Franchise */}
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                      <Building2 className="h-5 w-5 text-[#0284C7]" />
+                      Multi-Location & Franchise
+                    </CardTitle>
+                    <CardDescription className="text-slate-500">
+                      Sample locations and regions. Figures are illustrative for review, not guaranteed outcomes.
+                    </CardDescription>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <Label htmlFor="rollup" className="text-sm font-semibold text-slate-700">Portfolio rollup</Label>
+                    <Switch
+                      id="rollup"
+                      checked={rollupEnabled}
+                      onCheckedChange={setRollupEnabled}
+                      className="data-[state=checked]:bg-[#38BDF8]"
+                    />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-3">
+                {rollupEnabled && (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3">
+                      <p className="text-xs text-slate-500">Total active bids</p>
+                      <p className="text-xl font-bold text-slate-900">
+                        {ENTERPRISE_LOCATIONS.reduce((s, l) => s + l.activeBids, 0)}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3">
+                      <p className="text-xs text-slate-500">Locations</p>
+                      <p className="text-xl font-bold text-slate-900">{ENTERPRISE_LOCATIONS.length}</p>
+                    </div>
+                    <div className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3">
+                      <p className="text-xs text-slate-500">Avg win rate</p>
+                      <p className="text-xl font-bold text-[#0284C7]">
+                        {Math.round(
+                          ENTERPRISE_LOCATIONS.reduce((s, l) => s + l.winRatePct, 0) /
+                            ENTERPRISE_LOCATIONS.length,
+                        )}
+                        %
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {ENTERPRISE_LOCATIONS.map((loc) => (
+                    <div
+                      key={loc.id}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-white p-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-[180px]">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F1F5F9] text-[#0284C7]">
+                          <MapPin className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">{loc.name}</p>
+                          <p className="text-xs text-slate-500">{loc.region}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-5 text-sm">
+                        <div className="text-right">
+                          <p className="text-slate-500 text-xs">Active bids</p>
+                          <p className="font-semibold text-slate-700">{loc.activeBids}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-slate-500 text-xs">Win rate</p>
+                          <p className="font-semibold text-slate-700">{loc.winRatePct}%</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-slate-500 text-xs">Pipeline</p>
+                          <p className="font-semibold text-slate-700">{loc.pipelineLabel}</p>
+                        </div>
+                        <span
+                          className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
+                            loc.status === "active"
+                              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}
+                        >
+                          {loc.status === "active" ? "Active" : "Onboarding"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Role-based access */}
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                      <ShieldCheck className="h-5 w-5 text-[#0284C7]" />
+                      Role-Based Access
+                    </CardTitle>
+                    <CardDescription className="text-slate-500">
+                      Seeded roles and permissions. Access is enforced with human review of approvals.
+                    </CardDescription>
+                  </div>
+                  <Button
+                    className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold shrink-0"
+                    onClick={() =>
+                      toast({
+                        title: "Invite sent (prototype)",
+                        description: "User invitations are simulated in this demo — nothing is persisted.",
+                      })
+                    }
+                  >
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Invite user
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-3">
+                {ENTERPRISE_ROLES.map((role) => (
+                  <div key={role.id} className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-slate-500" />
+                        <p className="text-sm font-semibold text-slate-900">{role.name}</p>
+                        <span className="text-xs text-slate-500">· {role.members} members</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">{role.description}</p>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {ENTERPRISE_PERMISSIONS.map((perm) => {
+                        const granted = role.permissions.includes(perm.id);
+                        return (
+                          <span
+                            key={perm.id}
+                            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+                              granted
+                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                : "bg-white text-slate-400 border-[#E2E8F0]"
+                            }`}
+                          >
+                            {granted && <Check className="h-3 w-3" />}
+                            {perm.label}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            {/* Regional segmentation */}
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F1F5F9] text-[#0284C7] shrink-0">
+                      <Layers className="h-4 w-4" />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="regional" className="text-sm font-semibold text-slate-700">
+                        Regional segmentation
+                      </Label>
+                      <p className="text-sm text-slate-500 leading-relaxed">
+                        Scope dashboards, pipelines, and alerts by region. Signals are drawn only from lawful,
+                        public data and surfaced for human review.
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="regional"
+                    checked={regionalSegmentation}
+                    onCheckedChange={(v) => {
+                      setRegionalSegmentation(v);
+                      toast({
+                        title: v ? "Regional segmentation on (prototype)" : "Regional segmentation off",
+                        description: "Preference is local to this demo session only.",
+                      });
+                    }}
+                    className="data-[state=checked]:bg-[#38BDF8]"
+                  />
                 </div>
               </CardContent>
             </Card>

@@ -12,6 +12,7 @@ import {
   Sparkles,
   ShieldCheck,
   Plug,
+  Network,
   type LucideIcon,
 } from "lucide-react";
 
@@ -20,6 +21,8 @@ const ICONS: Record<string, LucideIcon> = {
   video: Video,
   crosshair: Crosshair,
   "line-chart": LineChart,
+  network: Network,
+  "shield-check": ShieldCheck,
 };
 
 function StatusChip({ status }: { status: AddOn["status"] }) {

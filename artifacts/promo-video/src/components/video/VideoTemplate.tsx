@@ -14,28 +14,28 @@ import { Scene9 } from './video_scenes/Scene9';
 import { Scene10 } from './video_scenes/Scene10';
 
 export const SCENE_DURATIONS = {
-  hook: 8000,
-  voiceconnect: 13000,
+  hook: 6500,
+  capture: 10000,
   bid_intel: 10000,
-  bid_package: 10000,
-  deployment: 10000,
-  execution: 9000,
-  briefings: 8000,
-  industry: 13000,
-  competitor: 8000,
-  closing: 9000,
+  bid_package: 9000,
+  deployment: 15000,
+  execution: 15000,
+  risk: 10000,
+  government: 10000,
+  market: 10000,
+  closing: 10500,
 };
 
 const SCENE_COMPONENTS: Record<string, ComponentType> = {
   hook: Scene1,
-  voiceconnect: Scene2,
+  capture: Scene2,
   bid_intel: Scene3,
   bid_package: Scene4,
   deployment: Scene5,
   execution: Scene6,
-  briefings: Scene7,
-  industry: Scene8,
-  competitor: Scene9,
+  risk: Scene7,
+  government: Scene8,
+  market: Scene9,
   closing: Scene10,
 };
 
@@ -53,7 +53,7 @@ const AUDIO_SEEK_EPSILON_SEC = 0.18;
 
 export default function VideoTemplate({
   durations = SCENE_DURATIONS,
-  loop = true,
+  loop = false,
   muted = false,
   onSceneChange,
 }: {

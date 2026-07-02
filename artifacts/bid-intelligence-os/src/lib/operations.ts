@@ -578,7 +578,7 @@ export const dailyBriefing: DailyBriefing = {
   greeting: "Good morning, Jordan.",
   date: "Tuesday, July 1, 2025",
   summary:
-    "You have 3 bids needing follow-up, 2 jobs with weather risk, 1 permit blocking deployment, and 1 project trending under its labor budget.",
+    "You have 3 bids needing follow-up, 2 jobs with weather risk, 1 permit blocking deployment, and 1 project trending under its labor budget. MarketWatchOS is flagging fresh public-signal opportunities on the Opportunity Radar for review.",
   stats: [
     { label: "Bids to follow up", value: "3" },
     { label: "Jobs at weather risk", value: "2" },

@@ -22,6 +22,7 @@ import {
   type CrewStatus,
   type RiskBand,
 } from "@/lib/operations";
+import { radarAlerts } from "@/lib/market-watch";
 import { Link } from "wouter";
 import {
   AreaChart,
@@ -61,6 +62,8 @@ import {
   Crosshair,
   Mic,
   Radio,
+  Radar,
+  Flame,
 } from "lucide-react";
 
 const severityColor: Record<AlertSeverity, string> = {
@@ -534,6 +537,97 @@ export default function CommandCenter() {
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Opportunity Radar — MarketWatchOS connected add-on */}
+        <Card className="bg-white border-[#E2E8F0] shadow-sm overflow-hidden">
+          <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex-shrink-0">
+                <Radar className="w-4 h-4 text-[#B45309]" />
+              </span>
+              <div className="min-w-0">
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2 flex-wrap">
+                  OPPORTUNITY RADAR
+                  <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded-full bg-amber-50 text-[#B45309] border border-amber-200">
+                    <Radio className="w-2.5 h-2.5" />
+                    Connected add-on
+                  </span>
+                </CardTitle>
+                <p className="text-[10px] text-slate-500 mt-0.5">
+                  Top public-signal opportunities from MarketWatchOS
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/market-watch"
+              className="text-xs text-[#B45309] hover:text-slate-900 transition-colors flex items-center gap-1 font-medium flex-shrink-0"
+            >
+              Open MarketWatchOS <ArrowRight className="w-3 h-3" />
+            </Link>
+          </CardHeader>
+          <CardContent className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+              {[...radarAlerts]
+                .sort((a, b) => b.opportunityScore - a.opportunityScore)
+                .slice(0, 3)
+                .map((alert) => {
+                  const levelDot =
+                    alert.level === "critical-window"
+                      ? "#EF4444"
+                      : alert.level === "high"
+                      ? "#22C55E"
+                      : "#F59E0B";
+                  const levelLabel =
+                    alert.level === "critical-window"
+                      ? "Critical bid window"
+                      : alert.level === "high"
+                      ? "High opportunity"
+                      : "Medium";
+                  const scoreCol =
+                    alert.opportunityScore >= 85
+                      ? "#EF4444"
+                      : alert.opportunityScore >= 75
+                      ? "#F59E0B"
+                      : "#0284C7";
+                  return (
+                    <Link key={alert.id} href="/market-watch">
+                      <div className="h-full rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3 hover:border-amber-300 transition-colors cursor-pointer">
+                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                          <span className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-slate-500">
+                            <span
+                              className="w-2 h-2 rounded-full"
+                              style={{ backgroundColor: levelDot }}
+                            />
+                            {levelLabel}
+                          </span>
+                          <span
+                            className="text-lg font-bold tabular-nums leading-none"
+                            style={{ color: scoreCol }}
+                          >
+                            {alert.opportunityScore}
+                          </span>
+                        </div>
+                        <p className="text-[11px] font-semibold text-slate-900 leading-snug line-clamp-2">
+                          {alert.title}
+                        </p>
+                        <div className="flex items-center gap-1.5 mt-2 text-[9px] font-medium text-slate-500">
+                          <Flame className="w-2.5 h-2.5 text-amber-600" />
+                          <span className="truncate">
+                            {alert.trade} · {alert.region}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+            </div>
+            <p className="text-[10px] text-slate-500 mt-3 flex items-center gap-1.5">
+              <ShieldCheck className="w-3 h-3 text-[#0284C7]" />
+              Lawful, public signals only — decision-support scoring requiring review before you
+              commit bid resources.
+            </p>
           </CardContent>
         </Card>
 

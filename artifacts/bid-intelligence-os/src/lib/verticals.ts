@@ -11,6 +11,7 @@ export type VerticalId =
   | "specialty"
   | "insurance"
   | "engineering"
+  | "government"
   | "custom";
 
 export interface VerticalConfig {
@@ -292,6 +293,35 @@ export const VERTICALS: VerticalConfig[] = [
     bidFields: ["Project Type", "Quantity", "Location", "Bid Due Date", "Contract Type"],
   },
 ];
+
+export const GOVERNMENT_VERTICAL: VerticalConfig = {
+  id: "government",
+  name: "Government Contracting",
+  short: "GOV",
+  tagline: "Federal, state, and municipal contract pursuit and delivery.",
+  jobPhases: [
+    "Opportunity Review",
+    "Eligibility Validation",
+    "Proposal Development",
+    "Submission",
+    "Award & Kickoff",
+    "Performance Period",
+    "Reporting & Compliance",
+    "Closeout & CPARS",
+  ],
+  costCategories: ["Direct Labor", "Subcontractors", "Materials", "Travel", "Overhead & G&A", "Bonding & Insurance"],
+  laborCategories: ["Program Manager", "Contracts Administrator", "Site Superintendent", "Quality Control", "Safety Officer"],
+  subCategories: ["Small Business Subs", "Set-Aside Partners", "Specialty Trades", "Logistics", "Testing & Inspection"],
+  permitNeeds: ["SAM Registration", "Capability Statement", "W-9 / EIN Verification", "Bonding Documentation", "Insurance Certificates"],
+  weatherSensitive: true,
+  weatherNote: "Period-of-performance schedules leave little float for weather delays; document all impacts.",
+  roiMetrics: ["Contract Margin", "Cost Variance vs Baseline", "On-Time Milestones", "CPARS Rating"],
+  proposalSections: ["Cover & Compliance Matrix", "Technical Approach", "Past Performance", "Staffing Plan", "Pricing Volume", "Certifications"],
+  alertTypes: ["SAM expiration", "Submission deadlines", "Compliance gaps", "Reporting due dates", "Modification actions"],
+  bidFields: ["Solicitation Number", "Set-Aside Type", "NAICS Code", "Response Deadline", "Bond Required"],
+};
+
+VERTICALS.push(GOVERNMENT_VERTICAL);
 
 export const DEFAULT_VERTICAL: VerticalId = "gc";
 

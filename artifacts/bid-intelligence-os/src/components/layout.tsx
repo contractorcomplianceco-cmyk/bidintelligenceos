@@ -33,6 +33,8 @@ import {
   Video,
   Blocks,
   Globe,
+  Network,
+  Landmark,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
@@ -79,6 +81,7 @@ const navGroups: NavGroup[] = [
       { href: "/bids", label: "Bid Intelligence", icon: Radar },
       { href: "/package-builder", label: "Bid Package Builder", icon: PackageOpen },
       { href: "/won-jobs", label: "Won Jobs", icon: Trophy },
+      { href: "/government", label: "Government Contracting", icon: Landmark, badge: "GOV" },
     ],
   },
   {
@@ -108,8 +111,10 @@ const navGroups: NavGroup[] = [
       { href: "/add-ons", label: "Add-On Marketplace", icon: Blocks },
       { href: "/voice-connect", label: "VoiceConnect", icon: AudioLines },
       { href: "/video-connect", label: "VideoConnect", icon: Video },
+      { href: "/build-connect", label: "BuildConnect", icon: Network },
+      { href: "/compliance-connect", label: "ComplianceConnect", icon: ShieldCheck },
+      { href: "/market-watch", label: "MarketWatchOS", icon: Globe },
       { href: "/competitor-watch", label: "CompetitorWatchOS", icon: Crosshair, badge: "Soon" },
-      { href: "/market-watch", label: "MarketWatchOS", icon: Globe, badge: "Soon" },
     ],
   },
   {
