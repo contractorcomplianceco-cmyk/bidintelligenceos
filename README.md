@@ -131,12 +131,20 @@ server {
 }
 ```
 
-### 4. Process manager (PM2 example)
+### 4. Process manager (PM2 — use the repo config)
 
 ```bash
 npm install -g pm2
+./deploy/deploy.sh
+```
+
+This builds the SPA, starts `bid-intelligence-os` on port **5001**, and runs `pm2 save` so the process survives reboots (systemd `pm2-ubuntu` is already enabled on the server).
+
+Manual start:
+
+```bash
 npm run build
-pm2 start npm --name bidintelligence -- run start
+pm2 start deploy/ecosystem.config.cjs
 pm2 save
 ```
 
