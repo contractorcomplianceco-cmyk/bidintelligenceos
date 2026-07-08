@@ -8,6 +8,7 @@ import { nextId, nowIso } from "../../lib/ids.js";
 import { getBidDocumentContext } from "../../lib/document-context.js";
 import { generateScopeAnalysis } from "../../lib/rose-ai-engine.js";
 import { buildLiveRoseInsights, executivePosture } from "../../lib/rose-insights.js";
+import { generateRoseExecutiveBrief, isRoseBrainEnabled } from "../../lib/rose-brain.js";
 import { parseVoiceTranscriptToBid } from "../../lib/voice-bid-parser.js";
 import { requireAuth, type AuthedRequest } from "../../middleware/auth.js";
 import { orgScopeMiddleware } from "../../middleware/org-scope.js";
@@ -199,6 +200,42 @@ router.get("/roseos/summary", async (req, res) => {
 
   const verdict = insights.length > 0 ? executivePosture(insights) : overdue.length > 2 ? "red" : active.length > 5 ? "yellow" : "green";
 
+  const insightCards =
+    insights.length > 0
+      ? insights.map((i) => ({
+          id: i.id,
+          title: i.title,
+          verdict: i.verdict,
+          summary: i.rationale,
+          recommendation: i.recommendation,
+          href: i.href,
+          humanReviewed: i.humanReviewed,
+          section: i.section,
+        }))
+      : [
+          {
+            id: "rose-fallback",
+            title: "Pipeline follow-up pressure",
+            verdict,
+            summary:
+              overdue.length > 0
+                ? `${overdue.length} bid(s) need follow-up action this week.`
+                : "Follow-up queue is within normal range.",
+            humanReviewed: true,
+          },
+        ];
+
+  const executiveBrief = await generateRoseExecutiveBrief({
+    activeBids: active.length,
+    overdueFollowUps: overdue.length,
+    pendingHumanReview: insights.filter((i) => !i.humanReviewed).length,
+    topInsights: insightCards.slice(0, 5).map((i) => ({
+      title: i.title,
+      verdict: i.verdict,
+      rationale: i.summary,
+    })),
+  });
+
   res.json({
     verdict,
     stats: {
@@ -207,30 +244,9 @@ router.get("/roseos/summary", async (req, res) => {
       totalBids: bidRows.length,
       pendingHumanReview: insights.filter((i) => !i.humanReviewed).length,
     },
-    insights:
-      insights.length > 0
-        ? insights.map((i) => ({
-            id: i.id,
-            title: i.title,
-            verdict: i.verdict,
-            summary: i.rationale,
-            recommendation: i.recommendation,
-            href: i.href,
-            humanReviewed: i.humanReviewed,
-            section: i.section,
-          }))
-        : [
-            {
-              id: "rose-fallback",
-              title: "Pipeline follow-up pressure",
-              verdict,
-              summary:
-                overdue.length > 0
-                  ? `${overdue.length} bid(s) need follow-up action this week.`
-                  : "Follow-up queue is within normal range.",
-              humanReviewed: true,
-            },
-          ],
+    executiveBrief,
+    roseBrain: isRoseBrainEnabled(),
+    insights: insightCards,
     guardrail: "Powered by AI. Reviewed by humans required before client-facing use.",
   });
 });

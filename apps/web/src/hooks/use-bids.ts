@@ -97,8 +97,10 @@ export function useRoseOsSummary() {
       if (!live) return null;
       return apiFetch<{
         verdict: string;
-        stats: { activeBids: number; overdueFollowUps: number; totalBids: number };
-        insights: { id: string; title: string; verdict: string; summary: string }[];
+        roseBrain?: boolean;
+        executiveBrief?: { headline: string; narrative: string; priorities: string[]; engine: string };
+        stats: { activeBids: number; overdueFollowUps: number; totalBids: number; pendingHumanReview?: number };
+        insights: { id: string; title: string; verdict: string; summary: string; recommendation?: string }[];
       }>("/api/v1/intelligence/roseos/summary");
     },
     enabled: live,

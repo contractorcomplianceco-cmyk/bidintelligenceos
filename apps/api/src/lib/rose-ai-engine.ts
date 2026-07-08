@@ -1,4 +1,5 @@
 import { computeComplianceEligibility } from "./compliance-eligibility.js";
+import { roseBrainComplete, isRoseBrainEnabled } from "./rose-brain.js";
 import { parseStateFromLocation } from "./state-parse.js";
 
 export type ScopeRfi = { title: string; detail: string; severity: "high" | "medium" };
@@ -246,39 +247,20 @@ export async function runRoseScopeAnalysis(bid: BidContext): Promise<ScopeAnalys
 }
 
 async function tryOpenAiEnhance(bid: BidContext, base: ScopeAnalysisPayload): Promise<ScopeAnalysisPayload> {
-  const apiKey = process.env.BIOS_OPENAI_API_KEY ?? process.env.OPENAI_API_KEY;
-  if (!apiKey) return base;
+  if (!isRoseBrainEnabled()) return base;
 
-  const model = process.env.BIOS_OPENAI_MODEL ?? "gpt-4o-mini";
-  const prompt = `You are ROSEOS, CCA's executive bid intelligence layer. Rewrite ONLY the narrative fields as JSON.
+  const raw = await roseBrainComplete({
+    context: `Rewrite ONLY narrative fields as JSON.
 Bid: ${JSON.stringify(bid)}
-Base analysis: ${JSON.stringify({ roseVerdict: base.roseVerdict, risks: base.risks.map((r) => r.label) })}
+Base: ${JSON.stringify({ roseVerdict: base.roseVerdict, risks: base.risks.map((r) => r.label) })}
 Return JSON: {"roseNarrative":"...","recommendedActions":["..."],"deliverables":"..."}
-Keep decision-support tone. No guarantees. Under 120 words for narrative.`;
+Under 120 words for narrative. Decision-support only.`,
+    maxTokens: 500,
+  });
+  if (!raw) return base;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.3,
-        max_tokens: 500,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: "Executive construction bid intelligence. JSON only." },
-          { role: "user", content: prompt },
-        ],
-      }),
-    });
-    if (!response.ok) return base;
-    const data = (await response.json()) as { choices?: { message?: { content?: string } }[] };
-    const content = data.choices?.[0]?.message?.content;
-    if (!content) return base;
-    const parsed = JSON.parse(content) as Partial<ScopeAnalysisPayload>;
+    const parsed = JSON.parse(raw) as Partial<ScopeAnalysisPayload>;
     return {
       ...base,
       roseNarrative: parsed.roseNarrative ?? base.roseNarrative,

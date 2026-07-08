@@ -62,10 +62,13 @@ export default function RoseOs() {
   const { data: liveRose } = useRoseOsSummary();
   const [filter, setFilter] = useState<VerdictFilter>("all");
 
-  const headline = live && liveRose
-    ? liveRose.insights[0]?.summary ?? executiveSummary.headline
-    : executiveSummary.headline;
+  const headline = live && liveRose?.executiveBrief?.headline
+    ? liveRose.executiveBrief.headline
+    : live && liveRose
+      ? liveRose.insights[0]?.summary ?? executiveSummary.headline
+      : executiveSummary.headline;
   const posture = (live && liveRose ? liveRose.verdict : executiveSummary.posture) as Verdict;
+  const brainNarrative = live && liveRose?.executiveBrief?.narrative;
 
   const filtered = (items: typeof roseInsights) =>
     filter === "all" ? items : items.filter((i) => i.verdict === filter);
@@ -205,8 +208,11 @@ export default function RoseOs() {
               {headline}
             </h2>
             <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-4xl">
-              {executiveSummary.narrative}
+              {brainNarrative ?? executiveSummary.narrative}
             </p>
+            {live && liveRose?.roseBrain && (
+              <p className="text-[10px] text-slate-400 mt-2">Rose Brain active — human review required before client use.</p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5">
               {executiveSummary.priorities.map((p) => (
                 <Link key={p.id} href={p.href}>

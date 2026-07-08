@@ -5,6 +5,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { clerkMiddleware } from "@clerk/express";
 import { dbHealth, getDb } from "./db/client.js";
+import { isRoseBrainEnabled } from "./lib/rose-brain.js";
 import { isClerkAuthEnabled } from "./lib/clerk-config.js";
 import v1Routes from "./routes/v1/index.js";
 
@@ -55,6 +56,7 @@ app.get("/api/health", (_req, res) => {
     auth: isClerkAuthEnabled() ? "clerk" : "legacy",
     storage: process.env.BIOS_S3_BUCKET ? "s3" : "local",
     auditEngine: Boolean(process.env.AUDIT_ENGINE_API_URL?.trim() || process.env.CCA_AUDIT_API_URL?.trim()),
+    roseBrain: isRoseBrainEnabled(),
     database: db,
     note: isProd
       ? "Serving built frontend and API from a single process."
