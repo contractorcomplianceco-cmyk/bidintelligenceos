@@ -1,11 +1,12 @@
 import { SignIn } from "@clerk/clerk-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth-context";
-import { isClerkFrontendEnabled } from "@/lib/clerk-root";
+import { clerkAppUrl, clerkSignInUrl, isClerkFrontendEnabled, usesHostedAccountPortal } from "@/lib/clerk-root";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 import logo from "@/assets/bidintelligence-logo.png";
 
 export default function Login() {
@@ -15,6 +16,20 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isClerkFrontendEnabled() || !usesHostedAccountPortal()) return;
+    const returnUrl = encodeURIComponent(clerkAppUrl() || window.location.origin);
+    window.location.replace(`${clerkSignInUrl()}?redirect_url=${returnUrl}`);
+  }, []);
+
+  if (isClerkFrontendEnabled() && usesHostedAccountPortal()) {
+    return (
+      <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6 text-slate-300">
+        <Loader2 className="w-6 h-6 animate-spin mr-2" /> Redirecting to CCA sign in…
+      </div>
+    );
+  }
 
   if (isClerkFrontendEnabled()) {
     return (

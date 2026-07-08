@@ -49,7 +49,11 @@ lines = upsertEnv(lines, "CLERK_SECRET_KEY", sk);
 lines = upsertEnv(lines, "CLERK_PUBLISHABLE_KEY", pk);
 lines = upsertEnv(lines, "VITE_CLERK_PUBLISHABLE_KEY", pk);
 lines = upsertEnv(lines, "ADMIN_EMAILS", "contractorcomplianceco@gmail.com,carmenaburoda@gmail.com");
-lines = upsertEnv(lines, "CORS_ORIGIN", "https://ccabidintelligence.com");
+lines = upsertEnv(lines, "CORS_ORIGIN", "https://bidintelligence.docs.cagteam.net");
+lines = upsertEnv(lines, "BIOS_PUBLIC_URL", "https://bidintelligence.docs.cagteam.net");
+lines = upsertEnv(lines, "VITE_APP_URL", "https://bidintelligence.docs.cagteam.net");
+lines = upsertEnv(lines, "VITE_CLERK_SIGN_IN_URL", "https://accounts.docs.cagteam.net/sign-in");
+lines = upsertEnv(lines, "VITE_CLERK_SIGN_UP_URL", "https://accounts.docs.cagteam.net/sign-up");
 
 fs.writeFileSync(biosEnv, lines.filter((l, i, a) => !(i === a.length - 1 && l === "")).join("\n") + "\n");
 console.log("OK: Clerk keys synced to bid-intelligence-os/.env (AUTH_ENABLED=true)");
