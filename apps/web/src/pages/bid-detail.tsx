@@ -18,8 +18,13 @@ import {
   ShieldCheck,
   Pencil,
 } from "lucide-react";
-import { seedBids, bidDetails, documentReadiness, competitorSignals } from "@core/data";
+import { bidDetails, documentReadiness, competitorSignals } from "@core/data";
 import { useToast } from "@/hooks/use-toast";
+import { useBid } from "@/hooks/use-bids";
+import { useLiveData } from "@/lib/data-mode";
+import { useAuth } from "@/lib/auth-context";
+import { BidIntelligencePanel } from "@/components/bid-intelligence-panel";
+import { BidDocumentsPanel } from "@/components/bid-documents-panel";
 
 const COST_TEMPLATE = [
   { label: "Equipment & Materials", pct: 0.43 },
@@ -40,10 +45,20 @@ export default function BidDetail() {
   const params = useParams();
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  const bid = seedBids.find((b) => b.id === params.id);
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: bid, isLoading } = useBid(params.id);
   const detail = bid ? bidDetails[bid.id] : undefined;
 
-  if (!bid || !detail) {
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="max-w-xl mx-auto text-center py-24 text-slate-500">Loading bid…</div>
+      </Layout>
+    );
+  }
+
+  if (!bid) {
     return (
       <Layout>
         <div className="max-w-xl mx-auto text-center py-24">
@@ -59,6 +74,35 @@ export default function BidDetail() {
       </Layout>
     );
   }
+
+  if (!live && !detail) {
+    return (
+      <Layout>
+        <div className="max-w-xl mx-auto text-center py-24">
+          <h2 className="text-2xl font-bold text-slate-900">Bid not found</h2>
+          <p className="text-slate-500 mt-2">This opportunity is no longer available.</p>
+          <Link
+            href="/bids"
+            className="inline-flex items-center gap-2 mt-6 text-[#0284C7] hover:text-slate-900 transition-colors font-medium"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Bids
+          </Link>
+        </div>
+      </Layout>
+    );
+  }
+
+  const displayDetail =
+    detail ??
+    ({
+      summary: (bid as { scopeSummary?: string }).scopeSummary ?? bid.notes ?? "Draft opportunity — add scope and run analysis.",
+      scopeItems: (bid as { scopeSummary?: string }).scopeSummary ? [(bid as { scopeSummary?: string }).scopeSummary!] : ["Scope pending"],
+      milestones: [{ label: "Draft saved", date: bid.date, status: "done" as const }],
+      contact: { name: bid.contactPerson ?? "TBD", role: "Contact", org: bid.recipient },
+      risks: bid.riskScore
+        ? [{ label: "Preliminary risk score", level: (bid.riskScore > 60 ? "High" : "Medium") as "High" | "Medium" }]
+        : [],
+    } as unknown as (typeof bidDetails)[string]);
 
   const costLines = COST_TEMPLATE.map((c) => ({
     label: c.label,
@@ -125,7 +169,7 @@ export default function BidDetail() {
                 <Pencil className="w-4 h-4" /> Edit
               </button>
               <button
-                onClick={() => navigate("/scope-analyzer")}
+                onClick={() => navigate(`/scope-analyzer?bidId=${bid.id}`)}
                 className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
               >
                 Open Analysis Workspace <ArrowRight className="w-4 h-4" />
@@ -147,6 +191,13 @@ export default function BidDetail() {
           ))}
         </div>
 
+        {live && (
+          <>
+            <BidDocumentsPanel bidId={bid.id} live={live} />
+            <BidIntelligencePanel mode="bid" bidId={bid.id} location={bid.location} live={live} />
+          </>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left column */}
           <div className="lg:col-span-2 space-y-6">
@@ -157,9 +208,9 @@ export default function BidDetail() {
                 <h3 className="text-sm font-bold text-slate-900 tracking-wide">SCOPE SUMMARY</h3>
               </div>
               <div className="p-5">
-                <p className="text-sm text-slate-700 leading-relaxed">{detail.summary}</p>
+                <p className="text-sm text-slate-700 leading-relaxed">{displayDetail.summary}</p>
                 <ul className="mt-4 space-y-2.5">
-                  {detail.scopeItems.map((item) => (
+                  {displayDetail.scopeItems.map((item) => (
                     <li key={item} className="flex items-start gap-2.5 text-sm text-slate-700">
                       <CheckCircle2 className="w-4 h-4 text-[#0284C7] shrink-0 mt-0.5" />
                       {item}
@@ -167,7 +218,7 @@ export default function BidDetail() {
                   ))}
                 </ul>
                 <Link
-                  href="/scope-analyzer"
+                  href={`/scope-analyzer?bidId=${bid.id}`}
                   className="inline-flex items-center gap-1.5 mt-5 text-xs text-[#0284C7] hover:text-slate-900 transition-colors font-medium"
                 >
                   Open full scope analysis <ArrowRight className="w-3.5 h-3.5" />
@@ -220,7 +271,7 @@ export default function BidDetail() {
               </div>
               <div className="p-5">
                 <ol className="space-y-4">
-                  {detail.milestones.map((m, i) => (
+                  {displayDetail.milestones.map((m, i) => (
                     <li key={m.label} className="flex items-start gap-3">
                       <div className="flex flex-col items-center">
                         {m.status === "done" ? (
@@ -232,7 +283,7 @@ export default function BidDetail() {
                         ) : (
                           <Circle className="w-5 h-5 text-slate-300" />
                         )}
-                        {i < detail.milestones.length - 1 && (
+                        {i < displayDetail.milestones.length - 1 && (
                           <div className="w-px h-6 bg-[#E2E8F0] mt-1" />
                         )}
                       </div>
@@ -258,9 +309,9 @@ export default function BidDetail() {
             {/* Owner contact */}
             <div className="rounded-xl border border-[#E2E8F0] bg-white p-5">
               <h3 className="text-sm font-bold text-slate-900 tracking-wide mb-3">OWNER CONTACT</h3>
-              <div className="text-sm font-semibold text-slate-900">{detail.contact.name}</div>
-              <div className="text-xs text-slate-500 mt-0.5">{detail.contact.role}</div>
-              <div className="text-xs text-slate-500">{detail.contact.org}</div>
+              <div className="text-sm font-semibold text-slate-900">{displayDetail.contact.name}</div>
+              <div className="text-xs text-slate-500 mt-0.5">{displayDetail.contact.role}</div>
+              <div className="text-xs text-slate-500">{displayDetail.contact.org}</div>
               {bid.nextAction && (
                 <div className="mt-4 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3">
                   <div className="text-[10px] uppercase tracking-widest text-slate-400">Next Action</div>
@@ -277,7 +328,7 @@ export default function BidDetail() {
                 <h3 className="text-sm font-bold text-slate-900 tracking-wide">RISK FLAGS</h3>
               </div>
               <div className="p-3">
-                {detail.risks.map((r) => {
+                {displayDetail.risks.map((r) => {
                   const c = levelColor(r.level);
                   return (
                     <div

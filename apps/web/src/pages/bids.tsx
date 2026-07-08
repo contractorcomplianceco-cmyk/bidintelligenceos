@@ -6,10 +6,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { seedBids } from "@core/data";
 import { activateOnKey } from "@shared/a11y";
 import { Search, Plus, UploadCloud, FolderKanban, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useBids } from "@/hooks/use-bids";
 
 export default function Bids() {
   const { toast } = useToast();
@@ -31,16 +31,18 @@ export default function Bids() {
     navigate("/new-bid");
   };
 
+  const { data: bids = [], isLoading } = useBids();
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return seedBids;
-    return seedBids.filter((b) =>
+    if (!q) return bids;
+    return bids.filter((b) =>
       [b.name, b.recipient, b.type, b.location, b.status]
         .join(" ")
         .toLowerCase()
         .includes(q)
     );
-  }, [query]);
+  }, [query, bids]);
 
   return (
     <Layout>

@@ -9,6 +9,7 @@ import {
   type JobStatus,
   type PermitStatus,
 } from "@core/operations";
+import { useJobs } from "@/hooks/use-jobs";
 import {
   Building2,
   MapPin,
@@ -83,10 +84,19 @@ function permitIcon(kind: string) {
 
 export default function Deployment() {
   const { toast } = useToast();
-  const [selectedId, setSelectedId] = useState<string>(jobDeployments[0].id);
+  const { data: jobs = jobDeployments } = useJobs();
+  const [selectedId, setSelectedId] = useState<string>(jobs[0]?.id ?? jobDeployments[0]?.id ?? "");
 
-  const job: JobDeployment =
-    jobDeployments.find((j) => j.id === selectedId) ?? jobDeployments[0];
+  const job: JobDeployment | undefined =
+    jobs.find((j) => j.id === selectedId) ?? jobs[0];
+
+  if (!job) {
+    return (
+      <Layout>
+        <div className="p-8 text-center text-slate-500">No jobs in deployment workspace yet.</div>
+      </Layout>
+    );
+  }
 
   const phases = useMemo(() => {
     const vp = getVertical(job.vertical).jobPhases;
@@ -121,7 +131,7 @@ export default function Deployment() {
           <div className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white shadow-sm px-4 py-2.5">
             <div className="text-center">
               <div className="text-lg font-bold text-slate-900 leading-none">
-                {jobDeployments.length}
+                {jobs.length}
               </div>
               <div className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">
                 Active Jobs
@@ -131,7 +141,7 @@ export default function Deployment() {
             <div className="text-center">
               <div className="text-lg font-bold text-[#22C55E] leading-none">
                 {moneyM(
-                  jobDeployments.reduce((s, j) => s + j.contractValue, 0)
+                  jobs.reduce((s, j) => s + j.contractValue, 0)
                 )}
               </div>
               <div className="text-[10px] uppercase tracking-widest text-slate-500 mt-1">
@@ -147,7 +157,7 @@ export default function Deployment() {
             <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-1">
               Deployments
             </div>
-            {jobDeployments.map((j) => {
+            {jobs.map((j) => {
               const active = j.id === job.id;
               return (
                 <button

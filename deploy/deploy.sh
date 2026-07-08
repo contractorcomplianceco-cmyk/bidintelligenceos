@@ -10,7 +10,7 @@ npm run build
 
 echo "==> Starting / restarting PM2 process..."
 if pm2 describe bid-intelligence-os >/dev/null 2>&1; then
-  pm2 restart bid-intelligence-os --update-env
+  pm2 startOrReload deploy/ecosystem.config.cjs --update-env
 else
   pm2 start deploy/ecosystem.config.cjs
 fi

@@ -1,8 +1,12 @@
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
-import { seedBids, followUpQueue, analyticsData, documentReadiness } from "@core/data";
+import { followUpQueue, analyticsData, documentReadiness } from "@core/data";
 import { useToast } from "@/hooks/use-toast";
+import { useBids, useResearchExportReadyPreview, useRoseOsSummary } from "@/hooks/use-bids";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { DemoDataBadge } from "@/components/demo-data-badge";
 import {
   jobDeployments,
   alertItems,
@@ -109,9 +113,14 @@ const riskBandColor: Record<RiskBand, string> = {
 export default function CommandCenter() {
   const { verticalConfig } = useAppContext();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: allBids = [] } = useBids();
+  const { data: liveRose } = useRoseOsSummary();
+  const { data: researchPreview, isLoading: researchLoading } = useResearchExportReadyPreview("FL", 8);
 
-  const activeBids = seedBids.filter(
-    (b) => b.status === "In Progress" || b.status === "Review"
+  const activeBids = allBids.filter(
+    (b) => b.status === "In Progress" || b.status === "Review" || b.status === "Draft"
   );
   const openBidValue = activeBids.reduce((sum, b) => sum + b.amount, 0);
   const jobsInProgress = jobDeployments.filter((j) => j.status === "In Progress");
@@ -258,6 +267,10 @@ export default function CommandCenter() {
                 <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
                   {verticalConfig.name} Operations
                 </span>
+                {!live && <DemoDataBadge />}
+                {live && (
+                  <span className="text-[10px] font-medium text-amber-700">Ops modules: sample data</span>
+                )}
               </div>
               <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
                 {dailyBriefing.greeting}
@@ -404,6 +417,79 @@ export default function CommandCenter() {
               ROSEOS provides intelligence, not execution — every verdict is flagged for human
               review and no outcome is guaranteed.
             </p>
+          </CardContent>
+        </Card>
+
+        {/* Research Hub bridge — real compliance research preview */}
+        <Card className="bg-white border-[#E2E8F0] shadow-sm overflow-hidden">
+          <div className="h-[3px] w-full bg-gradient-to-r from-[#0BA3A8] via-[#38BDF8] to-transparent" />
+          <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#0BA3A8]" />
+                RESEARCH HUB COMPLIANCE BRIDGE
+              </CardTitle>
+              <p className="text-[10px] text-slate-500 mt-0.5">
+                Server-only preview of export-ready jurisdiction research for bid eligibility.
+              </p>
+            </div>
+            <a
+              href="https://command.cagteam.net/os/research-scoreboard"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[#0284C7] hover:text-slate-900 transition-colors flex items-center gap-1 font-medium"
+            >
+              Open scoreboard <ExternalLink className="w-3 h-3" />
+            </a>
+          </CardHeader>
+          <CardContent className="p-4">
+            {researchLoading ? (
+              <p className="text-sm text-slate-500">Loading Research Hub preview…</p>
+            ) : !researchPreview?.ok ? (
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                Research bridge is configured server-side, but no export-ready rows are available yet
+                {researchPreview?.reason ? ` (${researchPreview.reason})` : ""}.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Export-ready total</p>
+                    <p className="mt-1 text-2xl font-bold text-slate-900">{researchPreview.total}</p>
+                  </div>
+                  <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Preview state</p>
+                    <p className="mt-1 text-2xl font-bold text-slate-900">{researchPreview.state ?? "All"}</p>
+                  </div>
+                  <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Rows shown</p>
+                    <p className="mt-1 text-2xl font-bold text-slate-900">{researchPreview.rows.length}</p>
+                  </div>
+                </div>
+                <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+                  {researchPreview.rows.slice(0, 8).map((row) => (
+                    <div key={row.id ?? `${row.ccaRfCode}-${row.stateCode}`} className="rounded-lg border border-[#E2E8F0] bg-white p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold text-slate-900">{row.ccaRfCode ?? row.riskFactorNumber ?? "Research row"}</span>
+                        <span className="rounded-full bg-[#0BA3A8]/10 px-2 py-0.5 text-[10px] font-bold text-[#0A8A8F]">
+                          {row.stateCode ?? "NA"}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-[11px] text-slate-500">
+                        {row.workflowStage ?? "workflow pending"} · {row.teamValidationMethod ?? "validation pending"}
+                      </p>
+                      <p className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                        human approved: {row.humanApproved ? "yes" : "no"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-slate-500 flex items-center gap-1.5">
+                  <ShieldCheck className="w-3 h-3 text-[#0BA3A8]" />
+                  Sanitized fields only. Raw research notes, statutes, credentials, and service keys stay server-side.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

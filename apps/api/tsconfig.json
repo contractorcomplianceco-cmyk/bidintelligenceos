@@ -5,6 +5,13 @@
   "compilerOptions": {
     "noEmit": true,
     "lib": ["esnext"],
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@workspace/cca-core": ["../../../Audit-Risk-Model/lib/cca-core/src/index.ts"],
+      "@workspace/cca-core/*": ["../../../Audit-Risk-Model/lib/cca-core/src/*"],
+      "@workspace/cca-shared": ["../../../Audit-Risk-Model/lib/cca-shared/src/index.ts"],
+      "@workspace/cca-shared/*": ["../../../Audit-Risk-Model/lib/cca-shared/src/*"]
+    }
   }
 }

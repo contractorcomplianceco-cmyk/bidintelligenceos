@@ -17,6 +17,7 @@ module.exports = {
         HOST: "0.0.0.0",
         API_PORT: "5001",
       },
+      env_file: "/home/ubuntu/projects/bid-intelligence-os/.env",
       instances: 1,
       autorestart: true,
       watch: false,
@@ -24,6 +25,19 @@ module.exports = {
       min_uptime: "10s",
       max_restarts: 10,
       restart_delay: 3000,
+    },
+    {
+      name: "bid-intelligence-health-monitor",
+      cwd: "/home/ubuntu/projects/bid-intelligence-os",
+      script: "/usr/bin/bash",
+      args:
+        "-c 'while true; do node scripts/monitor-bid-intelligence-health.mjs || true; sleep 900; done'",
+      interpreter: "none",
+      exec_mode: "fork",
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: "64M",
     },
   ],
 };

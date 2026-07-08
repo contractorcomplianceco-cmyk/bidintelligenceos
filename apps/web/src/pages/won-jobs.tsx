@@ -5,6 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/lib/context";
 import { jobDeployments, BID_LIFECYCLE, type JobDeployment, type JobStatus } from "@core/operations";
+import { useJobs } from "@/hooks/use-jobs";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { DemoDataBadge } from "@/components/demo-data-badge";
 import {
   Trophy,
   DollarSign,
@@ -33,15 +37,18 @@ function money(n: number) {
 export default function WonJobs() {
   const { toast } = useToast();
   const { verticalConfig } = useAppContext();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: jobs = jobDeployments } = useJobs();
   const [converted, setConverted] = useState(false);
 
   const kpis = useMemo(() => {
-    const totalValue = jobDeployments.reduce((s, j) => s + j.contractValue, 0);
-    const count = jobDeployments.length;
+    const totalValue = jobs.reduce((s, j) => s + j.contractValue, 0);
+    const count = jobs.length;
     const avgRoi =
-      jobDeployments.reduce((s, j) => s + j.projectedRoi, 0) / (count || 1);
+      jobs.reduce((s, j) => s + j.projectedRoi, 0) / (count || 1);
     return { totalValue, count, avgRoi };
-  }, []);
+  }, [jobs]);
 
   const handleConvert = () => {
     setConverted(true);
@@ -193,7 +200,7 @@ export default function WonJobs() {
 
         {/* Won job cards */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-          {jobDeployments.map((job) => {
+          {jobs.map((job) => {
             const stageIndex = BID_LIFECYCLE.indexOf(job.stage);
             const stageProgress =
               ((stageIndex + 1) / BID_LIFECYCLE.length) * 100;

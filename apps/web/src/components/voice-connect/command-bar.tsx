@@ -9,6 +9,9 @@ import {
 } from "lucide-react";
 import { voiceCommands, VoiceCommand } from "@core/operations";
 import { useToast } from "@/hooks/use-toast";
+import { useVoiceHandoff } from "@/hooks/use-bids";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
 import { VoiceConnectMark } from "./logo";
 
 export function VoiceConnectCommandBar() {
@@ -17,19 +20,41 @@ export function VoiceConnectCommandBar() {
   const [active, setActive] = useState<VoiceCommand | null>(null);
   const [listening, setListening] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const handoff = useVoiceHandoff();
 
   const run = (cmd: VoiceCommand) => {
     setActive(cmd);
     setInput(cmd.command);
+    if (live) {
+      void handoff.mutateAsync({ transcript: cmd.response }).catch(() => undefined);
+    }
   };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    const transcript = input.trim();
+    if (!transcript) return;
     const match =
       voiceCommands.find((c) =>
-        c.command.toLowerCase().includes(input.trim().toLowerCase())
+        c.command.toLowerCase().includes(transcript.toLowerCase())
       ) ?? voiceCommands[0];
-    setActive({ ...match, command: input.trim() || match.command });
+    setActive({ ...match, command: transcript });
+    if (live) {
+      void handoff
+        .mutateAsync({ transcript, createBid: true })
+        .then((res) => {
+          const draft = res as { draft?: { bidId?: string; href?: string; message?: string } };
+          if (draft.draft?.bidId) {
+            toast({
+              title: "Bid draft created",
+              description: "VoiceConnect captured opportunity — human review required.",
+            });
+          }
+        })
+        .catch(() => undefined);
+    }
   };
 
   const toggleMic = () => {

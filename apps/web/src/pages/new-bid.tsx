@@ -1,23 +1,106 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, FileSearch, Upload, ArrowRight, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { Loader2, FileSearch, ArrowRight, ShieldAlert, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
+import { useCreateBid, useRequestScopeAnalysis } from "@/hooks/use-bids";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useToast } from "@/hooks/use-toast";
+import { BidIntelligencePanel } from "@/components/bid-intelligence-panel";
+import { BidDocumentsPanel } from "@/components/bid-documents-panel";
 
 export default function NewBid() {
-  const [analyzing, setAnalyzing] = useState(false);
-  const [analyzed, setAnalyzed] = useState(false);
+  const [, navigate] = useLocation();
+  const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const createBid = useCreateBid();
+  const analyze = useRequestScopeAnalysis();
 
-  const handleAnalyze = () => {
-    setAnalyzing(true);
-    setTimeout(() => {
-      setAnalyzing(false);
+  const [name, setName] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [type, setType] = useState("");
+  const [location, setLocation] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [scopeSummary, setScopeSummary] = useState("");
+  const [savedBidId, setSavedBidId] = useState<string | null>(null);
+  const [analyzed, setAnalyzed] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const handleSaveDraft = async (): Promise<string | null> => {
+    if (!name.trim()) {
+      toast({ title: "Name required", description: "Enter an opportunity name.", variant: "destructive" });
+      return null;
+    }
+    if (!live) {
+      toast({
+        title: "Demo mode",
+        description: "Sign in to save live bid drafts to your workspace.",
+      });
+      return null;
+    }
+    setSaving(true);
+    try {
+      const result = await createBid.mutateAsync({
+        name,
+        recipient,
+        type,
+        location,
+        date: dueDate || new Date().toISOString().slice(0, 10),
+        scopeSummary,
+        status: "Draft",
+      });
+      setSavedBidId(result.bid.id);
+      toast({ title: "Draft saved", description: "Bid opportunity saved to your pipeline." });
+      return result.bid.id;
+    } catch (e) {
+      toast({
+        title: "Save failed",
+        description: e instanceof Error ? e.message : "Could not save bid",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAnalyze = async () => {
+    if (!live) {
+      toast({
+        title: "Demo mode",
+        description: "Sign in to queue scope analysis on a saved bid.",
+      });
+      return;
+    }
+    setSaving(true);
+    try {
+      let bidId = savedBidId;
+      if (!bidId) {
+        bidId = await handleSaveDraft();
+      }
+      if (!bidId) return;
+      await analyze.mutateAsync({ bidId, scopeSummary });
       setAnalyzed(true);
-    }, 2000);
+      toast({
+        title: "Analysis queued",
+        description: "Preliminary scope analysis complete — human review required.",
+      });
+    } catch (e) {
+      toast({
+        title: "Analysis failed",
+        description: e instanceof Error ? e.message : "Could not run analysis",
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -28,14 +111,12 @@ export default function NewBid() {
              <FileSearch className="h-8 w-8 text-teal-600" />
              New Bid Analysis
           </h2>
-          <p className="text-slate-500 mt-2 text-lg">Input opportunity details to generate a preliminary scope analysis.</p>
+          <p className="text-slate-500 mt-2 text-lg">Save a draft opportunity, then queue scope analysis for reviewer approval.</p>
         </div>
 
         <div className="relative">
-          {/* Progress Connector line (visual only) */}
           <div className="absolute left-6 top-8 bottom-8 w-0.5 bg-[#E2E8F0] z-0"></div>
 
-          {/* STEP 1 */}
           <div className="relative z-10 flex gap-6 mb-8 opacity-100 transition-opacity">
             <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 transition-colors shadow-sm
               ${analyzed ? 'bg-teal-600 text-white' : 'bg-blue-600 text-white'}
@@ -43,7 +124,7 @@ export default function NewBid() {
               {analyzed ? <CheckCircle2 className="w-6 h-6" /> : "1"}
             </div>
             
-            <Card className={`flex-1 bg-white border-[#E2E8F0] shadow-sm transition-all duration-300 ${analyzed ? 'opacity-60 grayscale-[30%] pointer-events-none' : ''}`}>
+            <Card className={`flex-1 bg-white border-[#E2E8F0] shadow-sm transition-all duration-300 ${analyzed ? 'opacity-60 grayscale-[30%]' : ''}`}>
               <CardHeader className="border-b border-[#E2E8F0] pb-4">
                 <CardTitle className="text-lg text-slate-900">Opportunity Details</CardTitle>
                 <CardDescription className="text-slate-500">Basic metadata and specification documents.</CardDescription>
@@ -52,56 +133,61 @@ export default function NewBid() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Opportunity Name</Label>
-                    <Input placeholder="e.g. Terminal B HVAC Retrofit" className="bg-white border-[#E2E8F0] text-slate-700 focus-visible:ring-blue-500" />
+                    <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Terminal B HVAC Retrofit" className="bg-white border-[#E2E8F0] text-slate-700 focus-visible:ring-blue-500" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Client / Recipient</Label>
-                    <Input placeholder="e.g. Port Authority" className="bg-white border-[#E2E8F0] text-slate-700 focus-visible:ring-blue-500" />
+                    <Input value={recipient} onChange={(e) => setRecipient(e.target.value)} placeholder="e.g. Port Authority" className="bg-white border-[#E2E8F0] text-slate-700 focus-visible:ring-blue-500" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Trade / Type</Label>
-                    <Input placeholder="e.g. HVAC, Electrical..." className="bg-white border-[#E2E8F0] text-slate-700 focus-visible:ring-blue-500" />
+                    <Input value={type} onChange={(e) => setType(e.target.value)} placeholder="e.g. HVAC, Electrical..." className="bg-white border-[#E2E8F0] text-slate-700 focus-visible:ring-blue-500" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Location</Label>
-                    <Input placeholder="City, State" className="bg-white border-[#E2E8F0] text-slate-700 focus-visible:ring-blue-500" />
+                    <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, State" className="bg-white border-[#E2E8F0] text-slate-700 focus-visible:ring-blue-500" />
                   </div>
                   <div className="space-y-2 col-span-2 sm:col-span-1">
                     <Label className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Due Date</Label>
-                    <Input type="date" className="bg-white border-blue-200 text-slate-700 focus-visible:ring-blue-500" />
+                    <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="bg-white border-blue-200 text-slate-700 focus-visible:ring-blue-500" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Scope Summary / Narrative</Label>
-                  <Textarea placeholder="Paste high-level scope or link to plan room..." className="h-24 bg-white border-[#E2E8F0] text-slate-700 resize-none focus-visible:ring-blue-500" />
+                  <Textarea value={scopeSummary} onChange={(e) => setScopeSummary(e.target.value)} placeholder="Paste high-level scope or link to plan room..." className="h-24 bg-white border-[#E2E8F0] text-slate-700 resize-none focus-visible:ring-blue-500" />
                 </div>
                 
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Specification Documents</Label>
-                  <div className="p-8 border-2 border-dashed border-[#CBD5E1] rounded-lg bg-[#F8FAFC] hover:bg-slate-100 transition-colors flex flex-col items-center justify-center cursor-pointer group">
-                    <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-3 group-hover:bg-slate-200 transition-colors">
-                      <Upload className="w-5 h-5 text-slate-500 group-hover:text-blue-600" />
-                    </div>
-                    <p className="text-sm font-medium text-slate-700">Drop specification documents here</p>
-                    <p className="text-xs text-slate-500 mt-1">PDF, DOCX, Plan sets</p>
-                  </div>
+                  <BidDocumentsPanel bidId={savedBidId} live={live} />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-between border-t border-[#E2E8F0] p-4 bg-[#F8FAFC]">
-                <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">AI Extraction takes ~15 seconds</p>
-                <Button 
-                  onClick={handleAnalyze} 
-                  disabled={analyzing || analyzed}
-                  className="bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-sm px-6 h-11"
-                >
-                  {analyzing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileSearch className="mr-2 h-4 w-4" />}
-                  {analyzing ? "Analyzing Documents..." : "Extract Scope Details"}
-                </Button>
+              {location.trim() && (
+                <div className="px-6 pb-2">
+                  <BidIntelligencePanel mode="state" location={location} />
+                </div>
+              )}
+              <CardFooter className="flex flex-wrap justify-between gap-3 border-t border-[#E2E8F0] p-4 bg-[#F8FAFC]">
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-widest">Human review required on all AI output</p>
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" onClick={handleSaveDraft} disabled={saving || analyzed}>
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Save draft
+                  </Button>
+                  <Button 
+                    type="button"
+                    onClick={handleAnalyze} 
+                    disabled={saving || analyzed}
+                    className="bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-sm px-6 h-11"
+                  >
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileSearch className="mr-2 h-4 w-4" />}
+                    Queue scope analysis
+                  </Button>
+                </div>
               </CardFooter>
             </Card>
           </div>
 
-          {/* STEP 2 */}
           {analyzed && (
             <div className="relative z-10 flex gap-6 animate-in fade-in slide-in-from-bottom-8 duration-500">
               <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg shrink-0 bg-teal-600 text-white shadow-sm">
@@ -113,50 +199,28 @@ export default function NewBid() {
                 <CardHeader className="border-b border-[#E2E8F0] pb-4 bg-[#F8FAFC]">
                   <CardTitle className="text-lg text-[#0A8A8F] flex items-center gap-2">
                      <CheckCircle2 className="w-5 h-5" />
-                     Extraction Complete
+                     Draft saved — analysis queued
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6 pt-6">
-                  <div>
-                    <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Detected Scope Complexity</h4>
-                    <div className="flex gap-2">
-                      <div className="h-2 flex-1 rounded-full bg-red-500" />
-                      <div className="h-2 flex-1 rounded-full bg-yellow-500" />
-                      <div className="h-2 flex-1 rounded-full bg-slate-200" />
-                    </div>
-                    <p className="text-sm mt-3 text-slate-700 font-medium">Moderate-High <span className="text-slate-500 font-normal ml-2">Custom equipment ordering and tight schedule detected.</span></p>
+                  <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 border border-amber-200 text-amber-900 text-sm">
+                    <ShieldAlert className="w-5 h-5 shrink-0 mt-0.5" />
+                    <p>Preliminary scores are decision-support only. A reviewer must approve before client distribution.</p>
                   </div>
-                  
-                  <div className="bg-[#F8FAFC] rounded-lg p-4 border border-[#E2E8F0]">
-                    <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                       <ShieldAlert className="w-4 h-4 text-amber-600" /> Key Risk Factors
-                    </h4>
-                    <ul className="space-y-3">
-                      <li className="flex gap-3 text-sm">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0" />
-                        <div>
-                          <span className="text-slate-700 font-medium block">Timeline Constraint</span>
-                          <span className="text-slate-500">Submittals due in 4 days. Night-shift only access limits productivity.</span>
-                        </div>
-                      </li>
-                      <li className="flex gap-3 text-sm">
-                        <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-1.5 shrink-0" />
-                        <div>
-                          <span className="text-slate-700 font-medium block">Missing Information</span>
-                          <span className="text-slate-500">BMS integration specs are incomplete. Staging area not defined.</span>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
+                  {savedBidId && (
+                    <Link href={`/scope-analyzer?bidId=${savedBidId}`} className="inline-flex items-center gap-2 text-[#0284C7] font-semibold hover:underline">
+                      Open scope analyzer <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  )}
+                  {savedBidId && (
+                    <Link href={`/bids/${savedBidId}`} className="inline-flex items-center gap-2 text-slate-600 text-sm hover:underline">
+                      View bid record
+                    </Link>
+                  )}
+                  {savedBidId && live && (
+                    <BidIntelligencePanel mode="bid" bidId={savedBidId} location={location} live={live} />
+                  )}
                 </CardContent>
-                <CardFooter className="flex justify-end gap-3 border-t border-[#E2E8F0] p-4 bg-[#F8FAFC]">
-                  <Button variant="ghost" onClick={() => setAnalyzed(false)} className="text-slate-500 hover:text-slate-900 hover:bg-slate-100">Review Inputs</Button>
-                  <Link href="/scope-analyzer">
-                    <Button className="bg-teal-600 hover:bg-teal-500 text-white shadow-sm font-semibold px-6">
-                      View Full Analysis <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </Link>
-                </CardFooter>
               </Card>
             </div>
           )}

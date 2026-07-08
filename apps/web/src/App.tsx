@@ -6,6 +6,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/lib/context";
 import { DemoWalkthrough } from "@/components/demo-walkthrough";
 import { DemoChoiceHub } from "@/components/demo-choice-hub";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
+import { AuthProvider } from "@/lib/auth-context";
+import { ClerkRootProvider } from "@/lib/clerk-root";
+import { enterDemoSession } from "@/lib/data-mode";
 import { isDemoModeEnabled } from "@/lib/demo-mode";
 
 import Marketing from "@/pages/marketing";
@@ -93,6 +98,9 @@ function Router() {
   return (
     <Switch>
       {/* Operations */}
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
+
       <Route path="/" component={CommandCenter} />
       <Route path="/dashboard" component={CommandCenter} />
       <Route path="/briefings" component={Briefings} />
@@ -182,7 +190,7 @@ function App() {
 
   const handleRoseDemoLaunch = () => {
     if (!isDemoModeEnabled()) {
-      sessionStorage.setItem("cca-demo-entered", "1");
+      enterDemoSession();
       setView("app");
       syncUrl("/");
       return;
@@ -205,11 +213,17 @@ function App() {
   };
 
   const handleRoseDemoEnter = () => {
-    sessionStorage.setItem("cca-demo-entered", "1");
+    enterDemoSession();
     setShowRoseDemo(false);
     setRoseDemoAllowSound(false);
     setView("app");
     syncUrl("/");
+  };
+
+  const handleSignIn = () => {
+    setShowRoseDemo(false);
+    setView("app");
+    syncUrl("/login");
   };
 
   useEffect(() => {
@@ -237,8 +251,10 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppProvider>
-        <TooltipProvider>
+      <ClerkRootProvider>
+        <AuthProvider>
+        <AppProvider>
+          <TooltipProvider>
           {showRoseDemo && (
             <DemoWalkthrough
               allowSound={roseDemoAllowSound}
@@ -263,11 +279,13 @@ function App() {
               }}
             />
           ) : (
-            <Marketing onLaunchRoseDemo={handleRoseDemoLaunch} />
+            <Marketing onLaunchRoseDemo={handleRoseDemoLaunch} onSignIn={handleSignIn} />
           )}
           <Toaster />
         </TooltipProvider>
       </AppProvider>
+      </AuthProvider>
+      </ClerkRootProvider>
     </QueryClientProvider>
   );
 }

@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Link } from "wouter";
+import { useRoseOsSummary } from "@/hooks/use-bids";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
@@ -54,7 +57,15 @@ type VerdictFilter = Verdict | "all";
 
 export default function RoseOs() {
   const { verticalConfig } = useAppContext();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: liveRose } = useRoseOsSummary();
   const [filter, setFilter] = useState<VerdictFilter>("all");
+
+  const headline = live && liveRose
+    ? liveRose.insights[0]?.summary ?? executiveSummary.headline
+    : executiveSummary.headline;
+  const posture = (live && liveRose ? liveRose.verdict : executiveSummary.posture) as Verdict;
 
   const filtered = (items: typeof roseInsights) =>
     filter === "all" ? items : items.filter((i) => i.verdict === filter);
@@ -185,13 +196,13 @@ export default function RoseOs() {
           </CardHeader>
           <CardContent className="p-5">
             <div className="flex items-start gap-3 flex-wrap mb-3">
-              <VerdictBadge verdict={executiveSummary.posture} />
+              <VerdictBadge verdict={posture} />
               <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">
-                {executiveSummary.postureLabel}
+                {VERDICT_META[posture].label}
               </span>
             </div>
             <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-              {executiveSummary.headline}
+              {headline}
             </h2>
             <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-4xl">
               {executiveSummary.narrative}

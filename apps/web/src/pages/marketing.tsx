@@ -251,8 +251,10 @@ const GOVERNMENT = {
 
 export default function Marketing({
   onLaunchRoseDemo,
+  onSignIn,
 }: {
   onLaunchRoseDemo: () => void;
+  onSignIn: () => void;
 }) {
   const playerRef = useRef<HTMLDivElement | null>(null);
 
@@ -336,7 +338,7 @@ export default function Marketing({
           </nav>
           <div className="flex items-center gap-3">
             <button
-              onClick={onLaunchRoseDemo}
+              onClick={onSignIn}
               className="hidden sm:inline text-sm text-[#cbd5e1] hover:text-white transition-colors"
             >
               Sign in

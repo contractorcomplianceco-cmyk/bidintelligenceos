@@ -12,7 +12,8 @@
     "dev:api": "npm run dev -w apps/api",
     "build": "npm run build -w apps/web",
     "start": "NODE_ENV=production npm run start -w apps/api",
-    "typecheck": "npm run typecheck -w apps/web && npm run typecheck -w apps/api"
+    "typecheck": "npm run typecheck -w apps/web && npm run typecheck -w apps/api",
+    "check:security": "node scripts/check-cca-core-browser-leak.mjs && npm run test:security -w apps/api"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
