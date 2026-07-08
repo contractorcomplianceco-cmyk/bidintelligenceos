@@ -78,6 +78,30 @@ ADMIN_EMAILS=owner@example.com           # comma-separated → owner role
 - Web: `@clerk/clerk-react` Sign in/up at `/login` and `/register`
 - Legacy `/api/v1/auth/login` returns 400 when Clerk is enabled
 
+### Temporary smoke-test auth (before Clerk)
+
+For team QA when Clerk redirect URLs or DNS are being fixed:
+
+1. In `.env` (server only — do not commit):
+   - `AUTH_ENABLED=false`
+   - Comment out or remove `VITE_CLERK_PUBLISHABLE_KEY` so the web build uses the legacy `/login` form (Clerk keys stay in `.env` for later)
+2. Seed QA users: `node scripts/seed-smoke-users.mjs`
+   - Default accounts: `carmen@ccacontact.com`, `rose@ccacontact.com`
+   - Password from `BIOS_SMOKE_PASSWORD` (default `teamwork`) — temporary only
+3. Rebuild and restart: `./deploy/deploy.sh`
+4. Sign in at `https://<your-host>/login` with email + password
+
+**Restore Clerk when ready:**
+
+1. Set `AUTH_ENABLED=true` and restore `VITE_CLERK_PUBLISHABLE_KEY`
+2. In [Clerk Dashboard](https://dashboard.clerk.com) → your app → **Paths / Redirect URLs**, add:
+   - `https://bidintelligence.docs.cagteam.net`
+   - `https://bidintelligence.docs.cagteam.net/login`
+   - `https://bidintelligence.docs.cagteam.net/register`
+   - Sign-in/sign-up fallback: `https://accounts.docs.cagteam.net/sign-in` and `/sign-up` if using the hosted account portal
+3. Run `node scripts/sync-clerk-env.mjs` (optional) and `./deploy/deploy.sh`
+4. Remove or rotate smoke-test passwords in Postgres when no longer needed
+
 ## Object storage (S3)
 
 For multi-server or ephemeral disks, set `BIOS_S3_BUCKET`. Uses default AWS credential chain (env keys or EC2 instance role). Without it, uploads stay on local disk under `BIOS_UPLOADS_DIR` or `data/uploads/`.
