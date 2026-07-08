@@ -46,6 +46,66 @@ function auditApiBase(): string | null {
   return raw.replace(/\/$/, "");
 }
 
+const STATE_NAME_TO_CODE: Record<string, string> = {
+  alabama: "AL",
+  alaska: "AK",
+  arizona: "AZ",
+  arkansas: "AR",
+  california: "CA",
+  colorado: "CO",
+  connecticut: "CT",
+  delaware: "DE",
+  florida: "FL",
+  georgia: "GA",
+  hawaii: "HI",
+  idaho: "ID",
+  illinois: "IL",
+  indiana: "IN",
+  iowa: "IA",
+  kansas: "KS",
+  kentucky: "KY",
+  louisiana: "LA",
+  maine: "ME",
+  maryland: "MD",
+  massachusetts: "MA",
+  michigan: "MI",
+  minnesota: "MN",
+  mississippi: "MS",
+  missouri: "MO",
+  montana: "MT",
+  nebraska: "NE",
+  nevada: "NV",
+  "new hampshire": "NH",
+  "new jersey": "NJ",
+  "new mexico": "NM",
+  "new york": "NY",
+  "north carolina": "NC",
+  "north dakota": "ND",
+  ohio: "OH",
+  oklahoma: "OK",
+  oregon: "OR",
+  pennsylvania: "PA",
+  "rhode island": "RI",
+  "south carolina": "SC",
+  "south dakota": "SD",
+  tennessee: "TN",
+  texas: "TX",
+  utah: "UT",
+  vermont: "VT",
+  virginia: "VA",
+  washington: "WA",
+  "west virginia": "WV",
+  wisconsin: "WI",
+  wyoming: "WY",
+};
+
+function normalizeStateCode(value: string | null | undefined): string | null {
+  if (!value?.trim()) return null;
+  const trimmed = value.trim();
+  if (/^[A-Z]{2}$/i.test(trimmed)) return trimmed.toUpperCase();
+  return STATE_NAME_TO_CODE[trimmed.toLowerCase()] ?? null;
+}
+
 export function isAuditEngineConfigured() {
   return Boolean(auditApiBase());
 }
@@ -65,9 +125,10 @@ function normalizeList(value: unknown): string[] {
 
 function stateMatches(audit: AuditEngineSummary, stateCode: string) {
   const upper = stateCode.toUpperCase();
-  if (audit.homeState?.toUpperCase() === upper) return true;
-  const active = normalizeList(audit.activeStates);
-  return active.some((s) => s.toUpperCase() === upper);
+  const home = normalizeStateCode(audit.homeState);
+  if (home === upper) return true;
+  const active = normalizeList(audit.activeStates).map((s) => normalizeStateCode(s) ?? s.toUpperCase());
+  return active.some((s) => s === upper);
 }
 
 function tradeMatches(audit: AuditEngineSummary, trade: string | null | undefined) {
