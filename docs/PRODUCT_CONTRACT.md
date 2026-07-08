@@ -16,7 +16,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs from API when signed in; jobs/alerts/schedule demo |
+| Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs + live ROSEOS brief when signed in; jobs/alerts/schedule demo |
 | Daily Briefings | `/briefings` | demo | Seed |
 | Alerts | `/alerts` | demo | Seed |
 
@@ -24,7 +24,8 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Bid Intelligence | `/bids`, `/bids/:id` | **live** | API CRUD when authenticated |
+| Bid Intelligence | `/bids`, `/bids/:id` | **live** | API CRUD, Go/No-Go score workflow, outcome recording when authenticated |
+| Bid Fit | `/bid-fit` | **partial live** | Live 12-category score when `?bidId=` + signed in; demo otherwise |
 | New bid intake | `/new-bid` | **live** | Draft + document upload + ROSEOS scope analysis |
 | Package Builder | `/package-builder` | demo | Seed |
 | Won Jobs | `/won-jobs` | **partial live** | API when authenticated |
@@ -47,7 +48,8 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| ROSEOS | `/roseos` | **partial live** | Live pipeline insights when authenticated |
+| ROSEOS | `/roseos` | **partial live** | Live pipeline insights + Rose Brain brief when authenticated |
+| Analytics | `/analytics` | **partial live** | Win/loss KPIs from API when signed in; charts demo |
 | Bid DNA | `/bid-dna` | demo | Seed |
 | Market Watch | `/market-watch` | demo | Seed |
 | Scope analyzer | `/scope-analyzer` | **partial live** | Live brief when `?bidId=` + signed in |

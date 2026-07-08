@@ -9,6 +9,8 @@ import { serializePublicBidScore, type BidScoreResult } from "@workspace/cca-cor
 import bidDocumentsRoutes from "./bid-documents.js";
 import { computeComplianceEligibility } from "../../lib/compliance-eligibility.js";
 import { nextId, nowIso } from "../../lib/ids.js";
+import { hashBidScoreInputs, logScoreAccess } from "../../lib/score-access-log.js";
+import { computeWinLossAnalytics } from "../../lib/win-loss-analytics.js";
 import { parseStateFromLocation } from "../../lib/state-parse.js";
 import { requireAuth, type AuthedRequest } from "../../middleware/auth.js";
 import { orgScopeMiddleware } from "../../middleware/org-scope.js";
@@ -50,6 +52,12 @@ router.get("/", async (req, res) => {
 });
 
 router.use("/:bidId/documents", bidDocumentsRoutes);
+
+router.get("/analytics/win-loss", async (req, res) => {
+  const { orgId } = (req as unknown as AuthedRequest).auth;
+  const analytics = await computeWinLossAnalytics(orgId);
+  res.json(analytics);
+});
 
 async function loadBidForOrg(bidId: string, orgId: string) {
   const db = getDb();
@@ -116,12 +124,18 @@ router.get("/:id/score", async (req, res) => {
 });
 
 router.post("/:id/score", async (req, res) => {
-  const { orgId } = (req as unknown as AuthedRequest).auth;
+  const { orgId, userId } = (req as unknown as AuthedRequest).auth;
   const bid = await loadBidForOrg(req.params.id, orgId);
   if (!bid) {
     res.status(404).json({ error: "Bid not found" });
     return;
   }
+  logScoreAccess({
+    userId,
+    orgId,
+    bidId: bid.id,
+    inputHash: hashBidScoreInputs(bid),
+  });
   const score = await persistBidScoreForBid(bid, orgId);
   res.status(201).json({ score });
 });

@@ -5,6 +5,10 @@ import { analyticsData } from "@core/data";
 import { costRecords, jobDeployments } from "@core/operations";
 import { useAppContext } from "@/lib/context";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useWinLossAnalytics } from "@/hooks/use-bids";
+import { DemoDataBadge } from "@/components/demo-data-badge";
 import {
   TrendingUp,
   TrendingDown,
@@ -48,6 +52,9 @@ const LOSS_COLORS = ["#EF4444", "#F59E0B", "#38BDF8", "#8A96B0", "#A855F7"];
 export default function Analytics() {
   const { verticalConfig } = useAppContext();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: winLoss } = useWinLossAnalytics();
   const [range, setRange] = useState<"6M" | "12M">("12M");
 
   const winRateSeries = useMemo(
@@ -63,9 +70,14 @@ export default function Analytics() {
   const firstMargin = analyticsData.marginTrend[0].margin;
   const marginDelta = +(currentMargin - firstMargin).toFixed(1);
 
-  const totalWon = analyticsData.projectTypes.reduce((s, p) => s + p.won, 0);
-  const totalLost = analyticsData.projectTypes.reduce((s, p) => s + p.lost, 0);
+  const totalWon = live && winLoss
+    ? (winLoss.byOutcome.find((b) => b.outcome === "won")?.count ?? 0)
+    : analyticsData.projectTypes.reduce((s, p) => s + p.won, 0);
+  const totalLost = live && winLoss
+    ? (winLoss.byOutcome.find((b) => b.outcome === "lost")?.count ?? 0)
+    : analyticsData.projectTypes.reduce((s, p) => s + p.lost, 0);
   const totalOutcomes = totalWon + totalLost;
+  const liveWinRate = winLoss?.summary.winRate;
 
   const avgProjectedRoi = useMemo(
     () => +(costRecords.reduce((s, r) => s + r.projectedRoi, 0) / costRecords.length).toFixed(1),
@@ -129,7 +141,14 @@ export default function Analytics() {
   ];
 
   const kpis = [
-    { label: "Win Rate", value: `${currentWinRate}%`, delta: `${winRateDelta >= 0 ? "+" : ""}${winRateDelta}pp MoM`, positive: winRateDelta >= 0, icon: Target, color: "#38BDF8" },
+    {
+      label: "Win Rate",
+      value: live && liveWinRate != null ? `${liveWinRate}%` : `${currentWinRate}%`,
+      delta: live && winLoss ? `${winLoss.summary.decided} decided bids` : `${winRateDelta >= 0 ? "+" : ""}${winRateDelta}pp MoM`,
+      positive: live && liveWinRate != null ? liveWinRate >= 50 : winRateDelta >= 0,
+      icon: Target,
+      color: "#38BDF8",
+    },
     { label: "Avg Gross Margin", value: `${currentMargin}%`, delta: `${marginDelta >= 0 ? "+" : ""}${marginDelta}pp YTD`, positive: marginDelta >= 0, icon: Percent, color: "#22C55E" },
     { label: "Avg Projected ROI", value: `${avgProjectedRoi}%`, delta: "Across active jobs", positive: true, icon: TrendingUp, color: "#0BA3A8" },
     { label: "Total Outcomes", value: `${totalOutcomes}`, delta: `${totalWon} won / ${totalLost} lost`, positive: true, icon: BarChart3, color: "#A855F7" },
@@ -148,8 +167,12 @@ export default function Analytics() {
             <p className="text-slate-500 mt-1">
               Win/loss and performance intelligence for {verticalConfig.name}. Decision-support guidance only.
             </p>
+            {live && winLoss && (
+              <p className="text-[11px] text-teal-700 mt-1">Win/loss KPIs from live bid outcomes — charts remain demo fixtures.</p>
+            )}
           </div>
           <div className="flex items-center gap-2">
+            {!live && <DemoDataBadge />}
             <div className="flex rounded-lg border border-[#E2E8F0] bg-white p-1">
               {(["6M", "12M"] as const).map((r) => (
                 <button

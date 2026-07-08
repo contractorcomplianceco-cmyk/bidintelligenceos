@@ -224,6 +224,7 @@ export function useComputeBidScore() {
       qc.invalidateQueries({ queryKey: ["bid-score", bidId] });
       qc.invalidateQueries({ queryKey: ["bid", bidId] });
       qc.invalidateQueries({ queryKey: ["bids"] });
+      qc.invalidateQueries({ queryKey: ["win-loss-analytics"] });
     },
   });
 }
@@ -268,7 +269,39 @@ export function useRecordBidOutcome() {
       qc.invalidateQueries({ queryKey: ["bids"] });
       qc.invalidateQueries({ queryKey: ["bid", vars.bidId] });
       qc.invalidateQueries({ queryKey: ["roseos-summary"] });
+      qc.invalidateQueries({ queryKey: ["win-loss-analytics"] });
     },
+  });
+}
+
+export type WinLossOutcomeBucket = {
+  outcome: "won" | "lost" | "no-bid" | "pending";
+  count: number;
+  totalValue: number;
+  avgTotalScore: number | null;
+  verdictBreakdown: Record<string, number>;
+  avgCategoryScores: { key: string; label: string; points: number; maxPoints: number }[];
+};
+
+export type WinLossAnalytics = {
+  summary: {
+    totalBids: number;
+    decided: number;
+    winRate: number | null;
+    scoredBids: number;
+  };
+  byOutcome: WinLossOutcomeBucket[];
+};
+
+export function useWinLossAnalytics() {
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+
+  return useQuery({
+    queryKey: ["win-loss-analytics", live ? "live" : "demo"],
+    enabled: live,
+    queryFn: () => apiFetch<WinLossAnalytics>("/api/v1/bids/analytics/win-loss"),
+    staleTime: 60_000,
   });
 }
 

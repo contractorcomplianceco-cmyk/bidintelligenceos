@@ -413,7 +413,7 @@ export default function BidDetail() {
             <div className="rounded-xl border border-sky-200 bg-white p-5 space-y-2.5">
               <h3 className="text-sm font-bold text-slate-900 tracking-wide mb-1">NEXT STEPS</h3>
               <button
-                onClick={() => navigate("/bid-fit")}
+                onClick={() => navigate(`/bid-fit?bidId=${encodeURIComponent(bid.id)}`)}
                 className="w-full inline-flex items-center justify-between rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#F1F5F9] transition-colors"
               >
                 Evaluate bid-fit score <ArrowRight className="w-4 h-4" />

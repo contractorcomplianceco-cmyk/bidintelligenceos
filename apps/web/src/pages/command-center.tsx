@@ -119,6 +119,28 @@ export default function CommandCenter() {
   const { data: liveRose } = useRoseOsSummary();
   const { data: researchPreview, isLoading: researchLoading } = useResearchExportReadyPreview("FL", 8);
 
+  const rosePosture = (live && liveRose ? liveRose.verdict : executiveSummary.posture) as Verdict;
+  const roseHeadline =
+    live && liveRose?.executiveBrief?.headline
+      ? liveRose.executiveBrief.headline
+      : executiveSummary.headline;
+  const roseNarrative =
+    live && liveRose?.executiveBrief?.narrative ? liveRose.executiveBrief.narrative : executiveSummary.narrative;
+  const liveInsightCards =
+    live && liveRose?.insights?.length
+      ? liveRose.insights.filter((i) => i.verdict !== "green").slice(0, 3)
+      : roseInsights.filter((i) => i.verdict !== "green").slice(0, 3);
+  const liveVerdictCounts =
+    live && liveRose
+      ? {
+          green: liveRose.insights.filter((i) => i.verdict === "green").length,
+          yellow: liveRose.insights.filter((i) => i.verdict === "yellow").length,
+          red: liveRose.insights.filter((i) => i.verdict === "red").length,
+        }
+      : { green: roseStats.green, yellow: roseStats.yellow, red: roseStats.red };
+
+  const liveWonBids = allBids.filter((b) => b.status === "Won");
+
   const activeBids = allBids.filter(
     (b) => b.status === "In Progress" || b.status === "Review" || b.status === "Draft"
   );
@@ -225,12 +247,14 @@ export default function CommandCenter() {
     },
     {
       label: "Won Jobs",
-      value: wonJobsCount,
+      value: live ? liveWonBids.length : wonJobsCount,
       icon: Trophy,
       color: "#22C55E",
-      sub: `$${(
-        jobDeployments.reduce((s, j) => s + j.contractValue, 0) / 1_000_000
-      ).toFixed(2)}M contracted`,
+      sub: live
+        ? `$${(liveWonBids.reduce((s, b) => s + b.amount, 0) / 1_000_000).toFixed(2)}M won value`
+        : `$${(
+            jobDeployments.reduce((s, j) => s + j.contractValue, 0) / 1_000_000
+          ).toFixed(2)}M contracted`,
       href: "/won-jobs",
     },
     {
@@ -368,11 +392,14 @@ export default function CommandCenter() {
             <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <VerdictBadge verdict={executiveSummary.posture} size="sm" />
+                  <VerdictBadge verdict={rosePosture} size="sm" />
                   <p className="text-xs font-semibold text-slate-900 leading-snug">
-                    {executiveSummary.headline}
+                    {roseHeadline}
                   </p>
                 </div>
+                {live && liveRose?.executiveBrief && (
+                  <p className="text-[11px] text-slate-500 mt-2 leading-relaxed line-clamp-2">{roseNarrative}</p>
+                )}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 {(["green", "yellow", "red"] as Verdict[]).map((v) => (
@@ -386,31 +413,36 @@ export default function CommandCenter() {
                     }}
                   >
                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: VERDICT_META[v].color }} />
-                    {roseStats[v]} {VERDICT_META[v].label}
+                    {liveVerdictCounts[v]} {VERDICT_META[v].label}
                   </span>
                 ))}
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-              {roseInsights
-                .filter((i) => i.verdict !== "green")
-                .slice(0, 3)
-                .map((item) => (
-                  <Link key={item.id} href="/roseos">
-                    <div className="h-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3 hover:border-[#FDA4AF] transition-colors cursor-pointer">
-                      <div className="flex items-start justify-between gap-2 mb-1.5">
-                        <VerdictBadge verdict={item.verdict} size="sm" />
+              {liveInsightCards.map((item) => (
+                <Link key={item.id} href={"href" in item && item.href ? String(item.href) : "/roseos"}>
+                  <div className="h-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3 hover:border-[#FDA4AF] transition-colors cursor-pointer">
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <VerdictBadge verdict={item.verdict as Verdict} size="sm" />
+                      {"detectedAgo" in item && item.detectedAgo ? (
                         <span className="text-[9px] text-slate-500 flex-shrink-0">{item.detectedAgo}</span>
-                      </div>
-                      <p className="text-[11px] font-semibold text-slate-900 leading-snug line-clamp-2">
-                        {item.title}
-                      </p>
+                      ) : null}
+                    </div>
+                    <p className="text-[11px] font-semibold text-slate-900 leading-snug line-clamp-2">
+                      {item.title}
+                    </p>
+                    {"sourceModule" in item && item.sourceModule ? (
                       <p className="text-[9px] font-bold uppercase tracking-widest mt-2" style={{ color: ROSE_COLOR_DARK }}>
                         via {item.sourceModule}
                       </p>
-                    </div>
-                  </Link>
-                ))}
+                    ) : (
+                      <p className="text-[9px] font-bold uppercase tracking-widest mt-2" style={{ color: ROSE_COLOR_DARK }}>
+                        via Bid Intelligence
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              ))}
             </div>
             <p className="text-[10px] text-slate-500 mt-3 flex items-center gap-1.5">
               <ShieldCheck className="w-3 h-3 text-[#0284C7]" />
