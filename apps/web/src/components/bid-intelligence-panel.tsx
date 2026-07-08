@@ -9,6 +9,8 @@ import {
   useComplianceEligibility,
   useComplianceEligibilityByState,
   useComputeBidScore,
+  useLockBidScore,
+  useRecordBidOutcome,
   type BidScoreSnapshot,
   type ComplianceEligibility,
 } from "@/hooks/use-bids";
@@ -123,15 +125,23 @@ function ScoreBody({
   score,
   onCompute,
   onApprove,
+  onLock,
+  onOutcome,
   computing,
   approving,
+  locking,
+  recordingOutcome,
   canRun,
 }: {
   score?: BidScoreSnapshot | null;
   onCompute: () => void;
   onApprove: () => void;
+  onLock: () => void;
+  onOutcome: (outcome: "won" | "lost" | "no-bid") => void;
   computing?: boolean;
   approving?: boolean;
+  locking?: boolean;
+  recordingOutcome?: boolean;
   canRun: boolean;
 }) {
   if (!score) {
@@ -205,7 +215,27 @@ function ScoreBody({
             Approve for client use
           </Button>
         )}
+        {canRun && score.humanReviewed && (
+          <Button type="button" variant="outline" onClick={onLock} disabled={locking}>
+            {locking ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Lock className="w-4 h-4 mr-2" />}
+            Lock score for submission
+          </Button>
+        )}
       </div>
+      {canRun && score.humanReviewed && (
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-[#E2E8F0]">
+          <p className="w-full text-xs font-bold uppercase tracking-wider text-slate-500">Record outcome (Bid DNA)</p>
+          <Button type="button" size="sm" variant="outline" disabled={recordingOutcome} onClick={() => onOutcome("won")}>
+            Won
+          </Button>
+          <Button type="button" size="sm" variant="outline" disabled={recordingOutcome} onClick={() => onOutcome("lost")}>
+            Lost
+          </Button>
+          <Button type="button" size="sm" variant="outline" disabled={recordingOutcome} onClick={() => onOutcome("no-bid")}>
+            No-bid
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -231,6 +261,8 @@ export function BidIntelligencePanel(props: Props) {
   const { data: scoreData, isLoading: scoreLoading } = useBidScore(bidId, live);
   const computeScore = useComputeBidScore();
   const approveScore = useApproveBidScore();
+  const lockScore = useLockBidScore();
+  const recordOutcome = useRecordBidOutcome();
 
   const handleCompute = async () => {
     if (!bidId) return;
@@ -255,6 +287,34 @@ export function BidIntelligencePanel(props: Props) {
       toast({
         title: "Approval failed",
         description: e instanceof Error ? e.message : "Could not approve score",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLock = async () => {
+    if (!bidId) return;
+    try {
+      await lockScore.mutateAsync(bidId);
+      toast({ title: "Score locked", description: "Snapshot locked for submission / Zoho sync when enabled." });
+    } catch (e) {
+      toast({
+        title: "Lock failed",
+        description: e instanceof Error ? e.message : "Could not lock score",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleOutcome = async (outcome: "won" | "lost" | "no-bid") => {
+    if (!bidId) return;
+    try {
+      await recordOutcome.mutateAsync({ bidId, outcome });
+      toast({ title: "Outcome recorded", description: `Bid marked ${outcome}.` });
+    } catch (e) {
+      toast({
+        title: "Outcome failed",
+        description: e instanceof Error ? e.message : "Could not record outcome",
         variant: "destructive",
       });
     }
@@ -300,8 +360,12 @@ export function BidIntelligencePanel(props: Props) {
                 score={scoreData?.score}
                 onCompute={handleCompute}
                 onApprove={handleApprove}
+                onLock={handleLock}
+                onOutcome={handleOutcome}
                 computing={computeScore.isPending}
                 approving={approveScore.isPending}
+                locking={lockScore.isPending}
+                recordingOutcome={recordOutcome.isPending}
                 canRun={live && !!bidId}
               />
             )}

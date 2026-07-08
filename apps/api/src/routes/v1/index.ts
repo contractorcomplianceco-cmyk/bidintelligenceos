@@ -5,6 +5,7 @@ import orgRoutes from "./org.js";
 import jobsRoutes from "./jobs.js";
 import intelligenceRoutes from "./intelligence.js";
 import researchRoutes from "./research.js";
+import commandCenterRoutes from "./command-center.js";
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use("/org", orgRoutes);
 router.use("/jobs", jobsRoutes);
 router.use("/intelligence", intelligenceRoutes);
 router.use("/research", researchRoutes);
+router.use("/command-center", commandCenterRoutes);
 
 export default router;

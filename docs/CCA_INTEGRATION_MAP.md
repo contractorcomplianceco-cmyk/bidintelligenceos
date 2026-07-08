@@ -40,6 +40,8 @@ VITE_CLERK_PUBLISHABLE_KEY=
 | `GET /api/v1/bids/:id/score` | `serializePublicBidScore` (payload-leak safe) |
 | `PUT /api/v1/bids/:id/score/lock` | Lock latest score snapshot before submission |
 | `POST /api/v1/bids/:id/outcome` | Record won/lost/no-bid outcome for Bid DNA |
+| `GET /api/v1/command-center/projection` | Sanitized pipeline snapshot for Command Center |
+| `POST /api/v1/bids/:id/outcome` | Record won/lost/no-bid outcome for Bid DNA |
 
 ## Pre-build security
 
