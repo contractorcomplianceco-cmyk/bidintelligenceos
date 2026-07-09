@@ -24,6 +24,8 @@ export function VoiceConnectCommandBar() {
   const live = useLiveData(isAuthenticated);
   const handoff = useVoiceHandoff();
 
+  if (live) return null;
+
   const run = (cmd: VoiceCommand) => {
     setActive(cmd);
     setInput(cmd.command);

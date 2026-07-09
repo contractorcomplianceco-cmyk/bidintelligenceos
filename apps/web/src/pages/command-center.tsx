@@ -376,12 +376,14 @@ export default function CommandCenter() {
               <p className="text-[11px] text-slate-500 mt-2">{dailyBriefing.date}</p>
             </div>
             <div className="flex flex-col items-start lg:items-end gap-2">
+              {!live && (
               <div className="flex items-center gap-2 rounded-lg border border-[#0BA3A8]/40 bg-[#0BA3A8]/10 px-3 py-2">
                 <Sparkles className="w-4 h-4 text-[#0BA3A8]" />
                 <span className="text-xs text-[#0A8A8F]">
                   Try VoiceConnect: <span className="font-semibold text-slate-900">"Show jobs at risk today"</span>
                 </span>
               </div>
+              )}
               <Link
                 href="/briefings"
                 className="text-xs text-[#0284C7] hover:text-slate-900 transition-colors flex items-center gap-1 font-medium"
@@ -736,6 +738,7 @@ export default function CommandCenter() {
                 ))
               )}
               </div>
+              {!live && (
               <div className="p-3 border-t border-[#E2E8F0] mt-auto">
                 <button
                   onClick={() =>
@@ -749,6 +752,7 @@ export default function CommandCenter() {
                   <PhoneCall className="w-3.5 h-3.5" /> Auto-dial with VoiceConnect
                 </button>
               </div>
+              )}
             </CardContent>
           </Card>
         </div>

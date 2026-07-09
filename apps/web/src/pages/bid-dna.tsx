@@ -141,10 +141,7 @@ export default function BidDna() {
   const profiles = live && liveView ? liveView.profiles : bidDnaProfiles;
   const stats = live && liveView ? liveView.stats : dnaStats;
   const learnings = live && liveView ? liveView.learnings : dnaLearnings;
-  const accuracySeries =
-    live && liveView && liveView.accuracySeries.length > 0
-      ? liveView.accuracySeries
-      : estimateAccuracySeries;
+  const accuracySeries = live && liveView ? liveView.accuracySeries : estimateAccuracySeries;
 
   const [selected, setSelected] = useState<BidDnaProfile>(() => profiles[0]);
   const [statusFilter, setStatusFilter] = useState<LearningStatus | "all">("all");

@@ -1,9 +1,11 @@
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { activateOnKey } from "@shared/a11y";
 import {
   ArrowRight,
+  AudioLines,
   ClipboardList,
   Users,
   Phone,
@@ -76,6 +78,12 @@ export default function VoiceConnect() {
   const C = 2 * Math.PI * R;
 
   return (
+    <OpsModuleGate
+      title="VoiceConnect"
+      subtitle="Voice-first field capture that drafts bids into BidIntelligenceOS."
+      module="VoiceConnect field capture"
+      icon={<AudioLines className="h-7 w-7 text-[#0BA3A8]" />}
+    >
     <Layout>
       <div className="space-y-8">
         {/* Header */}
@@ -271,5 +279,6 @@ export default function VoiceConnect() {
         </div>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }

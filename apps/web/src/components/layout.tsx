@@ -40,6 +40,8 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { VERTICALS } from "@core/verticals";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
 import { VoiceConnectCommandBar } from "@/components/voice-connect/command-bar";
 import logo from "@/assets/bidintelligence-logo.png";
 
@@ -188,6 +190,8 @@ export function Layout({ children }: { children: ReactNode }) {
   const { mode, setMode } = useAppContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
 
   useEffect(() => {
     document.documentElement.classList.remove("dark");
@@ -406,8 +410,8 @@ export function Layout({ children }: { children: ReactNode }) {
         </footer>
       </main>
 
-      {/* Persistent VoiceConnect command bar */}
-      <VoiceConnectCommandBar />
+      {/* VoiceConnect command bar — demo sessions only */}
+      {!live && <VoiceConnectCommandBar />}
     </div>
   );
 }

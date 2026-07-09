@@ -197,13 +197,15 @@ export default function Briefings() {
               ))}
             </div>
 
-            {/* VoiceConnect hint */}
+            {/* VoiceConnect hint — demo sessions only */}
+            {!live && (
             <div className="mt-5 flex items-center gap-2 text-xs text-[#0BA3A8]">
               <PhoneCall className="w-3.5 h-3.5" />
               <span className="font-medium">
                 Ask VoiceConnect: "Brief me on what needs attention today."
               </span>
             </div>
+            )}
           </CardContent>
         </Card>
 

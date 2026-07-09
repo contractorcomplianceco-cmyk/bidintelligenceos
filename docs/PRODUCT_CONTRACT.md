@@ -29,7 +29,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 | New bid intake | `/new-bid` | **live** | Draft + document upload + ROSEOS scope analysis |
 | Package Builder | `/package-builder` | **live** | Section preview from uploaded bid documents + compliance gates via `/api/v1/ops/package-builder`; demo templates for anonymous sessions |
 | Won Jobs | `/won-jobs` | **live** | Jobs from `/api/v1/jobs`; convert won bids via `POST /api/v1/jobs/from-bid/:bidId` |
-| Government Contracting | `/government` | **partial live** | Demo fixtures for anonymous/demo sessions; `OpsModuleEmpty` for authed users (no seed contracts) |
+| Government Contracting | `/government` | **partial live** | Demo fixtures for anonymous/demo sessions; live pipeline from Public/GC bids + jurisdiction compliance when signed in; `OpsModuleEmpty` when authed with no qualifying bids or jurisdiction data (no seed contracts) |
 | Bid Library | `/bid-library` | **partial live** | Orphan route (not in nav). Live bids list from `/api/v1/bids` when signed in; demo fixtures otherwise; `OpsModuleEmpty` when authed with no bids |
 | Bid Monitoring | `/monitoring` | **partial live** | Orphan route (not in nav). Active pipeline from `/api/v1/bids` + jobs KPIs + `/api/health` when signed in; demo fixtures otherwise |
 
@@ -56,12 +56,23 @@ Living map of marketing promises → routes → data status. Update when a modul
 | Market Watch | `/market-watch` | **partial live** | Demo fixtures for anonymous sessions; read-only Research Hub export-ready preview when bridge configured; honest empty for authed users without bridge data |
 | Scope analyzer | `/scope-analyzer` | **partial live** | Live brief when `?bidId=` + signed in |
 
+## Add-ons (demo marketplace)
+
+| Module | Route | Status | Notes |
+|--------|-------|--------|-------|
+| Add-On Marketplace | `/add-ons` | demo | Catalog of connected and coming-soon add-ons; fixtures for all sessions |
+| VoiceConnect | `/voice-connect` | **demo** | Demo fixtures for anonymous/demo sessions; `OpsModuleEmpty` for authed team users; command bar and command-center feed hidden when signed in |
+| VideoConnect | `/video-connect` | demo | Marketing showcase; no live API |
+| BuildConnect | `/build-connect` | demo | Marketing showcase; no live API |
+| ComplianceConnect | `/compliance-connect` | demo | Marketing showcase; no live API |
+| CompetitorWatchOS | `/competitor-watch` | demo | Seed fixtures; coming soon |
+
 ## Account
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
 | Business profile | `/business-profile` | live | |
-| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; empty fields for missing data; enterprise tab demo-only |
+| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; empty fields for missing data; enterprise tab shows `OpsModuleEmpty` for authed users |
 
 ## Guardrails
 
