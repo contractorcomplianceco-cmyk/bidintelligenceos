@@ -46,7 +46,7 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
 > **What we did:**
 > - **Preserved** the old promo-video `main` on archive branch **`archive/main-promo-video-pre-bidos-2026-07`** (tip `58352bc`) — nothing was deleted:  
 >   https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/tree/archive/main-promo-video-pre-bidos-2026-07
-> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`5e38f98`**). **`main` is now the production branch.**
+> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`946bc20`**). **`main` is now the production branch.**
 > - **Production app** remains at **https://bidintelligence.cagteam.net** (unchanged by this git operation).
 >
 > **Still pending (unchanged):** Clerk shared-auth cutover per `deploy/RUNBOOK.md` — do not enable `AUTH_ENABLED=true` until Clerk redirect URLs for `bidintelligence.cagteam.net` are configured and we run `./deploy/deploy.sh`. Preflight: `node scripts/clerk-cutover-preflight.mjs --check-only`.
@@ -64,7 +64,7 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
 | # | Action | Command / link |
 |---|--------|----------------|
 | 1 | Automated smoke (legacy auth) | `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` — health, login, bids/jobs/ops/command-center; prints `SMOKE PASS` or `SMOKE FAIL` (no secrets logged) |
-| 2 | **Run smoke after deploy** | After `./deploy/deploy.sh`, run `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` → expect `SMOKE PASS` before sign-off |
+| 2 | **Post-deploy smoke (optional)** | With `BIOS_SMOKE_PASSWORD` in server `.env`, `./deploy/deploy.sh` runs `scripts/smoke-team-url.mjs` after the health curl → expect `SMOKE PASS` (deploy fails on `SMOKE FAIL`). Manual: `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` |
 | 3 | Health check | `GET https://bidintelligence.cagteam.net/api/health` → `200` |
 | 4 | Human review approve UX | Open any bid → **Bid Intelligence** panel shows **Pending human review** until approved; use **Approve for use** on bid detail to clear lock (API: `PATCH /api/v1/bids/:id` `humanReviewApproved: true`) |
 | 5 | PM2 fork fix (restart loop) | Confirm `pm2 describe bid-intelligence-os` shows **fork_mode** + `tsx` (not `cluster` + `npm`). If restarts spike, redeploy: `./deploy/deploy.sh` — see `deploy/RUNBOOK.md` § Troubleshooting (PM2 restarts) |
@@ -78,8 +78,8 @@ Smoke users: `carmen@ccacontact.com`, `rose@ccacontact.com` (`node scripts/seed-
 
 ```
 archive/main-promo-video-pre-bidos-2026-07  → 58352bc  (promo video era — preserved)
-main                                        → 5e38f98  (BidOS production line)
-feat/bidos-production-2026-07               → 5e38f98  (aligned with main)
+main                                        → 946bc20  (BidOS production line)
+feat/bidos-production-2026-07               → 946bc20  (aligned with main)
 ```
 
 ## Merge / PR record
