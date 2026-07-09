@@ -36,6 +36,7 @@ const orgProfileSchema = z
     leadership: z.array(leadershipEntrySchema).optional(),
     brandName: z.string().optional(),
     logoUrl: z.union([z.string().url(), z.literal("")]).optional(),
+    brandColor: z.union([z.string().regex(/^#[0-9A-Fa-f]{6}$/), z.literal("")]).optional(),
   })
   .passthrough();
 

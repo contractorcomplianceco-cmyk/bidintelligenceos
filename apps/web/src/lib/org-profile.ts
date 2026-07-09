@@ -20,6 +20,14 @@ export function parseStringField(value: unknown): string {
 }
 
 /** Returns trimmed URL string when value is a valid http(s) URL; otherwise empty. */
+export const DEFAULT_BRAND_COLOR = "#0284C7";
+
+/** Returns a valid 6-digit hex color string, or the fallback when invalid. */
+export function parseBrandColor(value: unknown, fallback = DEFAULT_BRAND_COLOR): string {
+  const trimmed = parseStringField(value);
+  return /^#[0-9A-Fa-f]{6}$/.test(trimmed) ? trimmed : fallback;
+}
+
 export function parseUrlField(value: unknown): string {
   const trimmed = parseStringField(value);
   if (!trimmed) return "";

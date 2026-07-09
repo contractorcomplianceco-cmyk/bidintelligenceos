@@ -23,7 +23,7 @@ import {
   ENTERPRISE_PERMISSIONS,
   ENTERPRISE_ROLES,
 } from "@core/enterprise";
-import { parseCertifications, parseLeadershipEntries, parseLicenseEntries, parseStringField, parseUrlField, type LeadershipEntry, type LicenseEntry } from "@/lib/org-profile";
+import { parseBrandColor, parseCertifications, parseLeadershipEntries, parseLicenseEntries, parseStringField, parseUrlField, type LeadershipEntry, type LicenseEntry } from "@/lib/org-profile";
 
 export default function Settings() {
   const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
@@ -89,6 +89,7 @@ export default function Settings() {
     setLeadership(parseLeadershipEntries(org.profile?.leadership));
     setBrandName(parseStringField(org.profile?.brandName));
     setLogoUrl(parseUrlField(org.profile?.logoUrl));
+    setBrandColor(parseBrandColor(org.profile?.brandColor, BRAND_COLORS[0].hex));
   }, [live, org?.id, org?.profile]);
 
   const [brandColor, setBrandColor] = useState(BRAND_COLORS[0].hex);
@@ -136,6 +137,7 @@ export default function Settings() {
         leadership: nextLeadership,
         brandName: brandName.trim(),
         ...(trimmedLogoUrl ? { logoUrl: trimmedLogoUrl } : { logoUrl: "" }),
+        brandColor,
       },
     });
     toast({
@@ -520,7 +522,7 @@ export default function Settings() {
                   White Label
                 </CardTitle>
                 <CardDescription className="text-slate-500">
-                  Optional brand name and logo URL shown on your business profile header. URL only — no file upload.
+                  Optional brand name, logo URL, and accent color shown on your business profile header. URL only — no file upload.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
@@ -551,6 +553,26 @@ export default function Settings() {
                     />
                   </div>
                 </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Brand color</Label>
+                  <div className="flex flex-wrap gap-2 rounded-xl border border-[#E2E8F0] bg-[#F1F5F9] p-4">
+                    {BRAND_COLORS.map((c) => {
+                      const active = c.hex === brandColor;
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          title={c.label}
+                          onClick={() => setBrandColor(c.hex)}
+                          className={`h-9 w-9 rounded-full border-2 transition-all ${
+                            active ? "border-slate-900 scale-110 shadow-sm" : "border-white hover:scale-105"
+                          }`}
+                          style={{ backgroundColor: c.hex }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
                 {(brandName.trim() || parseUrlField(logoUrl)) && (
                   <div className="flex items-center gap-4 rounded-xl border border-[#E2E8F0] bg-[#F1F5F9] p-4">
                     {parseUrlField(logoUrl) ? (
@@ -560,8 +582,11 @@ export default function Settings() {
                         className="h-14 w-14 rounded-lg border border-[#E2E8F0] bg-white object-contain shrink-0"
                       />
                     ) : (
-                      <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[#E2E8F0] bg-white shrink-0">
-                        <Building2 className="h-7 w-7 text-[#0284C7]" />
+                      <div
+                        className="flex h-14 w-14 items-center justify-center rounded-lg border border-[#E2E8F0] shrink-0"
+                        style={{ backgroundColor: brandColor }}
+                      >
+                        <Building2 className="h-7 w-7 text-white" />
                       </div>
                     )}
                     <div>

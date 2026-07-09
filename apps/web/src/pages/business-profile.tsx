@@ -18,6 +18,7 @@ import {
   parseCertifications,
   parseLeadershipEntries,
   parseLicenseEntries,
+  parseBrandColor,
   parseServiceAreas,
   parseStringField,
   parseUrlField,
@@ -199,6 +200,7 @@ export default function BusinessProfile() {
 
   const brandName = live ? parseStringField(org?.profile?.brandName) : "";
   const logoUrl = live ? parseUrlField(org?.profile?.logoUrl) : "";
+  const brandColor = live ? parseBrandColor(org?.profile?.brandColor) : "#0284C7";
   const headerTitle = brandName || companyName;
 
   return (
@@ -214,8 +216,11 @@ export default function BusinessProfile() {
                 className="h-14 w-14 rounded-xl border border-[#E2E8F0] bg-white object-contain shrink-0"
               />
             ) : (
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#E2E8F0] bg-white shrink-0">
-                <Building2 className="h-7 w-7 text-[#0284C7]" />
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#E2E8F0] shrink-0"
+                style={{ backgroundColor: brandColor }}
+              >
+                <Building2 className="h-7 w-7 text-white" />
               </div>
             )}
             <div>
@@ -227,7 +232,10 @@ export default function BusinessProfile() {
               )}
               <p className="text-slate-500 mt-1">
                 Company profile powering bid-fit for the{" "}
-                <span className="text-[#0284C7] font-semibold">{verticalConfig.name}</span> workflow.
+                <span className="font-semibold" style={{ color: brandColor }}>
+                  {verticalConfig.name}
+                </span>{" "}
+                workflow.
               </p>
               {!live && <div className="mt-2"><DemoDataBadge /></div>}
             </div>
