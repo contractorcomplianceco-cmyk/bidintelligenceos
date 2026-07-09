@@ -18,9 +18,22 @@ fi
 pm2 save
 
 echo "==> Health check..."
-sleep 2
-curl -sf "http://127.0.0.1:5001/api/health" | head -c 200
-echo ""
+MAX_ATTEMPTS=30
+SLEEP_SEC=2
+healthy=0
+for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+  if curl -sf "http://127.0.0.1:5001/api/health" | head -c 200; then
+    echo ""
+    healthy=1
+    break
+  fi
+  echo "Health check attempt ${attempt}/${MAX_ATTEMPTS} failed; retrying in ${SLEEP_SEC}s..."
+  sleep "$SLEEP_SEC"
+done
+if [ "$healthy" -ne 1 ]; then
+  echo "Health check failed after ${MAX_ATTEMPTS} attempts (~$((MAX_ATTEMPTS * SLEEP_SEC))s)"
+  exit 1
+fi
 
 echo "==> Post-deploy smoke..."
 # Clerk mode: smoke uses public health/config/login checks (no secrets).
