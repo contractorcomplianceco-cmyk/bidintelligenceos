@@ -129,7 +129,29 @@ curl -s -H "Cookie: bios_token=..." http://127.0.0.1:5001/api/v1/command-center/
 
 ---
 
-## Step 6 — Smoke test checklist (10 min)
+## Step 6 — Automated team URL smoke (2 min)
+
+Scripted check against **https://bidintelligence.cagteam.net** (health, legacy login, core authed APIs). Password is read from `BIOS_SMOKE_PASSWORD` only — never printed.
+
+```bash
+cd /home/ubuntu/projects/bid-intelligence-os
+# Password from .env or export; do not echo it
+BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs
+```
+
+Optional env:
+
+| Variable | Default |
+|----------|---------|
+| `BIOS_SMOKE_URL` | `https://bidintelligence.cagteam.net` |
+| `BIOS_SMOKE_EMAIL` | `carmen@ccacontact.com` (also `rose@ccacontact.com` via seed script) |
+| `BIOS_SMOKE_TIMEOUT_MS` | `15000` |
+
+Exit `0` = all checks passed; `1` = failure (no secrets in output). Smoke users: `node scripts/seed-smoke-users.mjs`.
+
+---
+
+## Step 7 — Manual smoke test checklist (10 min)
 
 | # | Action | Expected |
 |---|--------|----------|
