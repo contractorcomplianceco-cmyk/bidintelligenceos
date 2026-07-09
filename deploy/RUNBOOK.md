@@ -249,3 +249,41 @@ Raw research notes, statute text, credentials, service role keys, and Supabase U
 ## Postgres migration
 
 Dual-driver support: set `DATABASE_URL` for Postgres + RLS; omit for SQLite dev. Schema lives in `deploy/postgres/001_init.sql` and Drizzle `schema-pg.ts`.
+
+## Troubleshooting (PM2 restarts)
+
+### Symptom: high `↺` count on `bid-intelligence-os`
+
+1. Check status and restart counts:
+
+   ```bash
+   pm2 list | grep bid-intelligence
+   pm2 describe bid-intelligence-os
+   ```
+
+2. Inspect recent logs (look for port/env/OOM — do not paste secrets):
+
+   ```bash
+   pm2 logs bid-intelligence-os --lines 80 --nostream
+   pm2 logs bid-intelligence-os --err --lines 80 --nostream
+   curl -sf http://127.0.0.1:5001/api/health
+   ```
+
+3. **Known cause (fixed 2026-07-09):** PM2 `cluster_mode` with `script: npm` caused a restart loop — API logged “listening on :5001” then exited with code 1. Fix is `exec_mode: fork` and `exec tsx` directly (`deploy/ecosystem.config.cjs`). Redeploy:
+
+   ```bash
+   ./deploy/deploy.sh
+   ```
+
+4. After redeploy, confirm `exec mode` is `fork_mode` and restarts are stable for several minutes:
+
+   ```bash
+   pm2 describe bid-intelligence-os | grep -E 'exec mode|restarts|uptime'
+   ```
+
+### Health monitor (`bid-intelligence-health-monitor`)
+
+- PM2 app runs `scripts/monitor-bid-intelligence-health.mjs` every **15 minutes** (`sleep 900`).
+- Alerts email Carmen at `carmenaburoda@gmail.com` when local/public health or required PM2 apps fail (cooldown 1h).
+- One-off check: `node scripts/monitor-bid-intelligence-health.mjs`
+- Required PM2 apps: `bid-intelligence-os`, `bid-intelligence-health-monitor` (override with `BIOS_PM2_APPS`).

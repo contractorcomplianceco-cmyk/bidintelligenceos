@@ -10,8 +10,12 @@ module.exports = {
     {
       name: "bid-intelligence-os",
       cwd: "/home/ubuntu/projects/bid-intelligence-os",
-      script: "npm",
-      args: "run start",
+      // Fork + exec tsx directly — npm in cluster_mode caused restart loops (exit 1).
+      script: "/usr/bin/bash",
+      args:
+        "-c 'exec node_modules/.bin/tsx --tsconfig apps/api/tsconfig.json apps/api/src/index.ts'",
+      interpreter: "none",
+      exec_mode: "fork",
       env: {
         NODE_ENV: "production",
         HOST: "0.0.0.0",
