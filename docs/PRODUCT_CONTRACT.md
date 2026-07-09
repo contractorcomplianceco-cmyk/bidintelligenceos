@@ -4,7 +4,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 **Last verified:** 2026-07-08  
 **Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)  
-**Verified at:** `5d6995c`+ (through business-profile org licenses/certs read)
+**Verified at:** `7162e4a`+ (through business-profile org leadership/contact read)
 
 **Legend:** `live` = persisted API data when signed in · `partial live` = mix of live API + demo fixtures or honest empty · `demo` = seed fixtures / marketing showcase only · `planned` = not built
 
@@ -39,10 +39,10 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Bid Intelligence | `/bids`, `/bids/:id` | **live** | API CRUD, Go/No-Go score workflow, outcome recording when authenticated |
+| Bid Intelligence | `/bids`, `/bids/:id` | **live** | API CRUD, Go/No-Go score workflow, outcome recording when authenticated; package-builder CTA disabled until bid score is human-reviewed (live authed only) |
 | Bid Fit | `/bid-fit` | **partial live** | Live 12-category score when `?bidId=` + signed in; demo otherwise |
 | New bid intake | `/new-bid` | **live** | Draft + document upload + ROSEOS scope analysis (requires sign-in to persist) |
-| Package Builder | `/package-builder` | **live** | Section preview from uploaded bid documents + compliance gates via `/api/v1/ops/package-builder`; demo templates for anonymous sessions |
+| Package Builder | `/package-builder` | **live** | Section preview from uploaded bid documents + compliance gates via `/api/v1/ops/package-builder`; PDF/DOCX export disabled until bid score is human-reviewed (live authed only); demo templates for anonymous sessions |
 | Won Jobs | `/won-jobs` | **live** | Jobs from `/api/v1/jobs`; convert won bids via `POST /api/v1/jobs/from-bid/:bidId` |
 | Government Contracting | `/government` | **partial live** | Demo fixtures for anonymous/demo sessions; live pipeline from Public/GC bids + jurisdiction compliance when signed in; `OpsModuleEmpty` when authed with no qualifying bids or jurisdiction data |
 | Bid Library | `/bid-library` | **partial live** | Orphan route (not in nav). Live bids list from `/api/v1/bids` when signed in; demo fixtures otherwise; `OpsModuleEmpty` when authed with no bids |
@@ -86,8 +86,8 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses and certifications read from org profile JSON when signed in (honest empty when none saved); demo fixtures for anonymous sessions only; edit credentials in Settings → Enterprise & White Label; leadership and identity fields empty until org profile is populated |
-| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; enterprise tab persists `licenses` and `certifications` JSON arrays; white-label, multi-location, and RBAC deferred Phase 5 |
+| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses, certifications, primary contact (phone/email), and leadership read from org profile JSON when signed in (honest empty when none saved); demo fixtures for anonymous sessions only; edit in Settings → Enterprise & White Label; identity and service-area fields empty until org profile is populated |
+| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; enterprise tab persists `licenses`, `certifications`, `phone`, `contactEmail`, and `leadership` JSON fields; white-label, multi-location, and RBAC deferred Phase 5 |
 
 ## Orphan routes (not in nav)
 
@@ -128,4 +128,4 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | Settings enterprise — white label | planned | Brand color, product name override, custom domain, logo upload |
 | Settings enterprise — multi-location | planned | Franchise rollups, regional segmentation, location KPIs |
 | Settings enterprise — RBAC | planned | Role templates, permission grants, user invites |
-| `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses` (object array) and `certifications` (string array) persist in `organizations.profile_json`; other enterprise fields not yet modeled |
+| `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses` (object array), `certifications` (string array), `phone`, `contactEmail`, and `leadership` (object array) persist in `organizations.profile_json`; other enterprise fields not yet modeled |
