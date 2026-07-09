@@ -62,6 +62,8 @@ export type OpsPermit = {
   derivedFrom?: "payload" | "jurisdiction" | "compliance-gate";
 };
 
+export type OpsLaborBurnPoint = { week: string; planned: number; actual: number };
+
 export type OpsAlert = {
   id: string;
   severity: string;
@@ -216,13 +218,22 @@ export function useOpsLabor() {
 
   return useQuery({
     queryKey,
-    queryFn: async (): Promise<{ crew: CrewMember[]; subs: Subcontractor[] }> => {
-      if (!live) return { crew: demoCrew, subs: demoSubs };
+    queryFn: async (): Promise<{
+      crew: CrewMember[];
+      subs: Subcontractor[];
+      laborBurnSeries: OpsLaborBurnPoint[];
+    }> => {
+      if (!live) return { crew: demoCrew, subs: demoSubs, laborBurnSeries: [] };
       const data = await apiFetch<{
         crewMembers: CrewMember[];
         subcontractors: Subcontractor[];
+        laborBurnSeries?: OpsLaborBurnPoint[];
       }>("/api/v1/ops/labor");
-      return { crew: data.crewMembers, subs: data.subcontractors };
+      return {
+        crew: data.crewMembers,
+        subs: data.subcontractors,
+        laborBurnSeries: data.laborBurnSeries ?? [],
+      };
     },
     staleTime: 60_000,
   });
@@ -270,6 +281,7 @@ export function useOpsCostRoi() {
     queryKey,
     queryFn: async (): Promise<{
       records: CostRecord[];
+      laborBurnSeries: OpsLaborBurnPoint[];
       summary: {
         totalContract: number;
         totalCostToDate: number;
@@ -282,6 +294,7 @@ export function useOpsCostRoi() {
         const totalCostToDate = demoCostRecords.reduce((s, r) => s + r.actualCost, 0);
         return {
           records: demoCostRecords,
+          laborBurnSeries: [],
           summary: {
             totalContract,
             totalCostToDate,
@@ -290,7 +303,21 @@ export function useOpsCostRoi() {
           },
         };
       }
-      return apiFetch("/api/v1/ops/cost-roi");
+      const data = await apiFetch<{
+        records: CostRecord[];
+        laborBurnSeries?: OpsLaborBurnPoint[];
+        summary: {
+          totalContract: number;
+          totalCostToDate: number;
+          avgMargin: number;
+          avgProjectedRoi: number;
+        };
+      }>("/api/v1/ops/cost-roi");
+      return {
+        records: data.records,
+        laborBurnSeries: data.laborBurnSeries ?? [],
+        summary: data.summary,
+      };
     },
     staleTime: 60_000,
   });

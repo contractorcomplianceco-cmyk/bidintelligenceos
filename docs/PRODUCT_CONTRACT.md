@@ -57,7 +57,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | Labor & Subs | `/labor` | **live** | Crew/subs from job payload via `/api/v1/ops/labor`; `OpsModuleEmpty` when authed with no crew data |
 | Permits | `/permits` | **partial live** | Job payload permits + jurisdiction/compliance-derived items via `/api/v1/ops/permits` |
 | Weather | `/weather` | **partial live** | Open-Meteo 5-day forecast per active job (geocoded from site city/state); placeholder fallback when geocode fails |
-| Cost & ROI | `/cost-roi` | **partial live** | Job table + portfolio snapshot from `/api/v1/ops/cost-roi`; labor burn time-series remains demo seed even when signed in |
+| Cost & ROI | `/cost-roi` | **partial live** | Job table + portfolio snapshot + labor burn chart from `/api/v1/ops/cost-roi` (or `/api/v1/ops/labor`) when job payload includes crew hours; honest empty otherwise |
 | Risk & Change Orders | `/risk` | **partial live** | Risks from jobs/bids/scores via `/api/v1/ops/risk`; profit-fade from live cost when available |
 | Job Closeout | `/closeout` | **live** | Won/completed jobs via `/api/v1/ops/closeout`; punch list, closeout docs, and completion chart from job payload when present; honest empty otherwise |
 
@@ -112,10 +112,10 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 |----------|---------|
 | `GET /api/v1/ops/scheduling` | Schedule events from job payload |
 | `GET /api/v1/ops/permits` | Permits from job payload + jurisdiction/compliance derivation |
-| `GET /api/v1/ops/labor` | Crew/subs from job payload |
+| `GET /api/v1/ops/labor` | Crew/subs + labor burn series from job payload crew hours |
 | `GET /api/v1/ops/weather` | Open-Meteo forecast per active job (geocode from location); placeholder fallback |
 | `GET /api/v1/ops/closeout` | Closeout pipeline from won/completed jobs (completion fields) |
-| `GET /api/v1/ops/cost-roi` | Cost records from job budget fields |
+| `GET /api/v1/ops/cost-roi` | Cost records + labor burn series from job budget/crew-hour fields |
 | `GET /api/v1/ops/risk` | Risks + change orders derived from jobs/bids |
 | `GET /api/v1/ops/package-builder` | Active bid packages + documents + compliance |
 | `GET /api/v1/ops/alerts` | Ops alerts for briefings/alerts merge |

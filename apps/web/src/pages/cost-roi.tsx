@@ -6,7 +6,7 @@ import { costRecords as seedCostRecords, costToDateSeries, laborBurnSeries } fro
 import type { RiskLevel } from "@core/operations";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
-import { useOpsCostRoi } from "@/hooks/use-ops";
+import { useOpsCostRoi, useOpsLabor } from "@/hooks/use-ops";
 import { DemoDataBadge } from "@/components/demo-data-badge";
 import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import { AnalyticsChartEmpty } from "@/components/analytics-chart-empty";
@@ -58,6 +58,7 @@ export default function CostRoi() {
   const { isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
   const { data: costData } = useOpsCostRoi();
+  const { data: laborData } = useOpsLabor();
   const costRecords = live ? (costData?.records ?? []) : seedCostRecords;
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
 
@@ -116,6 +117,13 @@ export default function CostRoi() {
     () => (live ? buildLiveCostSnapshot(costRecords) : []),
     [live, costRecords],
   );
+
+  const liveLaborBurn = useMemo(() => {
+    if (!live) return [];
+    if (costData?.laborBurnSeries?.length) return costData.laborBurnSeries;
+    if (laborData?.laborBurnSeries?.length) return laborData.laborBurnSeries;
+    return [];
+  }, [live, costData, laborData]);
 
   const activeRecords = selectedJob
     ? costRecords.filter((r) => r.jobId === selectedJob)
@@ -296,8 +304,8 @@ export default function CostRoi() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 flex-1">
-              {live ? (
-                <AnalyticsChartEmpty label="Historical labor burn requires time-series capture on jobs" />
+              {live && liveLaborBurn.length === 0 ? (
+                <AnalyticsChartEmpty label="Labor burn requires crew hours on job deployments (planned vs actual)" />
               ) : (
               <>
               <div className="flex gap-4 mb-3 text-[10px] font-bold uppercase tracking-widest">
@@ -313,7 +321,7 @@ export default function CostRoi() {
               <div className="h-56 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={laborBurnSeries}
+                    data={live ? liveLaborBurn : laborBurnSeries}
                     margin={{ top: 0, right: 0, left: -10, bottom: 0 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />

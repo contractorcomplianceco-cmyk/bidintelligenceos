@@ -26,6 +26,60 @@ async function loadOrgJobs(orgId: string): Promise<JobRow[]> {
     .where(and(eq(jobs.orgId, orgId), isNull(jobs.deletedAt)));
 }
 
+type LaborBurnPoint = { week: string; planned: number; actual: number };
+
+function parseLaborBurnFromPayload(payload: Record<string, unknown>): LaborBurnPoint[] {
+  const series = payload.laborBurn ?? payload.laborBurnSeries;
+  if (Array.isArray(series) && series.length > 0) {
+    return series
+      .map((item, i) => {
+        const p = item as Record<string, unknown>;
+        return {
+          week: String(p.week ?? p.label ?? `Wk ${i + 1}`),
+          planned: Number(p.planned ?? p.plannedHours ?? 0),
+          actual: Number(p.actual ?? p.actualHours ?? 0),
+        };
+      })
+      .filter((pt) => pt.planned > 0 || pt.actual > 0);
+  }
+
+  const crewHours = payload.crewHours;
+  if (crewHours && typeof crewHours === "object") {
+    const ch = crewHours as Record<string, unknown>;
+    const planned = Number(ch.planned ?? ch.plannedHours ?? 0);
+    const actual = Number(ch.actual ?? ch.actualHours ?? 0);
+    if (planned > 0 || actual > 0) {
+      return [{ week: "Portfolio", planned, actual }];
+    }
+  }
+
+  const planned = Number(payload.plannedLaborHours ?? payload.plannedCrewHours ?? 0);
+  const actual = Number(payload.actualLaborHours ?? payload.actualCrewHours ?? 0);
+  if (planned > 0 || actual > 0) {
+    return [{ week: "Portfolio", planned, actual }];
+  }
+
+  return [];
+}
+
+function aggregateLaborBurnSeries(allSeries: LaborBurnPoint[][]): LaborBurnPoint[] {
+  const byWeek = new Map<string, { planned: number; actual: number }>();
+  for (const series of allSeries) {
+    for (const pt of series) {
+      const bucket = byWeek.get(pt.week) ?? { planned: 0, actual: 0 };
+      bucket.planned += pt.planned;
+      bucket.actual += pt.actual;
+      byWeek.set(pt.week, bucket);
+    }
+  }
+  if (byWeek.size === 0) return [];
+  return [...byWeek.entries()].map(([week, v]) => ({ week, planned: v.planned, actual: v.actual }));
+}
+
+function laborBurnFromJobRows(rows: JobRow[]): LaborBurnPoint[] {
+  return aggregateLaborBurnSeries(rows.map((row) => parseLaborBurnFromPayload(parsePayload(row))));
+}
+
 function placeholderForecast() {
   return FORECAST_LABELS.map((label) => ({
     label,
@@ -346,6 +400,7 @@ export async function buildLaborProjection(orgId: string) {
   return {
     crewMembers,
     subcontractors: subs,
+    laborBurnSeries: laborBurnFromJobRows(rows),
     jobCount: rows.length,
     avgUtilization:
       crewMembers.length > 0
@@ -643,6 +698,7 @@ export async function buildCostRoiProjection(orgId: string) {
 
   return {
     records,
+    laborBurnSeries: laborBurnFromJobRows(rows),
     jobCount: rows.length,
     summary: {
       totalContract,
