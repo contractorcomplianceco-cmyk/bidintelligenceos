@@ -11,10 +11,25 @@ const router = Router();
 router.use(requireAuth);
 router.use(orgScopeMiddleware);
 
+const licenseEntrySchema = z.object({
+  name: z.string(),
+  id: z.string().optional(),
+  status: z.string().optional(),
+  expires: z.string().optional(),
+});
+
+/** Optional enterprise fields live in organizations.profile_json alongside company prefs. */
+const orgProfileSchema = z
+  .object({
+    licenses: z.array(licenseEntrySchema).optional(),
+    certifications: z.array(z.string()).optional(),
+  })
+  .passthrough();
+
 const profileSchema = z.object({
   name: z.string().min(1).optional(),
   vertical: z.string().optional(),
-  profile: z.record(z.unknown()).optional(),
+  profile: orgProfileSchema.optional(),
 });
 
 router.get("/profile", async (req, res) => {

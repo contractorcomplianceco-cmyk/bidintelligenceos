@@ -16,14 +16,33 @@ import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { useOrgProfile, useUpdateOrgProfile } from "@/hooks/use-org";
 import { DemoDataBadge } from "@/components/demo-data-badge";
-import { OpsModuleEmpty } from "@/components/ops-module-empty";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BRAND_COLORS,
   ENTERPRISE_LOCATIONS,
   ENTERPRISE_PERMISSIONS,
   ENTERPRISE_ROLES,
 } from "@core/enterprise";
+
+type LicenseEntry = { name: string; id?: string; status?: string; expires?: string };
+
+function parseLicenseEntries(value: unknown): LicenseEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry): entry is Record<string, unknown> => typeof entry === "object" && entry !== null)
+    .map((entry) => ({
+      name: typeof entry.name === "string" ? entry.name : "",
+      id: typeof entry.id === "string" ? entry.id : undefined,
+      status: typeof entry.status === "string" ? entry.status : undefined,
+      expires: typeof entry.expires === "string" ? entry.expires : undefined,
+    }))
+    .filter((entry) => entry.name.trim().length > 0);
+}
+
+function parseCertifications(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0);
+}
 
 export default function Settings() {
   const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
@@ -33,7 +52,7 @@ export default function Settings() {
   const { data: org } = useOrgProfile();
   const updateOrg = useUpdateOrgProfile();
 
-  const profile = (org?.profile ?? {}) as Record<string, string>;
+  const profile = (org?.profile ?? {}) as Record<string, unknown>;
   const demoCompanyName = "Acme Commercial Trades";
   const demoContractorType = "General/Specialty";
   const demoServices = "HVAC, Electrical, Facilities Maintenance";
@@ -57,26 +76,59 @@ export default function Settings() {
   const [license, setLicense] = useState("");
 
   const companyNameValue = live ? (companyName || org?.name || "") : companyName || demoCompanyName;
-  const contractorTypeValue = live ? (contractorType || profile.contractorType || "") : contractorType || demoContractorType;
-  const servicesValue = live ? (services || profile.services || "") : services || demoServices;
-  const areasValue = live ? (areas || profile.serviceAreas || "") : areas || demoAreas;
-  const jobSizeValue = live ? (jobSize || profile.preferredJobSize || "") : jobSize || demoJobSize;
-  const crewValue = live ? (crew || profile.crewCapacity || "") : crew || demoCrew;
-  const marginValue = live ? (margin || profile.targetMargin || "") : margin || demoMargin;
-  const overheadValue = live ? (overhead || profile.overheadAssumptions || "") : overhead || demoOverhead;
-  const bondingValue = live ? (bonding || profile.bondingNotes || "") : bonding || demoBonding;
-  const licenseValue = live ? (license || profile.licenseNotes || "") : license || demoLicense;
+  const contractorTypeValue = live ? (contractorType || String(profile.contractorType ?? "")) : contractorType || demoContractorType;
+  const servicesValue = live ? (services || String(profile.services ?? "")) : services || demoServices;
+  const areasValue = live ? (areas || String(profile.serviceAreas ?? "")) : areas || demoAreas;
+  const jobSizeValue = live ? (jobSize || String(profile.preferredJobSize ?? "")) : jobSize || demoJobSize;
+  const crewValue = live ? (crew || String(profile.crewCapacity ?? "")) : crew || demoCrew;
+  const marginValue = live ? (margin || String(profile.targetMargin ?? "")) : margin || demoMargin;
+  const overheadValue = live ? (overhead || String(profile.overheadAssumptions ?? "")) : overhead || demoOverhead;
+  const bondingValue = live ? (bonding || String(profile.bondingNotes ?? "")) : bonding || demoBonding;
+  const licenseValue = live ? (license || String(profile.licenseNotes ?? "")) : license || demoLicense;
 
   const userNameParts = (live ? user?.name ?? "" : "Jordan P.").trim().split(/\s+/);
   const firstName = live ? userNameParts[0] ?? "" : "Jordan";
   const lastName = live ? userNameParts.slice(1).join(" ") : "P.";
   const email = live ? user?.email ?? "" : "jordan@acmetrades.com";
 
+  const [licenses, setLicenses] = useState<LicenseEntry[]>([]);
+  const [certifications, setCertifications] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!live || !org) return;
+    setLicenses(parseLicenseEntries(org.profile?.licenses));
+    setCertifications(parseCertifications(org.profile?.certifications));
+  }, [live, org?.id, org?.profile]);
+
   const [brandColor, setBrandColor] = useState(BRAND_COLORS[0].hex);
   const [productName, setProductName] = useState("BidIntelligenceOS");
   const [customDomain, setCustomDomain] = useState("bids.yourcompany.com");
   const [rollupEnabled, setRollupEnabled] = useState(true);
   const [regionalSegmentation, setRegionalSegmentation] = useState(false);
+
+  const handleSaveEnterpriseCredentials = () => {
+    if (!live) return;
+    const nextLicenses = licenses
+      .map((entry) => ({
+        name: entry.name.trim(),
+        ...(entry.id?.trim() ? { id: entry.id.trim() } : {}),
+        ...(entry.status?.trim() ? { status: entry.status.trim() } : {}),
+        ...(entry.expires?.trim() ? { expires: entry.expires.trim() } : {}),
+      }))
+      .filter((entry) => entry.name.length > 0);
+    const nextCertifications = certifications.map((entry) => entry.trim()).filter(Boolean);
+    updateOrg.mutate({
+      profile: {
+        ...profile,
+        licenses: nextLicenses,
+        certifications: nextCertifications,
+      },
+    });
+    toast({
+      title: "Enterprise credentials saved",
+      description: "Licenses and certifications stored on your organization profile.",
+    });
+  };
 
   const handleSaveProfile = () => {
     if (live) {
@@ -433,10 +485,165 @@ export default function Settings() {
           {/* Enterprise & White Label Tab */}
           <TabsContent value="enterprise" className="space-y-6">
             {live ? (
-              <OpsModuleEmpty
-                module="Enterprise & White Label"
-                description="Multi-location rollups, white-label branding, and role-based access are demo-only until enterprise settings are persisted."
-              />
+            <>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h3 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+                  <Sparkles className="h-6 w-6 text-[#0284C7]" />
+                  Enterprise Credentials
+                </h3>
+                <p className="text-slate-500 mt-1">
+                  Licenses and certifications persist on your organization profile. White-label branding,
+                  multi-location rollups, and role-based access remain Phase 5.
+                </p>
+              </div>
+            </div>
+
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                  <FileCheck className="h-5 w-5 text-[#0284C7]" />
+                  Licenses
+                </CardTitle>
+                <CardDescription className="text-slate-500">
+                  Trade and municipal licenses used for compliance and bid readiness.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                {licenses.length === 0 ? (
+                  <p className="text-sm text-slate-500">No licenses on file. Add your first license below.</p>
+                ) : (
+                  licenses.map((entry, index) => (
+                    <div key={index} className="grid gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">License name</Label>
+                        <Input
+                          value={entry.name}
+                          onChange={(e) =>
+                            setLicenses((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, name: e.target.value } : row)),
+                            )
+                          }
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">License ID</Label>
+                        <Input
+                          value={entry.id ?? ""}
+                          onChange={(e) =>
+                            setLicenses((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, id: e.target.value } : row)),
+                            )
+                          }
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</Label>
+                        <Input
+                          value={entry.status ?? ""}
+                          onChange={(e) =>
+                            setLicenses((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, status: e.target.value } : row)),
+                            )
+                          }
+                          placeholder="Active"
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Expires</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            value={entry.expires ?? ""}
+                            onChange={(e) =>
+                              setLicenses((rows) =>
+                                rows.map((row, i) => (i === index ? { ...row, expires: e.target.value } : row)),
+                              )
+                            }
+                            placeholder="Mar 2026"
+                            className="bg-white border-[#E2E8F0] text-slate-700"
+                          />
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="shrink-0 border-[#CBD5E1] bg-white text-slate-700"
+                            onClick={() => setLicenses((rows) => rows.filter((_, i) => i !== index))}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <Button
+                  variant="outline"
+                  className="border-[#CBD5E1] bg-white text-slate-700"
+                  onClick={() => setLicenses((rows) => [...rows, { name: "", status: "Active" }])}
+                >
+                  Add license
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-[#0284C7]" />
+                  Certifications
+                </CardTitle>
+                <CardDescription className="text-slate-500">
+                  Set-aside, safety, and trade certifications for pursuit and compliance gates.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                {certifications.length === 0 ? (
+                  <p className="text-sm text-slate-500">No certifications on file. Add your first certification below.</p>
+                ) : (
+                  certifications.map((cert, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input
+                        value={cert}
+                        onChange={(e) =>
+                          setCertifications((rows) =>
+                            rows.map((row, i) => (i === index ? e.target.value : row)),
+                          )
+                        }
+                        className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="shrink-0 border-[#CBD5E1] bg-white text-slate-700"
+                        onClick={() => setCertifications((rows) => rows.filter((_, i) => i !== index))}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))
+                )}
+                <Button
+                  variant="outline"
+                  className="border-[#CBD5E1] bg-white text-slate-700"
+                  onClick={() => setCertifications((rows) => [...rows, ""])}
+                >
+                  Add certification
+                </Button>
+              </CardContent>
+              <CardFooter className="border-t border-[#E2E8F0] pt-4">
+                <Button
+                  onClick={handleSaveEnterpriseCredentials}
+                  disabled={updateOrg.isPending}
+                  className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  Save credentials
+                </Button>
+              </CardFooter>
+            </Card>
+            </>
             ) : (
             <>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

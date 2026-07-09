@@ -86,8 +86,8 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses, certifications, leadership, and identity fields empty until org profile is populated |
-| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; empty fields for missing data; enterprise tab shows `OpsModuleEmpty` for authed users |
+| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses and certifications editable in Settings enterprise tab; leadership and identity fields empty until org profile is populated |
+| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; enterprise tab persists `licenses` and `certifications` JSON arrays; white-label, multi-location, and RBAC deferred Phase 5 |
 
 ## Orphan routes (not in nav)
 
@@ -120,3 +120,12 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | `GET /api/v1/ops/package-builder` | Active bid packages + documents + compliance |
 | `GET /api/v1/ops/alerts` | Ops alerts for briefings/alerts merge |
 | `POST /api/v1/jobs/from-bid/:bidId` | Convert won bid to job deployment with seeded schedule |
+
+## Phase 5 (deferred)
+
+| Surface | Status | Notes |
+|---------|--------|-------|
+| Settings enterprise — white label | planned | Brand color, product name override, custom domain, logo upload |
+| Settings enterprise — multi-location | planned | Franchise rollups, regional segmentation, location KPIs |
+| Settings enterprise — RBAC | planned | Role templates, permission grants, user invites |
+| `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses` (object array) and `certifications` (string array) persist in `organizations.profile_json`; other enterprise fields not yet modeled |
