@@ -25,7 +25,7 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
    git push origin origin/feat/bidos-production-2026-07:main --force-with-lease
    ```
    - Production baseline from feature branch: **`6ff2c75`** — `feat: enrich closeout stats and package scope from bid summary`
-   - Current `main` tip: **`5e38f98`** — leadership/contact + export-until-reviewed gates
+   - Current `main` tip: **`946bc20`** — leadership/contact + export-until-reviewed gates
    - No PR was opened (histories were unrelated); this doc serves as the merge record.
 
 3. **Clerk cutover** remains **pending** — see `deploy/RUNBOOK.md` § Clerk cutover checklist. Production still uses legacy smoke-test auth until redirect URLs and deploy are completed.
@@ -78,8 +78,8 @@ Smoke users: `carmen@ccacontact.com`, `rose@ccacontact.com` (`node scripts/seed-
 
 ```
 archive/main-promo-video-pre-bidos-2026-07  → 58352bc  (promo video era — preserved)
-main                                        → f8cd1f3  (BidOS production line)
-feat/bidos-production-2026-07               → f8cd1f3  (aligned with main)
+main                                        → 5e38f98  (BidOS production line)
+feat/bidos-production-2026-07               → 5e38f98  (aligned with main)
 ```
 
 ## Merge / PR record
