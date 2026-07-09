@@ -91,6 +91,8 @@ For team QA when Clerk redirect URLs or DNS are being fixed:
 3. Rebuild and restart: `./deploy/deploy.sh`
 4. Sign in at `https://bidintelligence.cagteam.net/login` with email + password
 
+**Team URL:** `https://bidintelligence.cagteam.net` (DNS A → `3.129.68.79`). Do not use `bidintelligence.docs.cagteam.net` unless that subdomain is added in DNS — it currently does not resolve.
+
 **Restore Clerk when ready:**
 
 1. Set `AUTH_ENABLED=true` and restore `VITE_CLERK_PUBLISHABLE_KEY`
