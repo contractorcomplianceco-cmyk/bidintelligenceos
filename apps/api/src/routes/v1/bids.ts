@@ -12,6 +12,8 @@ import { nextId, nowIso } from "../../lib/ids.js";
 import { hashBidScoreInputs, logScoreAccess } from "../../lib/score-access-log.js";
 import { computeWinLossAnalytics } from "../../lib/win-loss-analytics.js";
 import { parseStateFromLocation } from "../../lib/state-parse.js";
+import { buildPackageBuilderProjection } from "../../lib/ops-projection.js";
+import { generatePackagePdf, packagePdfFilename } from "../../lib/package-pdf-export.js";
 import { requireAuth, type AuthedRequest } from "../../middleware/auth.js";
 import { orgScopeMiddleware } from "../../middleware/org-scope.js";
 
@@ -216,7 +218,33 @@ router.post("/:id/package/export", async (req, res) => {
     res.status(403).json({ error: "Human review required before client-facing export" });
     return;
   }
-  res.status(501).json({ status: "planned", message: "PDF pipeline Phase 5" });
+
+  const format = String((req.body as { format?: string } | undefined)?.format ?? "PDF").toUpperCase();
+  if (format !== "PDF") {
+    res.status(501).json({ status: "planned", message: "DOCX export is Phase 5 — PDF available now" });
+    return;
+  }
+
+  const { packages } = await buildPackageBuilderProjection(orgId);
+  const pkg = packages.find((p) => p.bidId === bid.id);
+  if (!pkg) {
+    res.status(404).json({ error: "Package not found for bid" });
+    return;
+  }
+
+  const pdf = await generatePackagePdf({
+    bidName: bid.name,
+    recipient: bid.recipient || pkg.recipient || "Client",
+    projectType: bid.type,
+    location: bid.location,
+    sections: pkg.sections,
+  });
+
+  const filename = packagePdfFilename(bid.name, bid.id);
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.setHeader("Content-Length", String(pdf.length));
+  res.send(pdf);
 });
 
 router.post("/:id/outcome", async (req, res) => {
