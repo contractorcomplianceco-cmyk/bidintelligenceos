@@ -7,6 +7,7 @@ import intelligenceRoutes from "./intelligence.js";
 import researchRoutes from "./research.js";
 import commandCenterRoutes from "./command-center.js";
 import opsRoutes from "./ops.js";
+import integrationsRoutes from "./integrations.js";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use("/intelligence", intelligenceRoutes);
 router.use("/research", researchRoutes);
 router.use("/command-center", commandCenterRoutes);
 router.use("/ops", opsRoutes);
+router.use("/integrations", integrationsRoutes);
 
 export default router;

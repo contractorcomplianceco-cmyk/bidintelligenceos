@@ -82,6 +82,7 @@ export default function VoiceConnect() {
       title="VoiceConnect"
       subtitle="Voice-first field capture that drafts bids into BidIntelligenceOS."
       module="VoiceConnect field capture"
+      statusPath="/api/v1/integrations/voice-connect/status"
       icon={<AudioLines className="h-7 w-7 text-[#0BA3A8]" />}
     >
     <Layout>
