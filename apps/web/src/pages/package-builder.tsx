@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { samplePackages, BidPackageData } from "@core/bid-packages";
 import { Checkbox } from "@/components/ui/checkbox";
+import { clientExportBlocked, CLIENT_EXPORT_BLOCKED_MSG } from "@/lib/client-export-gate";
 
 type BuilderSection = {
   id: string;
@@ -259,7 +260,19 @@ export default function PackageBuilder() {
     }
   };
 
+  const selectedLivePkg = live ? livePackages.find((p) => p.id === selectedPkgId) : undefined;
+  const scoreReviewed = live ? Boolean(selectedLivePkg?.humanReviewed) : reviewed;
+  const exportBlocked = clientExportBlocked(live, scoreReviewed);
+
   const handleExport = (format: string) => {
+    if (exportBlocked) {
+      toast({
+        title: "Export blocked",
+        description: CLIENT_EXPORT_BLOCKED_MSG,
+        variant: "destructive",
+      });
+      return;
+    }
     toast({
       title: `Exporting ${format}`,
       description: live
@@ -313,30 +326,47 @@ export default function PackageBuilder() {
             <Button
               variant="outline"
               className="border-[#E2E8F0] hover:bg-slate-50 text-slate-700 bg-white h-9"
+              disabled={exportBlocked}
+              title={exportBlocked ? CLIENT_EXPORT_BLOCKED_MSG : undefined}
               onClick={() => handleExport("DOCX")}
             >
               <DownloadCloud className="w-4 h-4 mr-2" />
               DOCX
             </Button>
-            <Button className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white h-9" onClick={() => handleExport("PDF")}>
+            <Button
+              className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white h-9 disabled:opacity-50"
+              disabled={exportBlocked}
+              title={exportBlocked ? CLIENT_EXPORT_BLOCKED_MSG : undefined}
+              onClick={() => handleExport("PDF")}
+            >
               <Download className="w-4 h-4 mr-2" />
               Export PDF
             </Button>
-            <div className="w-px h-6 bg-[#E2E8F0] mx-1"></div>
-            <Button
-              variant={reviewed ? "secondary" : "default"}
-              className={
-                reviewed
-                  ? "bg-teal-50 text-[#0A8A8F] hover:bg-teal-100 border border-teal-200 h-9"
-                  : "bg-white text-slate-700 hover:bg-slate-50 border border-[#E2E8F0] h-9"
-              }
-              onClick={() => setReviewed(!reviewed)}
-            >
-              {reviewed ? <CheckSquare className="w-4 h-4 mr-2" /> : <Check className="w-4 h-4 mr-2" />}
-              {reviewed ? "Reviewed" : "Mark Reviewed"}
-            </Button>
+            {!live && (
+              <>
+                <div className="w-px h-6 bg-[#E2E8F0] mx-1"></div>
+                <Button
+                  variant={reviewed ? "secondary" : "default"}
+                  className={
+                    reviewed
+                      ? "bg-teal-50 text-[#0A8A8F] hover:bg-teal-100 border border-teal-200 h-9"
+                      : "bg-white text-slate-700 hover:bg-slate-50 border border-[#E2E8F0] h-9"
+                  }
+                  onClick={() => setReviewed(!reviewed)}
+                >
+                  {reviewed ? <CheckSquare className="w-4 h-4 mr-2" /> : <Check className="w-4 h-4 mr-2" />}
+                  {reviewed ? "Reviewed" : "Mark Reviewed"}
+                </Button>
+              </>
+            )}
           </div>
         </div>
+
+        {exportBlocked && (
+          <div className="bg-amber-50 border-b border-amber-200 px-4 py-2 text-xs text-amber-900 shrink-0">
+            {CLIENT_EXPORT_BLOCKED_MSG}
+          </div>
+        )}
 
         <div className="flex-1 flex overflow-hidden">
           <div className="w-[400px] shrink-0 border-r border-[#E2E8F0] bg-white flex flex-col overflow-y-auto">
@@ -434,15 +464,17 @@ export default function PackageBuilder() {
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Checkbox checked={reviewed} onCheckedChange={(c) => setReviewed(c === true)} className="mt-0.5 border-slate-300 bg-white data-[state=checked]:bg-[#2563EB] data-[state=checked]:border-[#2563EB]" />
+                  <Checkbox
+                    checked={scoreReviewed}
+                    disabled={live}
+                    onCheckedChange={live ? undefined : (c) => setReviewed(c === true)}
+                    className="mt-0.5 border-slate-300 bg-white data-[state=checked]:bg-[#2563EB] data-[state=checked]:border-[#2563EB]"
+                  />
                   <div className="space-y-0.5">
-                    <Label className="text-xs font-medium text-slate-700 cursor-pointer">Pricing summary reviewed</Label>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Checkbox checked={reviewed} onCheckedChange={(c) => setReviewed(c === true)} className="mt-0.5 border-slate-300 bg-white data-[state=checked]:bg-[#2563EB] data-[state=checked]:border-[#2563EB]" />
-                  <div className="space-y-0.5">
-                    <Label className="text-xs font-medium text-slate-700 cursor-pointer">Ready for contractor approval</Label>
+                    <Label className="text-xs font-medium text-slate-700">Bid score human-reviewed</Label>
+                    {live && !scoreReviewed && (
+                      <p className="text-[10px] text-amber-700 leading-tight">Approve score on bid detail to unlock export.</p>
+                    )}
                   </div>
                 </div>
               </div>

@@ -26,6 +26,7 @@ import { useLiveData } from "@/lib/data-mode";
 import { useAuth } from "@/lib/auth-context";
 import { BidIntelligencePanel } from "@/components/bid-intelligence-panel";
 import { BidDocumentsPanel } from "@/components/bid-documents-panel";
+import { clientExportBlocked, CLIENT_EXPORT_BLOCKED_MSG } from "@/lib/client-export-gate";
 
 const COST_TEMPLATE = [
   { label: "Equipment & Materials", pct: 0.43 },
@@ -52,6 +53,7 @@ export default function BidDetail() {
   const { data: scoreData } = useBidScore(params.id, live);
   const detail = bid ? bidDetails[bid.id] : undefined;
   const scoreReviewed = scoreData?.score?.humanReviewed ?? (bid as { humanReviewed?: boolean })?.humanReviewed ?? false;
+  const exportBlocked = clientExportBlocked(live, scoreReviewed);
 
   if (isLoading) {
     return (
@@ -461,13 +463,22 @@ export default function BidDetail() {
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button
-                onClick={() => navigate("/package-builder")}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
+                type="button"
+                disabled={exportBlocked}
+                title={exportBlocked ? CLIENT_EXPORT_BLOCKED_MSG : undefined}
+                onClick={() => {
+                  if (exportBlocked) return;
+                  navigate("/package-builder");
+                }}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-[#2563EB] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {exportBlocked && <Lock className="w-4 h-4" />}
                 Build vendor bid package <ArrowRight className="w-4 h-4" />
               </button>
               <p className="text-[10px] text-slate-400 text-center pt-1">
-                Internal strategy stays separate from the vendor-facing package. Review required before export.
+                {exportBlocked
+                  ? "Approve bid score before building or exporting the vendor package."
+                  : "Internal strategy stays separate from the vendor-facing package."}
               </p>
             </div>
           </div>
