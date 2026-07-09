@@ -25,7 +25,7 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
    git push origin origin/feat/bidos-production-2026-07:main --force-with-lease
    ```
    - Production baseline from feature branch: **`6ff2c75`** — `feat: enrich closeout stats and package scope from bid summary`
-   - Current `main` tip: **`afe436e`**+ — VoiceConnect Phase 5 status stub (`afe436e`); PDF export gate at `7dcfc57`; CI feat-branch gates at `2b1c3e2`
+   - Current `main` tip: **`badb5c1`** — org white-label brand fields stub (`badb5c1`); plan completion doc at `13e0e15`; team-review tag at `7d4e6af`
    - No PR was opened (histories were unrelated); this doc serves as the merge record.
 
 3. **Clerk cutover** remains **pending** — see `deploy/RUNBOOK.md` § Clerk cutover checklist. Production still uses legacy smoke-test auth until redirect URLs and deploy are completed.
@@ -46,7 +46,7 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
 > **What we did:**
 > - **Preserved** the old promo-video `main` on archive branch **`archive/main-promo-video-pre-bidos-2026-07`** (tip `58352bc`) — nothing was deleted:  
 >   https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/tree/archive/main-promo-video-pre-bidos-2026-07
-> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`afe436e`**+). **`main` is now the production branch.**
+> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`badb5c1`**). **`main` is now the production branch.**
 > - **Production app** remains at **https://bidintelligence.cagteam.net** (unchanged by this git operation).
 >
 > **Still pending (unchanged):** Clerk shared-auth cutover per `deploy/RUNBOOK.md` — do not enable `AUTH_ENABLED=true` until Clerk redirect URLs for `bidintelligence.cagteam.net` are configured and we run `./deploy/deploy.sh`. Preflight: `node scripts/clerk-cutover-preflight.mjs --check-only`.
@@ -80,8 +80,8 @@ Smoke users: `carmen@ccacontact.com`, `rose@ccacontact.com` (`node scripts/seed-
 
 ```
 archive/main-promo-video-pre-bidos-2026-07  → 58352bc  (promo video era — preserved)
-main                                        → 7d4e6af  (BidOS production line)  tag: team-review-2026-07-08
-feat/bidos-production-2026-07               → 7d4e6af  (aligned with main)      tag: team-review-2026-07-08
+main                                        → badb5c1  (BidOS production line)  tag: team-review-2026-07-08 @ 7d4e6af
+feat/bidos-production-2026-07               → badb5c1  (aligned with main)      tag: team-review-2026-07-08 @ 7d4e6af
 ```
 
 ## Merge / PR record

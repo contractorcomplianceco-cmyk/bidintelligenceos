@@ -1,6 +1,6 @@
 # BidIntelligenceOS — Plan completion summary (July 2026)
 
-Executive summary for **Carmen** and **Rose**. Production baseline: `main` / `feat/bidos-production-2026-07` at **`afe436e`+** (verified through doc tip **`7d4e6af`**).
+Executive summary for **Carmen** and **Rose**. Production baseline: `main` / `feat/bidos-production-2026-07` at **`badb5c1`** (team-review tag at `7d4e6af`).
 
 ---
 
@@ -121,4 +121,4 @@ Summary pointer for Slack/email:
 
 *Last updated: 2026-07-08 · Baseline `afe436e`+ · Doc commit on production branch line.*
 
-*Last verified: 2026-07-09 @ `13e0e15` — health `200` OK (postgres/rls); local typecheck + check:security + smoke:dry-run PASS; GitHub CI FAIL (Audit-Risk-Model sibling checkout, run [29017830988](https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/actions/runs/29017830988)).*
+*Last verified: 2026-07-09 @ `badb5c1` — health `200` OK (postgres/rls); local typecheck + check:security + smoke:dry-run PASS; GitHub CI FAIL (Audit-Risk-Model sibling checkout, run [29017830988](https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/actions/runs/29017830988)).*
