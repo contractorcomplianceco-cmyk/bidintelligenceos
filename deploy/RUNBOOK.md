@@ -92,10 +92,12 @@ AUDIT_ENGINE_API_TOKEN=   # optional Bearer (Clerk session JWT or service token)
 Live walkthrough status and capture UI when the external VideoConnect API is configured:
 
 ```env
-VIDEO_CONNECT_API_URL=https://your-video-connect-api-host
+VIDEO_CONNECT_API_URL=https://ccavideoconnect.com
 VIDEO_CONNECT_API_TOKEN=   # optional Bearer for protected VideoConnect API
-VIDEO_CONNECT_APP_URL=     # optional capture UI URL (defaults to VIDEO_CONNECT_API_URL)
+VIDEO_CONNECT_APP_URL=https://ccavideoconnect.com   # optional capture UI URL (defaults to VIDEO_CONNECT_API_URL)
 ```
+
+**Production host:** `https://ccavideoconnect.com` (DNS A → `3.129.68.79`, PM2 `ccavideoconnect` on `127.0.0.1:8092`).
 
 - `GET /api/v1/integrations/video-connect/status` — configured / connected / available states for authed team users
 - `GET /api/v1/integrations/video-connect/walkthroughs` — proxies walkthrough list when connected (expects `/api/health` and `/api/walkthroughs` on the VideoConnect service)
