@@ -13,7 +13,9 @@
     "build": "npm run build -w apps/web",
     "start": "NODE_ENV=production npm run start -w apps/api",
     "typecheck": "npm run typecheck -w apps/web && npm run typecheck -w apps/api",
-    "check:security": "node scripts/check-cca-core-browser-leak.mjs && npm run test:security -w apps/api"
+    "check:security": "node scripts/check-cca-core-browser-leak.mjs && npm run test:security -w apps/api",
+    "smoke:dry-run": "node scripts/smoke-team-url.mjs --dry-run",
+    "test": "npm run test:security -w apps/api"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

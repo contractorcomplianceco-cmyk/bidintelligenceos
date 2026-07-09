@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { samplePackages, BidPackageData } from "@core/bid-packages";
 import { Checkbox } from "@/components/ui/checkbox";
 import { clientExportBlocked, CLIENT_EXPORT_BLOCKED_MSG } from "@/lib/client-export-gate";
+import { apiFetch, ApiError } from "@/lib/api-client";
 
 type BuilderSection = {
   id: string;
@@ -264,13 +265,37 @@ export default function PackageBuilder() {
   const scoreReviewed = live ? Boolean(selectedLivePkg?.humanReviewed) : reviewed;
   const exportBlocked = clientExportBlocked(live, scoreReviewed);
 
-  const handleExport = (format: string) => {
+  const handleExport = async (format: string) => {
     if (exportBlocked) {
       toast({
         title: "Export blocked",
         description: CLIENT_EXPORT_BLOCKED_MSG,
         variant: "destructive",
       });
+      return;
+    }
+    if (format === "PDF" && live && selectedLivePkg) {
+      try {
+        await apiFetch<{ status: string; message: string }>(
+          `/api/v1/bids/${selectedLivePkg.bidId}/package/export`,
+          { method: "POST" },
+        );
+      } catch (e) {
+        if (e instanceof ApiError && e.status === 501) {
+          const body = e.body as { message?: string } | undefined;
+          toast({
+            title: "PDF export — Phase 5",
+            description: body?.message ?? "PDF pipeline Phase 5",
+          });
+          return;
+        }
+        toast({
+          title: "Export failed",
+          description: e instanceof ApiError ? e.message : "Could not export package",
+          variant: "destructive",
+        });
+        return;
+      }
       return;
     }
     toast({

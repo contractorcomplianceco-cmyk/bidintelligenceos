@@ -6,6 +6,7 @@
  * Usage:
  *   BIOS_SMOKE_PASSWORD=... node scripts/smoke-team-url.mjs
  *   BIOS_SMOKE_PASSWORD=... BIOS_SMOKE_EMAIL=rose@ccacontact.com node scripts/smoke-team-url.mjs
+ *   node scripts/smoke-team-url.mjs --dry-run   # CI: validate config, no network
  */
 import { config as loadEnv } from "dotenv";
 import path from "node:path";
@@ -14,10 +15,20 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 loadEnv({ path: path.join(root, ".env") });
 
+const DRY_RUN = process.argv.includes("--dry-run");
 const BASE_URL = (process.env.BIOS_SMOKE_URL || "https://bidintelligence.cagteam.net").replace(/\/+$/, "");
 const SMOKE_EMAIL = (process.env.BIOS_SMOKE_EMAIL || "carmen@ccacontact.com").trim().toLowerCase();
 const SMOKE_PASSWORD = process.env.BIOS_SMOKE_PASSWORD?.trim();
 const TIMEOUT_MS = Number(process.env.BIOS_SMOKE_TIMEOUT_MS || 15000);
+
+const PLANNED_CHECKS = [
+  "GET /api/health",
+  "POST /api/v1/auth/login",
+  "GET /api/v1/bids",
+  "GET /api/v1/jobs",
+  "GET /api/v1/ops/alerts",
+  "GET /api/v1/command-center/projection",
+];
 
 const DOCUMENTED_SMOKE_USERS = ["carmen@ccacontact.com", "rose@ccacontact.com"];
 
@@ -156,7 +167,25 @@ async function checkAuthedGet(label, path, cookie, validator) {
   pass(`GET ${path} (${status}) ${summarizeList(json)}`);
 }
 
+function runDryRun() {
+  console.log("BidIntelligenceOS team URL smoke — dry-run (no network)");
+  console.log(`Target: ${BASE_URL}`);
+  console.log(`Email: ${redactEmail(SMOKE_EMAIL)}`);
+  console.log(`Timeout: ${TIMEOUT_MS}ms`);
+  if (!DOCUMENTED_SMOKE_USERS.includes(SMOKE_EMAIL) && process.env.BIOS_SMOKE_EMAIL) {
+    console.error(`FAIL unknown smoke user ${redactEmail(SMOKE_EMAIL)}`);
+    process.exit(1);
+  }
+  for (const step of PLANNED_CHECKS) console.log(`  would run ${step}`);
+  console.log("SMOKE DRY-RUN PASS");
+}
+
 async function main() {
+  if (DRY_RUN) {
+    runDryRun();
+    return;
+  }
+
   console.log(`BidIntelligenceOS team URL smoke — ${BASE_URL}`);
 
   await checkHealth();

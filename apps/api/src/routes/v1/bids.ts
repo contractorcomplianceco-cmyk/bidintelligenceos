@@ -198,6 +198,27 @@ router.put("/:id/score/lock", async (req, res) => {
   res.json({ ok: true, lockedAt });
 });
 
+router.post("/:id/package/export", async (req, res) => {
+  const { orgId } = (req as unknown as AuthedRequest).auth;
+  const bid = await loadBidForOrg(req.params.id, orgId);
+  if (!bid) {
+    res.status(404).json({ error: "Bid not found" });
+    return;
+  }
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(bidScores)
+    .where(and(eq(bidScores.bidId, req.params.id), eq(bidScores.orgId, orgId)))
+    .orderBy(desc(bidScores.createdAt))
+    .limit(1);
+  if (!rows[0]?.humanReviewed) {
+    res.status(403).json({ error: "Human review required before client-facing export" });
+    return;
+  }
+  res.status(501).json({ status: "planned", message: "PDF pipeline Phase 5" });
+});
+
 router.post("/:id/outcome", async (req, res) => {
   const parsed = outcomeSchema.safeParse(req.body);
   if (!parsed.success) {
