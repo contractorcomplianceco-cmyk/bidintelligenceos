@@ -358,7 +358,7 @@ export default function Briefings() {
             </span>
           </CardHeader>
           <CardContent className="p-0 divide-y divide-[#E2E8F0]">
-            {live ? (
+            {isAuthenticated ? (
               <div className="p-8">
                 <Empty>
                   <EmptyHeader>
