@@ -84,6 +84,24 @@ ADMIN_EMAILS=owner@example.com           # comma-separated → owner role
 
 Production is on **legacy smoke-test auth** (`AUTH_ENABLED=false`) so the team can sign in while Clerk redirect URLs are finalized. **Do not flip Clerk on until every step below is done.**
 
+#### 0. Preflight (read-only — run before cutover)
+
+```bash
+cd /home/ubuntu/projects/bid-intelligence-os
+node scripts/clerk-cutover-preflight.mjs --check-only
+```
+
+Checks (never prints secret values):
+
+- Required Clerk / app URL env var **names** are present
+- `CLERK_PUBLISHABLE_KEY` / `VITE_CLERK_PUBLISHABLE_KEY` match `pk_live_*` or `pk_test_*`
+- `CORS_ORIGIN`, `BIOS_PUBLIC_URL`, `VITE_APP_URL` match `https://bidintelligence.cagteam.net`
+- Prints expected Clerk Dashboard redirect URL list for `bidintelligence.cagteam.net`
+- `AUTH_ENABLED` is **not** `true` (production not flipped yet)
+- `scripts/sync-clerk-env.mjs` and `scripts/seed-smoke-users.mjs` exist
+
+Fix any `PREFLIGHT FAIL` items before step 1. A `WARN` on commented `VITE_CLERK_PUBLISHABLE_KEY` is expected while smoke-test auth is active.
+
 #### 1. Server `.env` (never commit secrets)
 
 ```env
@@ -132,6 +150,36 @@ cd /home/ubuntu/projects/bid-intelligence-os
 
 - Rotate or delete smoke-test users (`node scripts/seed-smoke-users.mjs` accounts) in Postgres
 - Clear `BIOS_SMOKE_PASSWORD` from `.env` if set
+
+#### Rollback (revert to smoke-test / legacy auth)
+
+If Clerk cutover causes login issues, roll back **without** deleting Clerk keys from `.env`:
+
+1. In server `.env` (never commit):
+   - `AUTH_ENABLED=false`
+   - Comment out or remove `VITE_CLERK_PUBLISHABLE_KEY` (forces legacy `/login` form in the web build)
+   - Keep `CLERK_SECRET_KEY` / `CLERK_PUBLISHABLE_KEY` in place for a later retry
+2. Reseed QA users if passwords were rotated: `node scripts/seed-smoke-users.mjs`
+3. Rebuild and restart (required — `VITE_*` is baked at build time):
+
+   ```bash
+   ./deploy/deploy.sh
+   ```
+
+4. Verify: `GET https://bidintelligence.cagteam.net/api/health` → `200`; `/login` shows email/password; smoke users can sign in.
+5. Re-run preflight before the next cutover attempt:
+
+   ```bash
+   node scripts/clerk-cutover-preflight.mjs --check-only
+   ```
+
+**Scripts reference**
+
+| Script | Purpose |
+|--------|---------|
+| `node scripts/clerk-cutover-preflight.mjs --check-only` | Read-only cutover readiness (no deploy, no env writes) |
+| `node scripts/sync-clerk-env.mjs` | Copy Clerk keys from `cca-command-center-cloud` into `.env` and set `AUTH_ENABLED=true` — **only run when ready to cut over** |
+| `node scripts/seed-smoke-users.mjs` | Create/update legacy QA users (`carmen@ccacontact.com`, `rose@ccacontact.com`) for smoke-test auth |
 
 ### Temporary smoke-test auth (current production)
 
