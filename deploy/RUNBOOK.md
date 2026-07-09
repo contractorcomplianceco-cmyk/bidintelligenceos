@@ -78,7 +78,62 @@ ADMIN_EMAILS=owner@example.com           # comma-separated → owner role
 - Web: `@clerk/clerk-react` Sign in/up at `/login` and `/register`
 - Legacy `/api/v1/auth/login` returns 400 when Clerk is enabled
 
-### Temporary smoke-test auth (before Clerk)
+**Team URL:** `https://bidintelligence.cagteam.net` (DNS A → `3.129.68.79`). Do not use `bidintelligence.docs.cagteam.net` unless that subdomain is added in DNS — it currently does not resolve.
+
+### Clerk cutover checklist — `bidintelligence.cagteam.net` (not enabled yet)
+
+Production is on **legacy smoke-test auth** (`AUTH_ENABLED=false`) so the team can sign in while Clerk redirect URLs are finalized. **Do not flip Clerk on until every step below is done.**
+
+#### 1. Server `.env` (never commit secrets)
+
+```env
+AUTH_ENABLED=true
+CLERK_SECRET_KEY=sk_live_...
+CLERK_PUBLISHABLE_KEY=pk_live_...
+VITE_CLERK_PUBLISHABLE_KEY=pk_live_...   # required — baked into web build at deploy time
+VITE_CLERK_SIGN_IN_URL=https://accounts.docs.cagteam.net/sign-in
+VITE_CLERK_SIGN_UP_URL=https://accounts.docs.cagteam.net/sign-up
+ADMIN_EMAILS=owner@example.com           # comma-separated → owner role in BidOS
+```
+
+- Copy keys from Command Center: `node scripts/sync-clerk-env.mjs` (sets the vars above from `cca-command-center-cloud` artifacts).
+- Remove or comment the smoke-test block (`AUTH_ENABLED=false`, commented `VITE_CLERK_PUBLISHABLE_KEY`).
+
+#### 2. Clerk Dashboard — allowed origins & redirect URLs
+
+In [Clerk Dashboard](https://dashboard.clerk.com) → your CCA app → **Paths** / **Redirect URLs** / **Allowed origins**, add:
+
+| Purpose | URL |
+|--------|-----|
+| App origin | `https://bidintelligence.cagteam.net` |
+| Sign-in return | `https://bidintelligence.cagteam.net/login` |
+| Sign-up return | `https://bidintelligence.cagteam.net/register` |
+| Hosted account portal (if used) | `https://accounts.docs.cagteam.net/sign-in`, `https://accounts.docs.cagteam.net/sign-up` |
+
+After sign-in, Clerk should return users to the BidOS app on `bidintelligence.cagteam.net`, not `bidintelligence.docs.cagteam.net`.
+
+#### 3. Deploy (rebuild required)
+
+`VITE_CLERK_*` values are compiled into the web bundle — a restart alone is not enough.
+
+```bash
+cd /home/ubuntu/projects/bid-intelligence-os
+./deploy/deploy.sh
+```
+
+#### 4. Verify
+
+- `GET https://bidintelligence.cagteam.net/api/health` → `200`
+- `/login` shows Clerk (not email/password form)
+- `POST /api/v1/auth/login` returns `400` when Clerk is enabled
+- New Clerk user syncs to local `users` / `organizations` on first API call
+
+#### 5. Decommission smoke-test auth
+
+- Rotate or delete smoke-test users (`node scripts/seed-smoke-users.mjs` accounts) in Postgres
+- Clear `BIOS_SMOKE_PASSWORD` from `.env` if set
+
+### Temporary smoke-test auth (current production)
 
 For team QA when Clerk redirect URLs or DNS are being fixed:
 
@@ -91,18 +146,7 @@ For team QA when Clerk redirect URLs or DNS are being fixed:
 3. Rebuild and restart: `./deploy/deploy.sh`
 4. Sign in at `https://bidintelligence.cagteam.net/login` with email + password
 
-**Team URL:** `https://bidintelligence.cagteam.net` (DNS A → `3.129.68.79`). Do not use `bidintelligence.docs.cagteam.net` unless that subdomain is added in DNS — it currently does not resolve.
-
-**Restore Clerk when ready:**
-
-1. Set `AUTH_ENABLED=true` and restore `VITE_CLERK_PUBLISHABLE_KEY`
-2. In [Clerk Dashboard](https://dashboard.clerk.com) → your app → **Paths / Redirect URLs**, add:
-   - `https://bidintelligence.cagteam.net`
-   - `https://bidintelligence.cagteam.net/login`
-   - `https://bidintelligence.cagteam.net/register`
-   - Sign-in/sign-up fallback: `https://accounts.docs.cagteam.net/sign-in` and `/sign-up` if using the hosted account portal
-3. Run `node scripts/sync-clerk-env.mjs` (optional) and `./deploy/deploy.sh`
-4. Remove or rotate smoke-test passwords in Postgres when no longer needed
+Follow **Clerk cutover checklist** above when ready to enable Clerk.
 
 ## Object storage (S3)
 
