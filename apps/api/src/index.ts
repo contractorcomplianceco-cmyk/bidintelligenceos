@@ -59,6 +59,9 @@ app.get("/api/health", (_req, res) => {
     videoConnect: Boolean(
       process.env.VIDEO_CONNECT_API_URL?.trim() || process.env.CCA_VIDEO_CONNECT_API_URL?.trim(),
     ),
+    voiceConnect: Boolean(
+      process.env.VOICE_CONNECT_API_URL?.trim() || process.env.CCA_VOICE_CONNECT_API_URL?.trim(),
+    ),
     roseBrain: isRoseBrainEnabled(),
     database: db,
     note: isProd
