@@ -2,18 +2,30 @@ name: BidIntelligenceOS CI
 
 on:
   push:
-    branches: [main, master]
+    branches:
+      - main
+      - master
+      - "feat/**"
   pull_request:
+    branches:
+      - main
+      - master
+      - "feat/**"
 
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Checkout Audit-Risk-Model (sibling for @workspace/cca-core)
+        run: git clone --depth 1 "https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model.git" ../Audit-Risk-Model
+
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
+
       - run: npm ci
       - run: npm run typecheck
       - run: npm run check:security
