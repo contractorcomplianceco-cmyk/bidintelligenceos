@@ -14,7 +14,8 @@ import { DemoDataBadge } from "@/components/demo-data-badge";
 import { AnalyticsChartEmpty } from "@/components/analytics-chart-empty";
 import {
   buildLiveLossReasons,
-  buildLiveMarginByJob,
+  buildLiveMarginTrend,
+  hasLiveMarginTrend,
   buildLiveOutcomeByType,
   buildLiveOutcomeTimeline,
   buildLiveWinRateSeries,
@@ -91,9 +92,9 @@ export default function Analytics() {
     () => (live ? buildLiveOutcomeByType(allBids, winLoss) : []),
     [live, allBids, winLoss],
   );
-  const liveMarginByJob = useMemo(
-    () => (live && costData?.records?.length ? buildLiveMarginByJob(costData.records) : []),
-    [live, costData],
+  const liveMarginTrend = useMemo(
+    () => (live && costData?.records?.length ? buildLiveMarginTrend(costData.records, liveJobs) : []),
+    [live, costData, liveJobs],
   );
 
   const winRateSeries = useMemo(() => {
@@ -359,24 +360,12 @@ export default function Analytics() {
               <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">GROSS MARGIN TREND</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
-              {live && liveMarginByJob.length === 0 ? (
-                <AnalyticsChartEmpty label="Margin trend requires job cost tracking on deployments" />
-              ) : live && liveMarginByJob.length > 0 ? (
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={liveMarginByJob} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-                    <XAxis dataKey="name" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} unit="%" domain={["dataMin - 2", "dataMax + 2"]} />
-                    <RechartsTooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "Gross margin"]} />
-                    <Bar dataKey="margin" fill="#22C55E" radius={[3, 3, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              {live && !hasLiveMarginTrend(costData?.records ?? [], liveJobs) ? (
+                <AnalyticsChartEmpty label="Margin trend requires job cost tracking on at least two deployments" />
               ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={analyticsData.marginTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <LineChart data={live ? liveMarginTrend : analyticsData.marginTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
                     <XAxis dataKey="month" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
                     <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} unit="%" domain={["dataMin - 1", "dataMax + 1"]} />

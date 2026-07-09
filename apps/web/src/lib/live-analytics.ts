@@ -100,13 +100,40 @@ export function hasLiveOutcomeTimeline(bids: Bid[]): boolean {
   return decidedBids(bids).length >= 1;
 }
 
-export function buildLiveMarginByJob(
-  records: { jobName: string; grossMargin: number }[],
-): { name: string; margin: number }[] {
-  return records.map((r) => ({
-    name: r.jobName.split(" ").slice(0, 2).join(" "),
-    margin: r.grossMargin,
-  }));
+export function hasLiveMarginTrend(
+  records: { jobId: string; grossMargin: number }[],
+  jobs: { id: string; startDate: string }[],
+): boolean {
+  const dated = new Set(jobs.map((j) => j.id));
+  return records.filter((r) => dated.has(r.jobId)).length >= 2;
+}
+
+export function buildLiveMarginTrend(
+  records: { jobId: string; grossMargin: number }[],
+  jobs: { id: string; startDate: string }[],
+): { month: string; margin: number }[] {
+  const dateByJob = new Map(jobs.map((j) => [j.id, j.startDate]));
+  const byMonth = new Map<string, { sum: number; count: number; sortKey: number }>();
+
+  for (const r of records) {
+    const date = dateByJob.get(r.jobId);
+    if (!date) continue;
+    const key = monthKey(date);
+    const sortKey = new Date(date).getTime();
+    const bucket = byMonth.get(key) ?? { sum: 0, count: 0, sortKey };
+    bucket.sum += r.grossMargin;
+    bucket.count += 1;
+    bucket.sortKey = Number.isNaN(sortKey) ? bucket.sortKey : Math.min(bucket.sortKey, sortKey);
+    byMonth.set(key, bucket);
+  }
+
+  return [...byMonth.entries()]
+    .sort((a, b) => a[1].sortKey - b[1].sortKey)
+    .map(([month, { sum, count }]) => ({
+      month,
+      margin: Math.round((sum / count) * 10) / 10,
+    }))
+    .slice(-12);
 }
 
 export function buildLiveCostSnapshot(
