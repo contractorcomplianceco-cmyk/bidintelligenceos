@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { jobsiteWeather } from "@core/operations";
+import { jobsiteWeather as seedWeather } from "@core/operations";
 import type { WeatherCondition, RiskBand } from "@core/operations";
 import { useAppContext } from "@/lib/context";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOpsWeather } from "@/hooks/use-ops";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
   Sun,
   Cloud,
@@ -89,7 +94,33 @@ function RiskBadge({ label, band, icon: Icon }: { label: string; band: RiskBand;
 export default function Weather() {
   const { verticalConfig } = useAppContext();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: liveSites } = useOpsWeather();
+  const jobsiteWeather = live ? (liveSites ?? []) : seedWeather;
   const [rescheduled, setRescheduled] = useState<Record<string, boolean>>({});
+
+  if (live && jobsiteWeather.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+          <div>
+            <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+              <CloudRain className="h-7 w-7 text-[#0284C7]" />
+              Weather Watch
+            </h2>
+            <p className="text-slate-500 mt-1.5">
+              Jobsite weather placeholders for active {verticalConfig.name} deployments.
+            </p>
+          </div>
+          <OpsModuleEmpty
+            module="No active jobsites"
+            description="Record won jobs in deployment to monitor weather-sensitive work. External forecast API optional."
+          />
+        </div>
+      </Layout>
+    );
+  }
 
   const highRiskSites = jobsiteWeather.filter(
     (s) => s.rainRisk === "High" || s.rainRisk === "Severe" || s.windRisk === "High" || s.windRisk === "Severe"
@@ -117,6 +148,7 @@ export default function Weather() {
             <p className="text-slate-500 mt-1.5">
               5-day jobsite forecasts, weather-risk bands, and schedule impact for active {verticalConfig.name} operations.
             </p>
+            {!live && <DemoDataBadge />}
           </div>
           <div className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-2.5">
             <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Sites Monitored</div>

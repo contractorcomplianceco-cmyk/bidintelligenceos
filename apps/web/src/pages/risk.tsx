@@ -2,11 +2,16 @@ import { useMemo, useState } from "react";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOpsRisk } from "@/hooks/use-ops";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
-  riskItems,
-  changeOrders,
+  riskItems as seedRisks,
+  changeOrders as seedChangeOrders,
   profitFadeSignals,
-  riskStats,
+  riskStats as seedRiskStats,
   type RiskItem,
   type RiskCategory,
   type RiskSeverity,
@@ -104,11 +109,39 @@ function detectionMeta(source: DetectionSource): { icon: typeof Bot; color: stri
 
 export default function Risk() {
   const { verticalConfig } = useAppContext();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: riskData } = useOpsRisk();
+  const riskItems = live ? (riskData?.risks ?? []) : seedRisks;
+  const changeOrders = live ? (riskData?.changeOrders ?? []) : seedChangeOrders;
+  const riskStats = live ? (riskData?.stats ?? seedRiskStats) : seedRiskStats;
   const [severityFilter, setSeverityFilter] = useState<RiskSeverity | "All">("All");
   const [categoryFilter, setCategoryFilter] = useState<RiskCategory | "All">("All");
   const [selectedCoId, setSelectedCoId] = useState<string>(
-    changeOrders.find((c) => c.status === "Disputed")?.id ?? changeOrders[0].id
+    changeOrders.find((c) => c.status === "Disputed")?.id ?? changeOrders[0]?.id ?? ""
   );
+
+  if (live && riskItems.length === 0 && changeOrders.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <Radar className="w-7 h-7 text-[#0284C7]" />
+              Risk &amp; Change Orders
+            </h1>
+            <p className="text-slate-500 mt-1">
+              Risk signals derived from job status, permits, and bid scores for {verticalConfig.name}.
+            </p>
+          </div>
+          <OpsModuleEmpty
+            module="No risk signals yet"
+            description="Delayed jobs, permit gaps, and low bid-fit scores will populate the risk radar."
+          />
+        </div>
+      </Layout>
+    );
+  }
 
   const filteredRisks = useMemo(() => {
     return riskItems
@@ -119,7 +152,7 @@ export default function Risk() {
         if (b.status === "Resolved" && a.status !== "Resolved") return -1;
         return SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity);
       });
-  }, [severityFilter, categoryFilter]);
+  }, [severityFilter, categoryFilter, riskItems]);
 
   const selectedCo = changeOrders.find((c) => c.id === selectedCoId) ?? changeOrders[0];
 
@@ -137,6 +170,7 @@ export default function Risk() {
               Risk radar, change-order tracking, and profit-fade watch across active{" "}
               {verticalConfig.name} deployments.
             </p>
+            {!live && <DemoDataBadge />}
           </div>
           <div className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2">
             <Info className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />

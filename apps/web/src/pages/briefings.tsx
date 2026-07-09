@@ -5,11 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/lib/context";
 import {
-  dailyBriefing,
+  dailyBriefing as demoBriefing,
   type BriefingItem,
   type AlertCategory,
   type AlertSeverity,
 } from "@core/operations";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useCommandCenterProjection } from "@/hooks/use-command-center";
+import { useRoseOsSummary } from "@/hooks/use-bids";
+import { buildLiveBriefing } from "@/lib/live-operations";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   Sunrise,
   Sparkles,
@@ -97,11 +110,19 @@ const briefingArchive: ArchivedBriefing[] = [
 export default function Briefings() {
   const { toast } = useToast();
   const { verticalConfig } = useAppContext();
+  const { user, isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: projection } = useCommandCenterProjection();
+  const { data: roseSummary } = useRoseOsSummary();
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+
+  const dailyBriefing = live
+    ? buildLiveBriefing(projection, roseSummary?.stats, roseSummary?.insights ?? [], user?.name)
+    : demoBriefing;
 
   const criticalCount = useMemo(
     () => dailyBriefing.items.filter((i) => i.priority === "Critical").length,
-    []
+    [dailyBriefing.items],
   );
 
   const handleAction = (item: BriefingItem) => {
@@ -133,6 +154,7 @@ export default function Briefings() {
             <p className="text-slate-500 mt-1">
               Your automated morning brief for the {verticalConfig.name} operation. Decision-support guidance only.
             </p>
+            {!live && <DemoDataBadge />}
           </div>
           <button
             onClick={handleGenerate}
@@ -198,7 +220,24 @@ export default function Briefings() {
               </span>
             </CardHeader>
             <CardContent className="p-0 divide-y divide-[#E2E8F0]">
-              {dailyBriefing.items.map((item, idx) => {
+              {dailyBriefing.items.length === 0 ? (
+                <div className="p-8">
+                  <Empty>
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <Sunrise className="text-[#0284C7]" />
+                      </EmptyMedia>
+                      <EmptyTitle>No priority items today</EmptyTitle>
+                      <EmptyDescription>
+                        {live
+                          ? "Your pipeline is clear — no overdue follow-ups or ROSEOS alerts flagged."
+                          : "Generate a briefing to see demo priority items."}
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
+                </div>
+              ) : (
+              dailyBriefing.items.map((item, idx) => {
                 const style = severityStyles[item.priority];
                 const Icon = categoryIcon[item.category];
                 return (
@@ -245,7 +284,8 @@ export default function Briefings() {
                     </div>
                   </div>
                 );
-              })}
+              })
+              )}
             </CardContent>
           </Card>
 
@@ -316,7 +356,22 @@ export default function Briefings() {
             </span>
           </CardHeader>
           <CardContent className="p-0 divide-y divide-[#E2E8F0]">
-            {briefingArchive.map((brief) => {
+            {live ? (
+              <div className="p-8">
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <Archive className="text-slate-400" />
+                    </EmptyMedia>
+                    <EmptyTitle>No archived briefings</EmptyTitle>
+                    <EmptyDescription>
+                      Prior briefings will appear here once the archive API is available.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              </div>
+            ) : (
+            briefingArchive.map((brief) => {
               const style = severityStyles[brief.highlight];
               return (
                 <div
@@ -337,7 +392,8 @@ export default function Briefings() {
                   </div>
                 </div>
               );
-            })}
+            })
+            )}
           </CardContent>
         </Card>
       </div>

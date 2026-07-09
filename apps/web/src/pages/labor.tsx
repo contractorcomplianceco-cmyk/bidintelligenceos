@@ -1,8 +1,13 @@
 import { useMemo } from "react";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { crewMembers, subcontractors, CrewStatus, SubStatus } from "@core/operations";
+import { crewMembers as seedCrew, subcontractors as seedSubs, CrewStatus, SubStatus } from "@core/operations";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOpsLabor } from "@/hooks/use-ops";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
   Users,
   HardHat,
@@ -41,31 +46,54 @@ function utilizationColor(util: number): string {
 
 export default function Labor() {
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: laborData } = useOpsLabor();
+
+  const activeCrew = live ? (laborData?.crew ?? []) : seedCrew;
+  const activeSubs = live ? (laborData?.subs ?? []) : seedSubs;
+
+  if (live && activeCrew.length === 0 && activeSubs.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <Users className="h-7 w-7 text-[#0284C7]" />
+              Labor & Subcontractors
+            </h1>
+            <p className="text-slate-500 mt-1">Crew utilization and subcontractor status across active jobs.</p>
+          </div>
+          <OpsModuleEmpty module="Labor & Subs" description="Assign crew and subs on job deployments to populate labor tracking." />
+        </div>
+      </Layout>
+    );
+  }
 
   const stats = useMemo(() => {
-    const assigned = crewMembers.filter((c) => c.status !== "PTO" && c.status !== "Available");
-    const utilizationBase = crewMembers.filter((c) => c.utilization > 0);
+    const assigned = activeCrew.filter((c) => c.status !== "PTO" && c.status !== "Available");
+    const utilizationBase = activeCrew.filter((c) => c.utilization > 0);
     const avgUtil =
       utilizationBase.length > 0
         ? Math.round(
             utilizationBase.reduce((sum, c) => sum + c.utilization, 0) / utilizationBase.length,
           )
         : 0;
-    const overallocated = crewMembers.filter((c) => c.status === "Overallocated").length;
-    const subsAtRisk = subcontractors.filter(
+    const overallocated = activeCrew.filter((c) => c.status === "Overallocated").length;
+    const subsAtRisk = activeSubs.filter(
       (s) => s.status === "At Risk" || s.status === "Delayed",
     ).length;
     return {
-      crewCount: crewMembers.length,
+      crewCount: activeCrew.length,
       assignedCount: assigned.length,
       avgUtil,
       overallocated,
       subsAtRisk,
-      subCount: subcontractors.length,
+      subCount: activeSubs.length,
     };
-  }, []);
+  }, [activeCrew, activeSubs]);
 
-  const conflictCrew = crewMembers.find((c) => c.status === "Overallocated");
+  const conflictCrew = activeCrew.find((c) => c.status === "Overallocated");
 
   const handleCall = (name: string, contact?: string) => {
     toast({
@@ -125,6 +153,7 @@ export default function Labor() {
             <p className="text-slate-500 mt-1">
               Crew utilization, subcontractor status, and conflict detection across active jobs.
             </p>
+            {!live && <DemoDataBadge />}
           </div>
           <div className="text-[11px] text-slate-500 italic">Decision-support guidance only.</div>
         </div>
@@ -202,7 +231,7 @@ export default function Labor() {
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y divide-[#E2E8F0]">
-              {crewMembers.map((crew) => (
+              {activeCrew.map((crew) => (
                 <div
                   key={crew.id}
                   className="p-4 grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 items-center hover:bg-[#F1F5F9] transition-colors"
@@ -288,7 +317,7 @@ export default function Labor() {
           </CardHeader>
           <CardContent className="p-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {subcontractors.map((sub) => (
+              {activeSubs.map((sub) => (
                 <div
                   key={sub.id}
                   className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm p-4 hover:border-[#CBD5E1] transition-colors"

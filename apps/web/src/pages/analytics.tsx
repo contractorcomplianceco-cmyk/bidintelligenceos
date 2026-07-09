@@ -8,7 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { useWinLossAnalytics } from "@/hooks/use-bids";
+import { useJobs } from "@/hooks/use-jobs";
 import { DemoDataBadge } from "@/components/demo-data-badge";
+import { AnalyticsChartEmpty } from "@/components/analytics-chart-empty";
 import {
   TrendingUp,
   TrendingDown,
@@ -55,16 +57,22 @@ export default function Analytics() {
   const { isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
   const { data: winLoss } = useWinLossAnalytics();
+  const { data: liveJobsRaw } = useJobs();
+  const liveJobs = live ? (liveJobsRaw ?? []) : jobDeployments;
   const [range, setRange] = useState<"6M" | "12M">("12M");
 
   const winRateSeries = useMemo(
     () => (range === "6M" ? analyticsData.winRateOverTime.slice(-6) : analyticsData.winRateOverTime),
-    [range]
+    [range],
   );
 
-  const currentWinRate = analyticsData.winRateOverTime[analyticsData.winRateOverTime.length - 1].rate;
+  const currentWinRate = live && winLoss?.summary.winRate != null
+    ? winLoss.summary.winRate
+    : analyticsData.winRateOverTime[analyticsData.winRateOverTime.length - 1].rate;
   const priorWinRate = analyticsData.winRateOverTime[analyticsData.winRateOverTime.length - 2].rate;
-  const winRateDelta = currentWinRate - priorWinRate;
+  const winRateDelta = live && winLoss?.summary.winRate != null
+    ? 0
+    : currentWinRate - priorWinRate;
 
   const currentMargin = analyticsData.marginTrend[analyticsData.marginTrend.length - 1].margin;
   const firstMargin = analyticsData.marginTrend[0].margin;
@@ -79,30 +87,39 @@ export default function Analytics() {
   const totalOutcomes = totalWon + totalLost;
   const liveWinRate = winLoss?.summary.winRate;
 
-  const avgProjectedRoi = useMemo(
-    () => +(costRecords.reduce((s, r) => s + r.projectedRoi, 0) / costRecords.length).toFixed(1),
-    []
-  );
+  const avgProjectedRoi = useMemo(() => {
+    if (live) {
+      if (liveJobs.length === 0) return 0;
+      return +(liveJobs.reduce((s, j) => s + j.projectedRoi, 0) / liveJobs.length).toFixed(1);
+    }
+    return +(costRecords.reduce((s, r) => s + r.projectedRoi, 0) / costRecords.length).toFixed(1);
+  }, [live, liveJobs]);
 
-  const roiByJob = useMemo(
-    () =>
-      [...costRecords]
+  const roiByJob = useMemo(() => {
+    if (live) {
+      return [...liveJobs]
         .sort((a, b) => b.projectedRoi - a.projectedRoi)
-        .map((r) => ({
-          name: r.jobName.replace(/ (Retrofit|Replacement|Electrical|Restoration|Buildout|Facilities)$/i, ""),
-          projected: r.projectedRoi,
-          actual: r.actualRoi,
-        })),
-    []
-  );
+        .map((j) => ({
+          name: j.name.replace(/ (Retrofit|Replacement|Electrical|Restoration|Buildout|Facilities)$/i, ""),
+          projected: j.projectedRoi,
+          actual: 0,
+        }));
+    }
+    return [...costRecords]
+      .sort((a, b) => b.projectedRoi - a.projectedRoi)
+      .map((r) => ({
+        name: r.jobName.replace(/ (Retrofit|Replacement|Electrical|Restoration|Buildout|Facilities)$/i, ""),
+        projected: r.projectedRoi,
+        actual: r.actualRoi,
+      }));
+  }, [live, liveJobs]);
 
-  const completionData = useMemo(
-    () =>
-      [...jobDeployments]
-        .sort((a, b) => b.completion - a.completion)
-        .map((j) => ({ name: j.name, completion: j.completion, status: j.status })),
-    []
-  );
+  const completionData = useMemo(() => {
+    const source = live ? liveJobs : jobDeployments;
+    return [...source]
+      .sort((a, b) => b.completion - a.completion)
+      .map((j) => ({ name: j.name, completion: j.completion, status: j.status }));
+  }, [live, liveJobs]);
 
   const topLossReason = [...analyticsData.lossReasons].sort((a, b) => b.count - a.count)[0];
   const bestType = [...analyticsData.projectTypes].sort(
@@ -168,7 +185,7 @@ export default function Analytics() {
               Win/loss and performance intelligence for {verticalConfig.name}. Decision-support guidance only.
             </p>
             {live && winLoss && (
-              <p className="text-[11px] text-teal-700 mt-1">Win/loss KPIs from live bid outcomes — charts remain demo fixtures.</p>
+              <p className="text-[11px] text-teal-700 mt-1">Win/loss KPIs from live bid outcomes.</p>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -229,6 +246,9 @@ export default function Analytics() {
               <span className="text-xs text-slate-500">{range === "6M" ? "Last 6 months" : "Trailing 12 months"}</span>
             </CardHeader>
             <CardContent className="p-5">
+              {live ? (
+                <AnalyticsChartEmpty label="Win rate trend requires historical outcomes" />
+              ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={winRateSeries} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -246,6 +266,7 @@ export default function Analytics() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+              )}
             </CardContent>
           </Card>
 
@@ -254,6 +275,9 @@ export default function Analytics() {
               <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">GROSS MARGIN TREND</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
+              {live ? (
+                <AnalyticsChartEmpty label="Margin trend requires job cost tracking (Phase 4)" />
+              ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={analyticsData.marginTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -265,6 +289,7 @@ export default function Analytics() {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -281,6 +306,9 @@ export default function Analytics() {
               </div>
             </CardHeader>
             <CardContent className="p-5">
+              {live ? (
+                <AnalyticsChartEmpty label="Outcome timeline requires more recorded bid outcomes" />
+              ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analyticsData.bidOutcomeTimeline} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -294,6 +322,7 @@ export default function Analytics() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+              )}
             </CardContent>
           </Card>
 
@@ -302,6 +331,9 @@ export default function Analytics() {
               <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">WIN / LOSS BY TYPE</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
+              {live ? (
+                <AnalyticsChartEmpty label="Win/loss by project type requires categorized outcomes" />
+              ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analyticsData.projectTypes} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
@@ -315,6 +347,7 @@ export default function Analytics() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -326,6 +359,9 @@ export default function Analytics() {
               <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">LOSS REASONS</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
+              {live ? (
+                <AnalyticsChartEmpty label="Loss reason breakdown requires lost bid annotations" />
+              ) : (
               <div className="flex items-center gap-4">
                 <div className="w-32 h-32 shrink-0">
                   <ResponsiveContainer width="100%" height="100%">
@@ -359,6 +395,7 @@ export default function Analytics() {
                   ))}
                 </div>
               </div>
+              )}
             </CardContent>
           </Card>
 
@@ -371,6 +408,9 @@ export default function Analytics() {
               </div>
             </CardHeader>
             <CardContent className="p-5">
+              {live && roiByJob.length === 0 ? (
+                <AnalyticsChartEmpty label="Add won jobs to see ROI by deployment" />
+              ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={roiByJob} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -383,6 +423,7 @@ export default function Analytics() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -393,6 +434,9 @@ export default function Analytics() {
             <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">JOB COMPLETION PROGRESS</CardTitle>
           </CardHeader>
           <CardContent className="p-5">
+            {live && completionData.length === 0 ? (
+              <AnalyticsChartEmpty label="Add job deployments to track completion progress" />
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
               {completionData.map((j) => (
                 <div key={j.name}>
@@ -427,10 +471,12 @@ export default function Analytics() {
                 </div>
               ))}
             </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Post-job learning loop */}
+        {!live && (
         <Card className="bg-white border-[#E2E8F0]">
           <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
@@ -462,6 +508,7 @@ export default function Analytics() {
             </div>
           </CardContent>
         </Card>
+        )}
       </div>
     </Layout>
   );

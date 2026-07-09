@@ -2,7 +2,21 @@ import { useMemo, useState } from "react";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { alertItems, AlertItem, AlertSeverity, AlertCategory } from "@core/operations";
+import { alertItems as demoAlerts, AlertItem, AlertSeverity, AlertCategory } from "@core/operations";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useCommandCenterProjection } from "@/hooks/use-command-center";
+import { useRoseOsSummary } from "@/hooks/use-bids";
+import { useOpsAlerts } from "@/hooks/use-ops";
+import { buildLiveAlerts } from "@/lib/live-operations";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   AlertTriangle,
   CloudRain,
@@ -57,11 +71,20 @@ const CATEGORIES: AlertCategory[] = [
 
 export default function Alerts() {
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: projection } = useCommandCenterProjection();
+  const { data: roseSummary } = useRoseOsSummary();
+  const { data: opsAlerts = [] } = useOpsAlerts();
+
+  const alertItems = live
+    ? buildLiveAlerts(projection, roseSummary?.insights ?? [], opsAlerts)
+    : demoAlerts;
 
   const [categoryFilter, setCategoryFilter] = useState<AlertCategory | "All">("All");
   const [severityFilter, setSeverityFilter] = useState<AlertSeverity | "All">("All");
-  const [resolvedMap, setResolvedMap] = useState<Record<string, boolean>>(
-    () => Object.fromEntries(alertItems.map((a) => [a.id, a.resolved]))
+  const [resolvedMap, setResolvedMap] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(alertItems.map((a) => [a.id, a.resolved])),
   );
 
   const withResolved = useMemo<AlertItem[]>(
@@ -130,6 +153,12 @@ export default function Alerts() {
               AI-detected risks across weather, permits, labor, subcontractors, cost, and ROI.
               Decision-support guidance only.
             </p>
+            {!live && <DemoDataBadge />}
+            {live && (
+              <p className="text-[11px] text-teal-700 mt-1">
+                Live alerts from bid pipeline, ROSEOS insights, and ops modules (jobs, permits, weather, labor).
+              </p>
+            )}
           </div>
           <div className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-2.5 text-center">
             <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Active Alerts</div>

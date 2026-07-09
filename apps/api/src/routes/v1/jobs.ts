@@ -2,7 +2,7 @@ import { Router } from "express";
 import { and, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../../db/client.js";
-import { jobs } from "../../db/schema.js";
+import { bids, jobs } from "../../db/schema.js";
 import { nextId, nowIso } from "../../lib/ids.js";
 import { requireAuth, type AuthedRequest } from "../../middleware/auth.js";
 import { orgScopeMiddleware } from "../../middleware/org-scope.js";
@@ -58,6 +58,96 @@ router.get("/", async (req, res) => {
     .from(jobs)
     .where(and(eq(jobs.orgId, orgId), isNull(jobs.deletedAt)));
   res.json({ jobs: rows.map(rowToJob) });
+});
+
+router.post("/from-bid/:bidId", async (req, res) => {
+  const { orgId } = (req as unknown as AuthedRequest).auth;
+  const db = getDb();
+  const bidRows = await db
+    .select()
+    .from(bids)
+    .where(and(eq(bids.id, req.params.bidId), eq(bids.orgId, orgId), isNull(bids.deletedAt)))
+    .limit(1);
+  const bid = bidRows[0];
+  if (!bid) {
+    res.status(404).json({ error: "Bid not found" });
+    return;
+  }
+  if (bid.status !== "Won") {
+    res.status(400).json({ error: "Only won bids can convert to job deployments" });
+    return;
+  }
+
+  const existing = await db
+    .select()
+    .from(jobs)
+    .where(and(eq(jobs.bidId, bid.id), eq(jobs.orgId, orgId), isNull(jobs.deletedAt)))
+    .limit(1);
+  if (existing[0]) {
+    res.status(409).json({ error: "Job already exists for this bid", job: rowToJob(existing[0]) });
+    return;
+  }
+
+  const ts = nowIso();
+  const id = nextId("CCA-JOB");
+  const startDate = ts.slice(0, 10);
+  const targetCompletion = bid.expectedDecisionDate ?? bid.nextActionDate ?? startDate;
+  const budget = Math.round((bid.amount ?? 0) * 0.75);
+  const projectedRoi = bid.margin ?? 15;
+  const riskLevel =
+    (bid.riskScore ?? 0) >= 70 ? "High" : (bid.riskScore ?? 0) >= 40 ? "Medium" : "Low";
+
+  const payload = {
+    stage: "Job Deployment Created",
+    completion: 0,
+    budget,
+    costToDate: 0,
+    projectedRoi,
+    weatherSensitive: false,
+    crew: [],
+    subs: [],
+    riskLevel,
+    nextMilestone: "Mobilization",
+    nextMilestoneDate: targetCompletion,
+    scheduleEvents: [
+      {
+        id: `sched-${id}-mob`,
+        title: "Mobilization",
+        assignee: "Unassigned",
+        startTime: "08:00",
+        endTime: "16:00",
+        dayIndex: 1,
+        type: "Crew",
+        status: "Scheduled",
+        critical: true,
+      },
+    ],
+  };
+
+  await db.insert(jobs).values({
+    id,
+    orgId,
+    bidId: bid.id,
+    name: bid.name,
+    client: bid.recipient ?? "",
+    location: bid.location ?? "",
+    vertical: "general-contractor",
+    contractValue: bid.amount ?? 0,
+    startDate,
+    targetCompletion,
+    projectManager: bid.contactPerson ?? "",
+    crewLead: "",
+    currentPhase: "Mobilization",
+    phaseIndex: 0,
+    totalPhases: 6,
+    status: "Mobilizing",
+    payloadJson: JSON.stringify(payload),
+    createdAt: ts,
+    updatedAt: ts,
+  });
+
+  const rows = await db.select().from(jobs).where(eq(jobs.id, id)).limit(1);
+  res.status(201).json({ job: rowToJob(rows[0]!) });
 });
 
 router.get("/:id", async (req, res) => {

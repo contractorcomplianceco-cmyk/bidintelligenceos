@@ -2,8 +2,13 @@ import { useMemo, useState } from "react";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
-import { costRecords, costToDateSeries, laborBurnSeries } from "@core/operations";
+import { costRecords as seedCostRecords, costToDateSeries, laborBurnSeries } from "@core/operations";
 import type { RiskLevel } from "@core/operations";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOpsCostRoi } from "@/hooks/use-ops";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
   DollarSign,
   TrendingUp,
@@ -48,17 +53,51 @@ const riskBadge: Record<RiskLevel, string> = {
 
 export default function CostRoi() {
   const { verticalConfig } = useAppContext();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: costData } = useOpsCostRoi();
+  const costRecords = live ? (costData?.records ?? []) : seedCostRecords;
   const [selectedJob, setSelectedJob] = useState<string | null>(null);
 
+  if (live && costRecords.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <Wallet className="w-7 h-7 text-[#0284C7]" />
+              Cost &amp; ROI
+            </h1>
+            <p className="text-slate-500 mt-1">
+              Budget tracking across active {verticalConfig.name} deployments.
+            </p>
+          </div>
+          <OpsModuleEmpty
+            module="No cost records yet"
+            description="Deploy won bids with budget and cost-to-date in job payload to populate cost tracking."
+          />
+        </div>
+      </Layout>
+    );
+  }
+
   const kpis = useMemo(() => {
+    if (live && costData?.summary) {
+      return {
+        totalContract: costData.summary.totalContract,
+        totalCostToDate: costData.summary.totalCostToDate,
+        avgMargin: costData.summary.avgMargin,
+        avgProjRoi: costData.summary.avgProjectedRoi,
+      };
+    }
     const totalContract = costRecords.reduce((s, r) => s + r.bidAmount, 0);
     const totalCostToDate = costRecords.reduce((s, r) => s + r.actualCost, 0);
     const avgMargin =
-      costRecords.reduce((s, r) => s + r.grossMargin, 0) / costRecords.length;
+      costRecords.reduce((s, r) => s + r.grossMargin, 0) / (costRecords.length || 1);
     const avgProjRoi =
-      costRecords.reduce((s, r) => s + r.projectedRoi, 0) / costRecords.length;
+      costRecords.reduce((s, r) => s + r.projectedRoi, 0) / (costRecords.length || 1);
     return { totalContract, totalCostToDate, avgMargin, avgProjRoi };
-  }, []);
+  }, [live, costData, costRecords]);
 
   const budgetVsActual = useMemo(
     () =>
@@ -68,7 +107,7 @@ export default function CostRoi() {
         actual: r.actualCost,
         jobId: r.jobId,
       })),
-    []
+    [costRecords]
   );
 
   const activeRecords = selectedJob
@@ -89,6 +128,7 @@ export default function CostRoi() {
               Budget-versus-actual tracking and margin intelligence across active{" "}
               {verticalConfig.name} deployments.
             </p>
+            {!live && <DemoDataBadge />}
           </div>
           <div className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2">
             <Info className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />

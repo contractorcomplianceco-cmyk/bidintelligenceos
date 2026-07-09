@@ -9,6 +9,13 @@ import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { useBid, useBidScore, useComplianceEligibility } from "@/hooks/use-bids";
 import { DemoDataBadge } from "@/components/demo-data-badge";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 
 const DEMO_SCORES = {
   overall: 78,
@@ -142,6 +149,18 @@ export default function BidFit() {
           <div className="flex items-center justify-center py-24 text-slate-500 gap-2">
             <Loader2 className="w-5 h-5 animate-spin" /> Loading live bid-fit score…
           </div>
+        ) : live && !bidId ? (
+          <Empty className="border border-[#E2E8F0] bg-white">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Target className="text-teal-600" />
+              </EmptyMedia>
+              <EmptyTitle>Select a bid to score</EmptyTitle>
+              <EmptyDescription>
+                Open a bid from the pipeline and run Go/No-Go scoring to see live Bid Fit analysis here.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <div className="grid gap-6 md:grid-cols-3">
             <Card className="md:col-span-1 bg-white border-[#E2E8F0] shadow-sm relative overflow-hidden flex flex-col justify-between">

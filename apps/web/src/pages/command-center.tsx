@@ -1,12 +1,19 @@
+import { useMemo } from "react";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
 import { followUpQueue, analyticsData, documentReadiness } from "@core/data";
 import { useToast } from "@/hooks/use-toast";
-import { useBids, useResearchExportReadyPreview, useRoseOsSummary } from "@/hooks/use-bids";
+import { useBids, useResearchExportReadyPreview, useRoseOsSummary, useWinLossAnalytics } from "@/hooks/use-bids";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { DemoDataBadge } from "@/components/demo-data-badge";
+import { useCommandCenterProjection } from "@/hooks/use-command-center";
+import { useJobs } from "@/hooks/use-jobs";
+import { useOpsScheduling, useOpsPermits, useOpsLabor } from "@/hooks/use-ops";
+import { buildLiveBriefing } from "@/lib/live-operations";
+import { buildLiveWinRateSeries, hasLiveChartData } from "@/lib/live-analytics";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
   jobDeployments,
   alertItems,
@@ -17,7 +24,7 @@ import {
   subcontractors,
   costToDateSeries,
   costRecords,
-  dailyBriefing,
+  dailyBriefing as demoBriefing,
   voiceCommands,
   BID_LIFECYCLE,
   type AlertSeverity,
@@ -113,11 +120,51 @@ const riskBandColor: Record<RiskBand, string> = {
 export default function CommandCenter() {
   const { verticalConfig } = useAppContext();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
   const { data: allBids = [] } = useBids();
   const { data: liveRose } = useRoseOsSummary();
+  const { data: projection } = useCommandCenterProjection();
+  const { data: liveJobs = [] } = useJobs();
+  const { data: winLoss } = useWinLossAnalytics();
+  const { data: liveSchedule = [] } = useOpsScheduling();
+  const { data: livePermits = [] } = useOpsPermits();
+  const { data: liveLabor } = useOpsLabor();
   const { data: researchPreview, isLoading: researchLoading } = useResearchExportReadyPreview("FL", 8);
+
+  const dailyBriefing = live
+    ? buildLiveBriefing(projection, liveRose?.stats, liveRose?.insights ?? [], user?.name)
+    : demoBriefing;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const liveFollowUp = useMemo(() => {
+    if (!live) return followUpQueue;
+    return allBids
+      .filter(
+        (b) =>
+          b.nextAction &&
+          (b.status === "In Progress" || b.status === "Review" || b.status === "Draft"),
+      )
+      .sort((a, b) => (a.nextActionDate ?? "").localeCompare(b.nextActionDate ?? ""))
+      .slice(0, 5)
+      .map((b) => ({
+        id: b.id,
+        client: b.recipient || b.name,
+        action: b.nextAction!,
+        date: b.nextActionDate ?? "TBD",
+        priority:
+          b.nextActionDate && b.nextActionDate < today
+            ? ("High" as const)
+            : ("Medium" as const),
+      }));
+  }, [live, allBids, today]);
+
+  const liveAlerts = useMemo(() => {
+    if (!live || !projection) return { critical: 0, total: 0 };
+    const critical = projection.counts.compliance_blocked;
+    const overdue = projection.counts.overdue_follow_ups;
+    return { critical: overdue > 0 ? overdue : critical, total: overdue + critical };
+  }, [live, projection]);
 
   const rosePosture = (live && liveRose ? liveRose.verdict : executiveSummary.posture) as Verdict;
   const roseHeadline =
@@ -145,32 +192,44 @@ export default function CommandCenter() {
     (b) => b.status === "In Progress" || b.status === "Review" || b.status === "Draft"
   );
   const openBidValue = activeBids.reduce((sum, b) => sum + b.amount, 0);
-  const jobsInProgress = jobDeployments.filter((j) => j.status === "In Progress");
-  const wonJobsCount = jobDeployments.length;
-  const activeAlerts = alertItems.filter((a) => !a.resolved);
-  const criticalAlerts = activeAlerts.filter((a) => a.severity === "Critical");
-  const avgRoi =
-    costRecords.reduce((sum, r) => sum + r.projectedRoi, 0) / costRecords.length;
+  const jobsInProgress = live
+    ? liveJobs.filter((j) => j.status === "In Progress")
+    : jobDeployments.filter((j) => j.status === "In Progress");
+  const wonJobsCount = live ? liveJobs.length : jobDeployments.length;
+  const criticalAlertCount = live
+    ? liveAlerts.critical
+    : alertItems.filter((a) => !a.resolved && a.severity === "Critical").length;
+  const activeAlertTotal = live
+    ? liveAlerts.total
+    : alertItems.filter((a) => !a.resolved).length;
+  const avgRoi = live
+    ? liveJobs.length
+      ? liveJobs.reduce((sum, j) => sum + j.projectedRoi, 0) / liveJobs.length
+      : 0
+    : costRecords.reduce((sum, r) => sum + r.projectedRoi, 0) / costRecords.length;
 
-  const todaySchedule = scheduleEvents
+  const todaySchedule = (live ? liveSchedule : scheduleEvents)
     .filter((e) => e.dayIndex === 1)
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-  const criticalPermits = permitItems.filter(
+  const activePermits = live ? livePermits : permitItems;
+  const criticalPermits = activePermits.filter(
     (p) => p.status === "Expiring" || p.status === "Blocked" || p.status === "Needed"
   );
-  const permitSnapshot = permitItems
+  const permitSnapshot = activePermits
     .filter((p) => p.critical || p.status === "Expiring" || p.status === "Blocked")
     .slice(0, 5);
 
-  const avgUtilization = Math.round(
-    crewMembers.reduce((sum, c) => sum + c.utilization, 0) / crewMembers.length
-  );
-  const overallocated = crewMembers.filter((c) => c.status === "Overallocated");
-  const topCrew = [...crewMembers]
+  const activeCrew = live ? (liveLabor?.crew ?? []) : crewMembers;
+  const activeSubs = live ? (liveLabor?.subs ?? []) : subcontractors;
+  const avgUtilization = activeCrew.length
+    ? Math.round(activeCrew.reduce((sum, c) => sum + c.utilization, 0) / activeCrew.length)
+    : 0;
+  const overallocated = activeCrew.filter((c) => c.status === "Overallocated");
+  const topCrew = [...activeCrew]
     .sort((a, b) => b.utilization - a.utilization)
     .slice(0, 6);
-  const subsAtRisk = subcontractors.filter(
+  const subsAtRisk = activeSubs.filter(
     (s) => s.status === "At Risk" || s.status === "Delayed"
   );
 
@@ -205,8 +264,13 @@ export default function CommandCenter() {
     })
     .filter((b) => b.value > 0);
 
-  const winRateSeries = analyticsData.winRateOverTime.slice(-8);
-  const latestWinRate = winRateSeries[winRateSeries.length - 1]?.rate ?? 0;
+  const winRateSeries = live
+    ? buildLiveWinRateSeries(allBids)
+    : analyticsData.winRateOverTime.slice(-8);
+  const hasWinRateChart = !live || hasLiveChartData(allBids);
+  const latestWinRate = live && winLoss?.summary.winRate != null
+    ? winLoss.summary.winRate
+    : winRateSeries[winRateSeries.length - 1]?.rate ?? 0;
   const firstWinRate = winRateSeries[0]?.rate ?? 0;
   const winRateDelta = latestWinRate - firstWinRate;
 
@@ -223,10 +287,14 @@ export default function CommandCenter() {
     Low: "#38BDF8",
   };
 
-  const docsComplete = documentReadiness.filter((d) => d.status === "complete").length;
-  const docsReadiness = documentReadiness.length
-    ? Math.round((docsComplete / documentReadiness.length) * 100)
-    : 0;
+  const docsComplete = live
+    ? 0
+    : documentReadiness.filter((d) => d.status === "complete").length;
+  const docsReadiness = live
+    ? 0
+    : documentReadiness.length
+      ? Math.round((docsComplete / documentReadiness.length) * 100)
+      : 0;
 
   const kpis = [
     {
@@ -242,7 +310,7 @@ export default function CommandCenter() {
       value: jobsInProgress.length,
       icon: Rocket,
       color: "#0BA3A8",
-      sub: `${jobDeployments.length} total deployments`,
+      sub: `${wonJobsCount} total deployments`,
       href: "/deployment",
     },
     {
@@ -259,10 +327,10 @@ export default function CommandCenter() {
     },
     {
       label: "Critical Alerts",
-      value: criticalAlerts.length,
+      value: criticalAlertCount,
       icon: AlertTriangle,
       color: "#EF4444",
-      sub: `${activeAlerts.length} active total`,
+      sub: `${activeAlertTotal} active total`,
       href: "/alerts",
     },
     {
@@ -292,9 +360,6 @@ export default function CommandCenter() {
                   {verticalConfig.name} Operations
                 </span>
                 {!live && <DemoDataBadge />}
-                {live && (
-                  <span className="text-[10px] font-medium text-amber-700">Ops modules: sample data</span>
-                )}
               </div>
               <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
                 {dailyBriefing.greeting}
@@ -630,7 +695,10 @@ export default function CommandCenter() {
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
               <div className="divide-y divide-[#E2E8F0]">
-                {followUpQueue.map((item) => (
+                {liveFollowUp.length === 0 && live ? (
+                <div className="p-6 text-center text-xs text-slate-500">No follow-ups queued — active bids are current.</div>
+              ) : (
+                liveFollowUp.map((item) => (
                   <div
                     key={item.id}
                     className="p-3 flex items-start justify-between gap-3 hover:bg-[#F1F5F9] transition-colors"
@@ -657,7 +725,8 @@ export default function CommandCenter() {
                       </span>
                     </div>
                   </div>
-                ))}
+                ))
+              )}
               </div>
               <div className="p-3 border-t border-[#E2E8F0] mt-auto">
                 <button
@@ -864,6 +933,9 @@ export default function CommandCenter() {
               </div>
             </CardHeader>
             <CardContent className="p-4 flex-1 flex flex-col">
+              {!hasWinRateChart ? (
+                <OpsModuleEmpty module="Win rate trend" description="Record at least two bid outcomes to chart win rate over time." />
+              ) : (
               <div className="h-48 w-full mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
@@ -910,6 +982,7 @@ export default function CommandCenter() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+              )}
               <p className="text-[10px] text-slate-500 mt-3 flex items-center gap-1.5">
                 <ShieldCheck className="w-3 h-3 text-[#0284C7]" />
                 Trailing win-rate trend across submitted bids. Past performance is not a guarantee.
@@ -1034,7 +1107,7 @@ export default function CommandCenter() {
                   className="text-2xl font-bold"
                   style={{ color: docsReadiness >= 90 ? "#22C55E" : "#F59E0B" }}
                 >
-                  {docsReadiness}%
+                  {live ? "—" : `${docsReadiness}%`}
                 </div>
                 <div className="text-[9px] text-slate-500 uppercase tracking-wider">
                   Docs ready
@@ -1181,6 +1254,11 @@ export default function CommandCenter() {
               </Link>
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
+              {live && todaySchedule.length === 0 ? (
+                <div className="p-4">
+                  <OpsModuleEmpty module="Today's schedule" description="Convert won bids to jobs to populate schedule events." />
+                </div>
+              ) : (
               <div className="divide-y divide-[#E2E8F0]">
                 {todaySchedule.map((event) => (
                   <div key={event.id} className="p-3 hover:bg-[#F1F5F9] transition-colors">
@@ -1214,6 +1292,7 @@ export default function CommandCenter() {
                   </div>
                 ))}
               </div>
+              )}
               <div className="p-3 border-t border-[#E2E8F0] mt-auto">
                 <Link href="/scheduling">
                   <button className="w-full py-2 bg-[#E2E8F0] hover:bg-[#CBD5E1] text-slate-900 text-xs font-semibold rounded transition-colors flex items-center justify-center gap-2">
@@ -1241,6 +1320,10 @@ export default function CommandCenter() {
               </Link>
             </CardHeader>
             <CardContent className="p-4 flex-1 flex flex-col">
+              {live ? (
+                <OpsModuleEmpty module="Cost tracking" description="Job cost-to-date feeds from deployments — add jobs with cost data in Phase 4." />
+              ) : (
+              <>
               <div className="flex gap-4 mb-4 text-[10px] font-bold uppercase tracking-widest">
                 <div className="flex items-center gap-1.5 text-[#0284C7]">
                   <span className="w-2 h-2 rounded-full bg-[#38BDF8]"></span>Budget
@@ -1309,6 +1392,8 @@ export default function CommandCenter() {
                 <ShieldCheck className="w-3 h-3 text-[#0284C7]" />
                 Decision-support guidance only. Projections require user verification.
               </p>
+              </>
+              )}
             </CardContent>
           </Card>
 
@@ -1326,6 +1411,12 @@ export default function CommandCenter() {
               </Link>
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
+              {live ? (
+                <div className="p-4">
+                  <OpsModuleEmpty module="Weather watch" description="Jobsite weather feeds from active deployments — coming in Phase 4." />
+                </div>
+              ) : (
+              <>
               <div className="divide-y divide-[#E2E8F0]">
                 {jobsiteWeather.map((site) => (
                   <div key={site.jobId} className="p-3">
@@ -1386,6 +1477,8 @@ export default function CommandCenter() {
                   {verticalConfig.weatherNote}
                 </p>
               </div>
+              </>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -1410,13 +1503,13 @@ export default function CommandCenter() {
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 p-2 text-center">
                   <div className="text-xl font-bold text-[#EF4444]">
-                    {permitItems.filter((p) => p.status === "Blocked").length}
+                    {activePermits.filter((p) => p.status === "Blocked").length}
                   </div>
                   <div className="text-[9px] text-slate-500 uppercase tracking-wider">Blocked</div>
                 </div>
                 <div className="rounded-lg border border-[#F59E0B]/30 bg-[#F59E0B]/10 p-2 text-center">
                   <div className="text-xl font-bold text-[#F59E0B]">
-                    {permitItems.filter((p) => p.status === "Expiring").length}
+                    {activePermits.filter((p) => p.status === "Expiring").length}
                   </div>
                   <div className="text-[9px] text-slate-500 uppercase tracking-wider">Expiring</div>
                 </div>
@@ -1537,7 +1630,7 @@ export default function CommandCenter() {
                 </div>
               )}
               <div className="space-y-2 flex-1">
-                {subcontractors.slice(0, 6).map((s) => (
+                {activeSubs.slice(0, 6).map((s) => (
                   <div
                     key={s.id}
                     className="flex items-center justify-between gap-2 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-2"

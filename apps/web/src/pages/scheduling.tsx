@@ -2,6 +2,11 @@ import { useMemo, useState } from "react";
 import { Layout } from "@/components/layout";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/lib/context";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOpsScheduling } from "@/hooks/use-ops";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
   scheduleDays,
   scheduleEvents as seedScheduleEvents,
@@ -49,16 +54,21 @@ const ALL_TYPES = Object.keys(TYPE_META) as ScheduleType[];
 export default function Scheduling() {
   const { toast } = useToast();
   const { verticalConfig } = useAppContext();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: liveEvents = [] } = useOpsScheduling();
   const [statusOverrides, setStatusOverrides] = useState<Record<string, ScheduleStatus>>({});
   const [activeType, setActiveType] = useState<ScheduleType | "All">("All");
 
+  const baseEvents = live ? liveEvents : seedScheduleEvents;
+
   const events: ScheduleEvent[] = useMemo(
     () =>
-      seedScheduleEvents.map((e) => ({
+      baseEvents.map((e) => ({
         ...e,
         status: statusOverrides[e.id] ?? e.status,
       })),
-    [statusOverrides],
+    [baseEvents, statusOverrides],
   );
 
   const visibleEvents = useMemo(
@@ -82,6 +92,28 @@ export default function Scheduling() {
     });
   };
 
+  if (live && baseEvents.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <CalendarDays className="w-7 h-7 text-[#0284C7]" />
+              Scheduling
+            </h1>
+            <p className="text-slate-500 mt-1">
+              Weekly operations calendar for {verticalConfig.name}.
+            </p>
+          </div>
+          <OpsModuleEmpty
+            module="Scheduling"
+            description="Convert a won bid to a job deployment to populate schedule milestones, or add scheduleEvents to job payloads."
+          />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -95,6 +127,7 @@ export default function Scheduling() {
             <p className="text-slate-500 mt-1">
               Weekly operations calendar — {verticalConfig.name}. Crews, subs, inspections, permits, and weather-sensitive work in one view.
             </p>
+            {!live && <DemoDataBadge />}
           </div>
           <div className="flex items-center gap-3">
             <div className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-2 text-center">

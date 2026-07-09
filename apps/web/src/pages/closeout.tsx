@@ -4,11 +4,16 @@ import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/lib/context";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOpsCloseout } from "@/hooks/use-ops";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
-  closeoutJobs,
+  closeoutJobs as seedCloseoutJobs,
   punchListItems,
   closeoutChecklist,
-  closeoutStats,
+  closeoutStats as seedCloseoutStats,
   bidDnaFeedSeries,
   CLOSEOUT_STAGES,
   type CloseoutJob,
@@ -94,10 +99,37 @@ function DocIcon({ status }: { status: DocStatus }) {
 export default function Closeout() {
   const { toast } = useToast();
   const { verticalConfig } = useAppContext();
-  const [selectedJobId, setSelectedJobId] = useState<string>(closeoutJobs[0].id);
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: closeoutData } = useOpsCloseout();
+  const closeoutJobs = live ? (closeoutData?.jobs ?? []) : seedCloseoutJobs;
+  const closeoutStats = live ? (closeoutData?.stats ?? seedCloseoutStats) : seedCloseoutStats;
+  const [selectedJobId, setSelectedJobId] = useState<string>(closeoutJobs[0]?.id ?? "");
+
+  if (live && closeoutJobs.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <ClipboardCheck className="h-7 w-7 text-[#0284C7]" />
+              Job Closeout
+            </h1>
+            <p className="text-slate-500 mt-1">
+              Closeout tracking for completed or near-complete {verticalConfig.name} jobs.
+            </p>
+          </div>
+          <OpsModuleEmpty
+            module="No jobs in closeout"
+            description="Mark jobs complete or set completion ≥90% in job payload to populate closeout pipeline."
+          />
+        </div>
+      </Layout>
+    );
+  }
 
   const selectedJob: CloseoutJob =
-    closeoutJobs.find((j) => j.id === selectedJobId) ?? closeoutJobs[0];
+    closeoutJobs.find((j) => j.id === selectedJobId) ?? closeoutJobs[0]!;
 
   const jobPunch = useMemo(
     () => punchListItems.filter((p) => p.jobId === selectedJobId),
@@ -121,6 +153,7 @@ export default function Closeout() {
               completing {verticalConfig.name} jobs — every closed job trains future
               estimates.
             </p>
+            {!live && <DemoDataBadge />}
           </div>
           <Link
             href="/bid-dna"

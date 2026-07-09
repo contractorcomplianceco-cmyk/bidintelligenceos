@@ -2,6 +2,11 @@ import { useMemo, useState } from "react";
 import { Layout } from "@/components/layout";
 import { useAppContext } from "@/lib/context";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOpsPermits } from "@/hooks/use-ops";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
   permitItems as seedPermits,
   PermitItem,
@@ -64,6 +69,9 @@ function StatusBadge({ status }: { status: PermitStatus }) {
 export default function Permits() {
   const { verticalConfig } = useAppContext();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: permitData = [] } = useOpsPermits();
 
   const [statuses, setStatuses] = useState<Record<string, PermitStatus>>(() =>
     Object.fromEntries(seedPermits.map((p) => [p.id, p.status]))
@@ -71,18 +79,37 @@ export default function Permits() {
   const [statusFilter, setStatusFilter] = useState<PermitStatus | "All">("All");
   const [jobFilter, setJobFilter] = useState<string>("All");
 
-  const items: PermitItem[] = useMemo(
+  const seedItems: PermitItem[] = useMemo(
     () => seedPermits.map((p) => ({ ...p, status: statuses[p.id] ?? p.status })),
     [statuses]
   );
 
+  const items: PermitItem[] = live ? permitData : seedItems;
+
+  if (live && items.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <FileCheck2 className="h-7 w-7 text-[#0284C7]" />
+              Permits & Inspections
+            </h1>
+            <p className="text-slate-500 mt-1">Track permits across {verticalConfig.name} job deployments.</p>
+          </div>
+          <OpsModuleEmpty module="Permits" description="Add permit records to job payloads or convert won bids to populate this tracker." />
+        </div>
+      </Layout>
+    );
+  }
+
   const jobs = useMemo(() => {
     const seen = new Map<string, string>();
-    seedPermits.forEach((p) => {
+    items.forEach((p) => {
       if (!seen.has(p.jobId)) seen.set(p.jobId, p.jobName);
     });
     return Array.from(seen.entries());
-  }, []);
+  }, [items]);
 
   const filtered = useMemo(
     () =>
@@ -145,6 +172,7 @@ export default function Permits() {
             <p className="text-slate-500 mt-2">
               Compliance and approval tracking for active {verticalConfig.name} jobs. Decision-support guidance only.
             </p>
+            {!live && <div className="mt-2"><DemoDataBadge /></div>}
           </div>
           <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm px-5 py-3 flex items-center gap-4">
             <div className="relative w-12 h-12 shrink-0">
@@ -278,6 +306,12 @@ export default function Permits() {
         </div>
 
         {/* Grouped permit lists + vertical needs */}
+        {live && items.length === 0 ? (
+          <OpsModuleEmpty
+            module="No permits tracked yet"
+            description="Add permits to job payload when deploying won bids, or record jobs from Won Jobs to start compliance tracking."
+          />
+        ) : (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <div className="xl:col-span-2 space-y-6">
             {grouped.length === 0 && (
@@ -319,6 +353,11 @@ export default function Permits() {
                                 <span className="text-[9px] font-bold text-slate-500 bg-[#E2E8F0] px-1.5 py-0.5 rounded uppercase tracking-widest">
                                   {p.kind}
                                 </span>
+                                {live && (p as PermitItem & { derivedFrom?: string }).derivedFrom === "jurisdiction" && (
+                                  <span className="text-[9px] font-bold text-[#0284C7] bg-sky-50 px-1.5 py-0.5 rounded uppercase tracking-widest">
+                                    Jurisdiction
+                                  </span>
+                                )}
                               </div>
                               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1.5 text-[11px] text-slate-500">
                                 {p.submittedDate && (
@@ -412,6 +451,7 @@ export default function Permits() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </Layout>
   );

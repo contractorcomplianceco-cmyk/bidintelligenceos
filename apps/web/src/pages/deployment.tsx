@@ -4,12 +4,23 @@ import { useToast } from "@/hooks/use-toast";
 import { getVertical } from "@core/verticals";
 import {
   jobDeployments,
-  permitItems,
+  permitItems as demoPermits,
   type JobDeployment,
   type JobStatus,
   type PermitStatus,
 } from "@core/operations";
 import { useJobs } from "@/hooks/use-jobs";
+import { useOpsPermits } from "@/hooks/use-ops";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   Building2,
   MapPin,
@@ -84,11 +95,44 @@ function permitIcon(kind: string) {
 
 export default function Deployment() {
   const { toast } = useToast();
-  const { data: jobs = jobDeployments } = useJobs();
-  const [selectedId, setSelectedId] = useState<string>(jobs[0]?.id ?? jobDeployments[0]?.id ?? "");
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: jobsRaw } = useJobs();
+  const { data: livePermits = [] } = useOpsPermits();
+  const jobs = live ? (jobsRaw ?? []) : jobDeployments;
+  const [selectedId, setSelectedId] = useState<string>("");
 
   const job: JobDeployment | undefined =
-    jobs.find((j) => j.id === selectedId) ?? jobs[0];
+    jobs.find((j) => j.id === (selectedId || jobs[0]?.id)) ?? jobs[0];
+
+  if (jobs.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3">
+              <Rocket className="w-7 h-7 text-[#0284C7]" />
+              Job Deployment
+            </h1>
+            <p className="text-slate-500 mt-1.5">
+              Field operations command for every won job in production.
+            </p>
+          </div>
+          <Empty className="border border-[#E2E8F0] bg-white">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Rocket className="text-[#0284C7]" />
+              </EmptyMedia>
+              <EmptyTitle>No deployments yet</EmptyTitle>
+              <EmptyDescription>
+                Convert a won bid to a job from Won Jobs, or create a job via the API.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!job) {
     return (
@@ -104,8 +148,8 @@ export default function Deployment() {
   }, [job]);
 
   const jobPermits = useMemo(
-    () => permitItems.filter((p) => p.jobId === job.id),
-    [job.id]
+    () => (live ? livePermits.filter((p) => p.jobId === job.id) : demoPermits.filter((p) => p.jobId === job.id)),
+    [live, livePermits, job.id],
   );
 
   const budgetPct = Math.min(
@@ -127,6 +171,7 @@ export default function Deployment() {
               Field operations command for every won job in production. Select a
               deployment to review crew, budget, permits, and milestones.
             </p>
+            {!live && <DemoDataBadge />}
           </div>
           <div className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white shadow-sm px-4 py-2.5">
             <div className="text-center">
@@ -553,7 +598,9 @@ export default function Deployment() {
               </h3>
               {jobPermits.length === 0 ? (
                 <p className="text-[13px] text-slate-500">
-                  No permits or documents tracked for this deployment.
+                  {live
+                    ? "No permits on this job yet. Add permits to the job payload to track compliance."
+                    : "No permits or documents tracked for this deployment."}
                 </p>
               ) : (
                 <div className="space-y-2">

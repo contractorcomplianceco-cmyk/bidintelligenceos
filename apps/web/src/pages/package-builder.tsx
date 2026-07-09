@@ -6,30 +6,161 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOpsPackageBuilder, type LivePackage } from "@/hooks/use-ops";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import { FileText, Download, Check, AlertTriangle, FileCheck, CheckSquare, Settings2, ShieldCheck, ShieldAlert, ChevronRight, DownloadCloud, Eye } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { samplePackages, BidPackageData, SectionType } from "@core/bid-packages";
 import { Checkbox } from "@/components/ui/checkbox";
 
+function LivePackageView({ packages }: { packages: LivePackage[] }) {
+  const [selectedId, setSelectedId] = useState(packages[0]?.id ?? "");
+  const pkg = packages.find((p) => p.id === selectedId) ?? packages[0]!;
+
+  const formatSize = (bytes: number) =>
+    bytes >= 1_000_000 ? `${(bytes / 1_000_000).toFixed(1)} MB` : `${Math.round(bytes / 1000)} KB`;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Bid Package Builder</h2>
+          <p className="text-slate-500 mt-1">
+            Live packages from active bids — documents and jurisdiction compliance checklist.
+          </p>
+        </div>
+        {packages.length > 1 && (
+          <Select value={selectedId} onValueChange={setSelectedId}>
+            <SelectTrigger className="w-full sm:w-72 bg-white border-[#E2E8F0]">
+              <SelectValue placeholder="Select package" />
+            </SelectTrigger>
+            <SelectContent>
+              {packages.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.project}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
+
+      <div className="rounded-xl border border-[#E2E8F0] bg-white p-6 space-y-5">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">{pkg.name}</h3>
+            <p className="text-sm text-slate-500">
+              {pkg.project} · {pkg.location || "Location TBD"} · {pkg.documentCount} documents
+            </p>
+          </div>
+          <span className="text-xs font-bold uppercase tracking-widest text-[#0284C7] bg-sky-50 px-2 py-1 rounded">
+            {pkg.verdict} · {pkg.humanReviewed ? "Reviewed" : "Pending review"}
+          </span>
+        </div>
+
+        {pkg.documents.length > 0 && (
+          <div>
+            <h4 className="text-sm font-bold text-slate-900 mb-2">Uploaded Bid Documents</h4>
+            <ul className="divide-y divide-[#E2E8F0] border border-[#E2E8F0] rounded-lg overflow-hidden">
+              {pkg.documents.map((doc) => (
+                <li key={doc.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm bg-white">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <FileText className="w-4 h-4 text-[#0284C7] shrink-0" />
+                    <span className="truncate text-slate-900">{doc.fileName}</span>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0 text-[11px] text-slate-500">
+                    <span>{formatSize(doc.sizeBytes)}</span>
+                    <span className={doc.extractionStatus === "done" ? "text-[#22C55E]" : "text-[#F59E0B]"}>
+                      {doc.extractionStatus}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {pkg.complianceItems.length > 0 && (
+          <div>
+            <h4 className="text-sm font-bold text-slate-900 mb-2">Compliance Checklist</h4>
+            <ul className="space-y-2">
+              {pkg.complianceItems.map((item) => (
+                <li
+                  key={item.label}
+                  className="flex items-center justify-between text-sm border border-[#E2E8F0] rounded-lg px-3 py-2"
+                >
+                  <span>{item.label}</span>
+                  <span className={item.status === "pass" ? "text-[#22C55E]" : "text-[#F59E0B]"}>
+                    {item.status}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <p className="text-[11px] text-slate-500 italic">
+          Full section preview remains in demo mode. Live export uses uploaded bid documents and scored
+          compliance from jurisdiction research and Go/No-Go gates.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function PackageBuilder() {
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: livePackages = [] } = useOpsPackageBuilder();
   const [reviewed, setReviewed] = useState(false);
   const [selectedPkgId, setSelectedPkgId] = useState<string>(samplePackages[0].id);
   const [activeTab, setActiveTab] = useState<string>(samplePackages[0].sections[0]?.id ?? "");
-  
-  const selectedPkg = useMemo(() => samplePackages.find(p => p.id === selectedPkgId) || samplePackages[0], [selectedPkgId]);
-  
-  // Track enabled sections
   const [enabledSections, setEnabledSections] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
-    samplePackages.forEach(pkg => {
-      pkg.sections.forEach(s => {
+    samplePackages.forEach((pkg) => {
+      pkg.sections.forEach((s) => {
         initial[`${pkg.id}-${s.id}`] = true;
       });
     });
     return initial;
   });
+
+  const selectedPkg = useMemo(
+    () => samplePackages.find((p) => p.id === selectedPkgId) || samplePackages[0],
+    [selectedPkgId],
+  );
+
+  if (live && livePackages.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto p-6">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Bid Package Builder</h2>
+            <p className="text-slate-500 mt-1">Aggregate bid documents and compliance checklists from your pipeline.</p>
+          </div>
+          <OpsModuleEmpty
+            module="No active bids to package"
+            description="Intake bids and upload documents to build client-facing packages from live data."
+          />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (live && livePackages.length > 0) {
+    return (
+      <Layout>
+        <div className="max-w-[1600px] mx-auto p-6">
+          <LivePackageView packages={livePackages} />
+        </div>
+      </Layout>
+    );
+  }
 
   const handleToggleSection = (sectionId: string, enabled: boolean) => {
     setEnabledSections(prev => ({

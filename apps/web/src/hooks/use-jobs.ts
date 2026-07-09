@@ -60,7 +60,10 @@ export function useUpdateJob() {
         method: "PATCH",
         body: JSON.stringify(body),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["jobs"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["jobs"] });
+      qc.invalidateQueries({ queryKey: ["ops"] });
+    },
   });
 }
 
@@ -72,6 +75,21 @@ export function useCreateJob() {
         method: "POST",
         body: JSON.stringify(body),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["jobs"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["jobs"] });
+      qc.invalidateQueries({ queryKey: ["ops"] });
+    },
+  });
+}
+
+export function useConvertBidToJob() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (bidId: string) =>
+      apiFetch<{ job: ApiJob }>(`/api/v1/jobs/from-bid/${bidId}`, { method: "POST" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["jobs"] });
+      qc.invalidateQueries({ queryKey: ["ops"] });
+    },
   });
 }

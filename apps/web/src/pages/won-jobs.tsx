@@ -5,10 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAppContext } from "@/lib/context";
 import { jobDeployments, BID_LIFECYCLE, type JobDeployment, type JobStatus } from "@core/operations";
-import { useJobs } from "@/hooks/use-jobs";
+import { useJobs, useConvertBidToJob } from "@/hooks/use-jobs";
+import { useBids } from "@/hooks/use-bids";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { DemoDataBadge } from "@/components/demo-data-badge";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   Trophy,
   DollarSign,
@@ -39,8 +47,17 @@ export default function WonJobs() {
   const { verticalConfig } = useAppContext();
   const { isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
-  const { data: jobs = jobDeployments } = useJobs();
+  const { data: jobsRaw } = useJobs();
+  const { data: allBids = [] } = useBids();
+  const convertMutation = useConvertBidToJob();
+  const jobs = live ? (jobsRaw ?? []) : jobDeployments;
   const [converted, setConverted] = useState(false);
+
+  const wonBidsWithoutJob = useMemo(() => {
+    if (!live) return [];
+    const jobBidIds = new Set(jobs.map((j) => j.bidId).filter(Boolean));
+    return allBids.filter((b) => b.status === "Won" && !jobBidIds.has(b.id));
+  }, [live, allBids, jobs]);
 
   const kpis = useMemo(() => {
     const totalValue = jobs.reduce((s, j) => s + j.contractValue, 0);
@@ -50,13 +67,40 @@ export default function WonJobs() {
     return { totalValue, count, avgRoi };
   }, [jobs]);
 
-  const handleConvert = () => {
-    setConverted(true);
-    toast({
-      title: "Won bid queued for deployment",
-      description:
-        "Intelligent handoff drafted: schedule, labor, permits, and weather watch pre-populated. Review before activating.",
-    });
+  const handleConvert = async () => {
+    if (!live) {
+      setConverted(true);
+      toast({
+        title: "Won bid queued for deployment",
+        description:
+          "Intelligent handoff drafted: schedule, labor, permits, and weather watch pre-populated. Review before activating.",
+      });
+      return;
+    }
+
+    const nextBid = wonBidsWithoutJob[0];
+    if (!nextBid) {
+      toast({
+        title: "No won bids to convert",
+        description: "Record a bid outcome as Won first, or all won bids already have deployments.",
+      });
+      return;
+    }
+
+    try {
+      await convertMutation.mutateAsync(nextBid.id);
+      setConverted(true);
+      toast({
+        title: "Won bid converted to job deployment",
+        description: `${nextBid.name} is now in deployment with mobilization schedule seeded. Review before activating.`,
+      });
+    } catch {
+      toast({
+        title: "Conversion failed",
+        description: "Could not create job from won bid. It may already have a deployment.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleOpen = (job: JobDeployment) => {
@@ -80,13 +124,21 @@ export default function WonJobs() {
               Awarded {verticalConfig.name} bids that have converted into active job
               deployments.
             </p>
+            {!live && (
+              <div className="mt-2">
+                <DemoDataBadge />
+              </div>
+            )}
           </div>
           <button
             onClick={handleConvert}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#0BA3A8] hover:bg-[#0BA3A8]/85 text-white text-sm font-semibold px-4 py-2.5 transition-colors shadow-sm"
+            disabled={live && wonBidsWithoutJob.length === 0}
+            className="inline-flex items-center gap-2 rounded-lg bg-[#0BA3A8] hover:bg-[#0BA3A8]/85 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2.5 transition-colors shadow-sm"
           >
             <Sparkles className="w-4 h-4" />
-            Convert won bid to job
+            {live && wonBidsWithoutJob.length > 0
+              ? `Convert ${wonBidsWithoutJob[0]?.name ?? "won bid"}`
+              : "Convert won bid to job"}
           </button>
         </div>
 
@@ -199,6 +251,19 @@ export default function WonJobs() {
         </Card>
 
         {/* Won job cards */}
+        {jobs.length === 0 && live ? (
+          <Empty className="border border-[#E2E8F0] bg-white">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Trophy className="text-[#0284C7]" />
+              </EmptyMedia>
+              <EmptyTitle>No won jobs yet</EmptyTitle>
+              <EmptyDescription>
+                Record a bid outcome as Won, then convert it to a job deployment to see it here.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
           {jobs.map((job) => {
             const stageIndex = BID_LIFECYCLE.indexOf(job.stage);
@@ -329,6 +394,7 @@ export default function WonJobs() {
             );
           })}
         </div>
+        )}
 
         <p className="text-[11px] text-slate-500 italic">
           Decision-support guidance only. Projected ROI and completion figures require user

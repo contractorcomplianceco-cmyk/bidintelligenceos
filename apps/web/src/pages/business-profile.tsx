@@ -11,6 +11,12 @@ import {
   costRecords,
 } from "@core/operations";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOrgProfile, useUpdateOrgProfile } from "@/hooks/use-org";
+import { useWinLossAnalytics } from "@/hooks/use-bids";
+import { useJobs } from "@/hooks/use-jobs";
+import { DemoDataBadge } from "@/components/demo-data-badge";
 import {
   Building2,
   MapPin,
@@ -61,20 +67,40 @@ function ProfileField({ label, value, editing, accent }: FieldProps) {
 export default function BusinessProfile() {
   const { verticalConfig } = useAppContext();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: org } = useOrgProfile();
+  const updateOrg = useUpdateOrgProfile();
+  const { data: liveJobs = [] } = useJobs();
+  const { data: winLoss } = useWinLossAnalytics();
   const [editing, setEditing] = useState(false);
 
+  const companyName = live && org?.name ? org.name : "Cornerstone Contracting Alliance";
+
   const stats = useMemo(() => {
-    const wonValue = jobDeployments.reduce((sum, j) => sum + j.contractValue, 0);
-    const avgProject = wonValue / jobDeployments.length;
-    const avgRoi =
-      costRecords.reduce((sum, c) => sum + c.projectedRoi, 0) / costRecords.length;
-    const activeCrew = crewMembers.filter((c) => c.status !== "PTO").length;
-    const activeSubs = subcontractors.length;
-    return { wonValue, avgProject, avgRoi, activeCrew, activeSubs };
-  }, []);
+    const jobs = live ? liveJobs : jobDeployments;
+    const wonValue = jobs.reduce((sum, j) => sum + j.contractValue, 0);
+    const avgProject = jobs.length ? wonValue / jobs.length : 0;
+    const avgRoi = live
+      ? jobs.length
+        ? jobs.reduce((sum, j) => sum + j.projectedRoi, 0) / jobs.length
+        : 0
+      : costRecords.reduce((sum, c) => sum + c.projectedRoi, 0) / costRecords.length;
+    const activeCrew = live ? 0 : crewMembers.filter((c) => c.status !== "PTO").length;
+    const activeSubs = live ? 0 : subcontractors.length;
+    const winRate = live && winLoss?.summary.winRate != null ? Math.round(winLoss.summary.winRate * 100) : live ? null : 63;
+    const activeContracts = jobs.length;
+    return { wonValue, avgProject, avgRoi, activeCrew, activeSubs, winRate, activeContracts };
+  }, [live, liveJobs, winLoss]);
 
   const handleToggleEdit = () => {
-    if (editing) {
+    if (editing && live && org) {
+      updateOrg.mutate({ name: companyName });
+      toast({
+        title: "Profile saved",
+        description: "Business profile updates recorded. Bid-fit inputs refreshed.",
+      });
+    } else if (editing) {
       toast({
         title: "Profile saved",
         description: "Business profile updates recorded. Bid-fit inputs refreshed.",
@@ -92,14 +118,18 @@ export default function BusinessProfile() {
     "facility",
   ];
 
-  const licenses = [
+  const licenses = live
+    ? []
+    : [
     { name: "TX General Contractor License", id: "GC-#TX-448120", status: "Active", expires: "Mar 2026" },
     { name: "TX Mechanical Contractor (HVAC)", id: "TACLB-#98341", status: "Active", expires: "Aug 2026" },
     { name: "TX Master Electrician", id: "ME-#221765", status: "Active", expires: "Nov 2025" },
     { name: "Roofing Contractor Registration", id: "RCAT-#7742", status: "Active", expires: "Jan 2026" },
   ];
 
-  const certifications = [
+  const certifications = live
+    ? []
+    : [
     "OSHA 30 (all supervisors)",
     "EPA 608 Universal",
     "IICRC Water & Fire Restoration",
@@ -108,7 +138,9 @@ export default function BusinessProfile() {
     "DBIA Design-Build",
   ];
 
-  const serviceAreas = [
+  const serviceAreas = live
+    ? []
+    : [
     "Austin Metro",
     "Round Rock",
     "Cedar Park",
@@ -118,7 +150,9 @@ export default function BusinessProfile() {
     "Waco Corridor",
   ];
 
-  const differentiators = [
+  const differentiators = live
+    ? []
+    : [
     {
       title: "Multi-trade self-perform",
       detail: "In-house HVAC, electrical, and restoration crews reduce sub dependency and schedule risk.",
@@ -141,7 +175,9 @@ export default function BusinessProfile() {
     },
   ];
 
-  const leadership = [
+  const leadership = live
+    ? []
+    : [
     { name: "Dana Whitfield", role: "President / Principal", tenure: "18 yrs", initials: "DW" },
     { name: "Marcus Ruiz", role: "VP Field Operations", tenure: "12 yrs", initials: "MR" },
     { name: "Priya Nair", role: "Director of Projects", tenure: "9 yrs", initials: "PN" },
@@ -159,12 +195,13 @@ export default function BusinessProfile() {
             </div>
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
-                Cornerstone Contracting Alliance
+                {companyName}
               </h1>
               <p className="text-slate-500 mt-1">
                 Company profile powering bid-fit for the{" "}
                 <span className="text-[#0284C7] font-semibold">{verticalConfig.name}</span> workflow.
               </p>
+              {!live && <div className="mt-2"><DemoDataBadge /></div>}
             </div>
           </div>
           <Button
@@ -190,12 +227,18 @@ export default function BusinessProfile() {
         {/* Past performance KPI row */}
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
           {[
-            { label: "Win Rate", value: "63%", note: "Last 12 months", icon: TrendingUp, color: "#22C55E" },
-            { label: "Avg Project Size", value: `$${(stats.avgProject / 1000).toFixed(0)}K`, note: "Active portfolio", icon: DollarSign, color: "#38BDF8" },
-            { label: "On-Time Completion", value: "91%", note: "Trailing 24 jobs", icon: Clock, color: "#38BDF8" },
-            { label: "Avg Projected ROI", value: `${stats.avgRoi.toFixed(1)}%`, note: "Across deployments", icon: Target, color: "#22C55E" },
-            { label: "Safety (EMR)", value: "0.78", note: "Below industry avg", icon: HardHat, color: "#F59E0B" },
-            { label: "Active Contracts", value: `${jobDeployments.length}`, note: "In deployment", icon: Briefcase, color: "#38BDF8" },
+            {
+              label: "Win Rate",
+              value: stats.winRate != null ? `${stats.winRate}%` : "—",
+              note: live ? "From recorded outcomes" : "Last 12 months",
+              icon: TrendingUp,
+              color: "#22C55E",
+            },
+            { label: "Avg Project Size", value: stats.avgProject ? `$${(stats.avgProject / 1000).toFixed(0)}K` : "—", note: live ? "From job deployments" : "Active portfolio", icon: DollarSign, color: "#38BDF8" },
+            { label: "On-Time Completion", value: live ? "—" : "91%", note: live ? "Ops module Phase 4" : "Trailing 24 jobs", icon: Clock, color: "#38BDF8" },
+            { label: "Avg Projected ROI", value: stats.avgRoi ? `${stats.avgRoi.toFixed(1)}%` : "—", note: "Across deployments", icon: Target, color: "#22C55E" },
+            { label: "Safety (EMR)", value: live ? "—" : "0.78", note: live ? "Add to org profile" : "Below industry avg", icon: HardHat, color: "#F59E0B" },
+            { label: "Active Contracts", value: `${stats.activeContracts}`, note: live ? "Live job count" : "In deployment", icon: Briefcase, color: "#38BDF8" },
           ].map((kpi) => (
             <div
               key={kpi.label}
@@ -230,13 +273,13 @@ export default function BusinessProfile() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <ProfileField label="Legal Name" value="Cornerstone Contracting Alliance, LLC" editing={editing} />
-                <ProfileField label="DBA" value="Cornerstone Builders" editing={editing} />
-                <ProfileField label="Founded" value="2007" editing={editing} />
-                <ProfileField label="Entity Type" value="Limited Liability Company" editing={editing} />
-                <ProfileField label="Headquarters" value="Austin, TX" editing={editing} />
-                <ProfileField label="Company Size" value="120 employees (48 field)" editing={editing} />
-                <ProfileField label="Annual Revenue" value="$42M (2024)" editing={editing} accent />
+                <ProfileField label="Legal Name" value={companyName} editing={editing} />
+                <ProfileField label="DBA" value={live ? "" : "Cornerstone Builders"} editing={editing} />
+                <ProfileField label="Founded" value={live ? "" : "2007"} editing={editing} />
+                <ProfileField label="Entity Type" value={live ? "" : "Limited Liability Company"} editing={editing} />
+                <ProfileField label="Headquarters" value={live ? "" : "Austin, TX"} editing={editing} />
+                <ProfileField label="Company Size" value={live ? "" : "120 employees (48 field)"} editing={editing} />
+                <ProfileField label="Annual Revenue" value={live ? "" : "$42M (2024)"} editing={editing} accent />
                 <ProfileField label="Primary Vertical" value={verticalConfig.name} editing={editing} accent />
               </CardContent>
             </Card>
@@ -329,7 +372,12 @@ export default function BusinessProfile() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {differentiators.map((d) => (
+                {differentiators.length === 0 ? (
+                  <p className="text-sm text-slate-500 col-span-2">
+                    {live ? "Add differentiators when editing your organization profile." : "No differentiators."}
+                  </p>
+                ) : (
+                differentiators.map((d) => (
                   <div
                     key={d.title}
                     className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 flex items-start gap-3"
@@ -342,7 +390,8 @@ export default function BusinessProfile() {
                       <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">{d.detail}</p>
                     </div>
                   </div>
-                ))}
+                ))
+                )}
               </CardContent>
             </Card>
           </div>
@@ -358,7 +407,12 @@ export default function BusinessProfile() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-5 space-y-3">
-                {licenses.map((l) => (
+                {licenses.length === 0 ? (
+                  <p className="text-sm text-slate-500">
+                    {live ? "No licenses on file. Edit profile to add licensing details." : "No licenses."}
+                  </p>
+                ) : (
+                licenses.map((l) => (
                   <div
                     key={l.id}
                     className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3"
@@ -374,7 +428,8 @@ export default function BusinessProfile() {
                       <span className="text-[10px] text-slate-500">Exp {l.expires}</span>
                     </div>
                   </div>
-                ))}
+                ))
+                )}
               </CardContent>
             </Card>
 
@@ -433,7 +488,12 @@ export default function BusinessProfile() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-5 space-y-3">
-                {leadership.map((p) => (
+                {leadership.length === 0 ? (
+                  <p className="text-sm text-slate-500">
+                    {live ? "Add leadership contacts when editing your organization profile." : "No leadership listed."}
+                  </p>
+                ) : (
+                leadership.map((p) => (
                   <div key={p.name} className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0BA3A8]/15 text-[#0BA3A8] text-xs font-bold shrink-0">
                       {p.initials}
@@ -444,7 +504,8 @@ export default function BusinessProfile() {
                     </div>
                     <span className="text-[10px] text-slate-500 shrink-0">{p.tenure}</span>
                   </div>
-                ))}
+                ))
+                )}
               </CardContent>
             </Card>
           </div>
