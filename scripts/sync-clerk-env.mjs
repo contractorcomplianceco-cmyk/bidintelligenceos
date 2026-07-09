@@ -49,9 +49,9 @@ lines = upsertEnv(lines, "CLERK_SECRET_KEY", sk);
 lines = upsertEnv(lines, "CLERK_PUBLISHABLE_KEY", pk);
 lines = upsertEnv(lines, "VITE_CLERK_PUBLISHABLE_KEY", pk);
 lines = upsertEnv(lines, "ADMIN_EMAILS", "contractorcomplianceco@gmail.com,carmenaburoda@gmail.com");
-lines = upsertEnv(lines, "CORS_ORIGIN", "https://bidintelligence.docs.cagteam.net");
-lines = upsertEnv(lines, "BIOS_PUBLIC_URL", "https://bidintelligence.docs.cagteam.net");
-lines = upsertEnv(lines, "VITE_APP_URL", "https://bidintelligence.docs.cagteam.net");
+lines = upsertEnv(lines, "CORS_ORIGIN", "https://bidintelligence.cagteam.net");
+lines = upsertEnv(lines, "BIOS_PUBLIC_URL", "https://bidintelligence.cagteam.net");
+lines = upsertEnv(lines, "VITE_APP_URL", "https://bidintelligence.cagteam.net");
 lines = upsertEnv(lines, "VITE_CLERK_SIGN_IN_URL", "https://accounts.docs.cagteam.net/sign-in");
 lines = upsertEnv(lines, "VITE_CLERK_SIGN_UP_URL", "https://accounts.docs.cagteam.net/sign-up");
 

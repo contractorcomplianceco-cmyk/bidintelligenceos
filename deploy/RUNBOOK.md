@@ -89,15 +89,15 @@ For team QA when Clerk redirect URLs or DNS are being fixed:
    - Default accounts: `carmen@ccacontact.com`, `rose@ccacontact.com`
    - Password from `BIOS_SMOKE_PASSWORD` (default `teamwork`) — temporary only
 3. Rebuild and restart: `./deploy/deploy.sh`
-4. Sign in at `https://<your-host>/login` with email + password
+4. Sign in at `https://bidintelligence.cagteam.net/login` with email + password
 
 **Restore Clerk when ready:**
 
 1. Set `AUTH_ENABLED=true` and restore `VITE_CLERK_PUBLISHABLE_KEY`
 2. In [Clerk Dashboard](https://dashboard.clerk.com) → your app → **Paths / Redirect URLs**, add:
-   - `https://bidintelligence.docs.cagteam.net`
-   - `https://bidintelligence.docs.cagteam.net/login`
-   - `https://bidintelligence.docs.cagteam.net/register`
+   - `https://bidintelligence.cagteam.net`
+   - `https://bidintelligence.cagteam.net/login`
+   - `https://bidintelligence.cagteam.net/register`
    - Sign-in/sign-up fallback: `https://accounts.docs.cagteam.net/sign-in` and `/sign-up` if using the hosted account portal
 3. Run `node scripts/sync-clerk-env.mjs` (optional) and `./deploy/deploy.sh`
 4. Remove or rotate smoke-test passwords in Postgres when no longer needed
