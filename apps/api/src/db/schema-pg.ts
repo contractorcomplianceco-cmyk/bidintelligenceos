@@ -39,6 +39,29 @@ export const organizationMembers = pgTable(
   (t) => [index("organization_members_org_idx").on(t.orgId)],
 );
 
+export const orgInvites = pgTable(
+  "org_invites",
+  {
+    id: text("id").primaryKey(),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id),
+    email: text("email").notNull(),
+    role: text("role").notNull().default("member"),
+    invitedByUserId: text("invited_by_user_id")
+      .notNull()
+      .references(() => users.id),
+    tokenHash: text("token_hash").notNull().unique(),
+    status: text("status").notNull().default("pending"),
+    expiresAt: text("expires_at").notNull(),
+    acceptedAt: text("accepted_at"),
+    acceptedByUserId: text("accepted_by_user_id").references(() => users.id),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (t) => [index("org_invites_org_idx").on(t.orgId)],
+);
+
 export const bids = pgTable(
   "bids",
   {

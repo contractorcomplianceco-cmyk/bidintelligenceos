@@ -233,6 +233,23 @@ function runSqliteMigrations(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS jobs_org_idx ON jobs(org_id);
     CREATE INDEX IF NOT EXISTS bid_scores_bid_idx ON bid_scores(bid_id);
     CREATE INDEX IF NOT EXISTS bid_documents_bid_idx ON bid_documents(bid_id);
+    CREATE TABLE IF NOT EXISTS org_invites (
+      id TEXT PRIMARY KEY,
+      org_id TEXT NOT NULL REFERENCES organizations(id),
+      email TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'member',
+      invited_by_user_id TEXT NOT NULL REFERENCES users(id),
+      token_hash TEXT NOT NULL UNIQUE,
+      status TEXT NOT NULL DEFAULT 'pending',
+      expires_at TEXT NOT NULL,
+      accepted_at TEXT,
+      accepted_by_user_id TEXT REFERENCES users(id),
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS org_invites_org_idx ON org_invites(org_id);
+    CREATE UNIQUE INDEX IF NOT EXISTS org_invites_org_email_pending_idx
+      ON org_invites(org_id, email) WHERE status = 'pending';
   `);
   ensureColumn(database, "bid_analyses", "payload_json", "TEXT NOT NULL DEFAULT '{}'");
 }

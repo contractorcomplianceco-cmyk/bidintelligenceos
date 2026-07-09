@@ -15,8 +15,16 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { useOrgProfile, useUpdateOrgProfile } from "@/hooks/use-org";
+import {
+  useAcceptOrgInvite,
+  useCreateOrgInvite,
+  useOrgInvites,
+  useOrgMembers,
+  useRevokeOrgInvite,
+} from "@/hooks/use-org-invites";
 import { DemoDataBadge } from "@/components/demo-data-badge";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation } from "wouter";
 import {
   BRAND_COLORS,
   ENTERPRISE_LOCATIONS,
@@ -32,6 +40,15 @@ export default function Settings() {
   const live = useLiveData(isAuthenticated);
   const { data: org } = useOrgProfile();
   const updateOrg = useUpdateOrgProfile();
+  const { data: members = [] } = useOrgMembers(live);
+  const teamAdmin =
+    live && Boolean(user?.role && ["owner", "admin"].includes(user.role.toLowerCase()));
+  const { data: pendingInvites = [] } = useOrgInvites(teamAdmin);
+  const createInvite = useCreateOrgInvite();
+  const revokeInvite = useRevokeOrgInvite();
+  const acceptInvite = useAcceptOrgInvite();
+  const [, setLocation] = useLocation();
+  const inviteAcceptStarted = useRef(false);
 
   const profile = (org?.profile ?? {}) as Record<string, unknown>;
   const demoCompanyName = "Acme Commercial Trades";
@@ -79,6 +96,9 @@ export default function Settings() {
   const [leadership, setLeadership] = useState<LeadershipEntry[]>([]);
   const [brandName, setBrandName] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
+  const [productName, setProductName] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteRole, setInviteRole] = useState("member");
 
   useEffect(() => {
     if (!live || !org) return;
@@ -89,11 +109,34 @@ export default function Settings() {
     setLeadership(parseLeadershipEntries(org.profile?.leadership));
     setBrandName(parseStringField(org.profile?.brandName));
     setLogoUrl(parseUrlField(org.profile?.logoUrl));
+    setProductName(parseStringField(org.profile?.productName));
     setBrandColor(parseBrandColor(org.profile?.brandColor, BRAND_COLORS[0].hex));
   }, [live, org?.id, org?.profile]);
 
+  useEffect(() => {
+    if (!live || inviteAcceptStarted.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("invite");
+    if (!token) return;
+    inviteAcceptStarted.current = true;
+    acceptInvite.mutate(token, {
+      onSuccess: (data) => {
+        toast({ title: "Invite accepted", description: data.message });
+        params.delete("invite");
+        const next = params.toString();
+        setLocation(next ? `/settings?${next}` : "/settings");
+      },
+      onError: (err: Error) => {
+        toast({
+          title: "Could not accept invite",
+          description: err.message,
+          variant: "destructive",
+        });
+      },
+    });
+  }, [live, acceptInvite, setLocation, toast]);
+
   const [brandColor, setBrandColor] = useState(BRAND_COLORS[0].hex);
-  const [productName, setProductName] = useState("BidIntelligenceOS");
   const [customDomain, setCustomDomain] = useState("bids.yourcompany.com");
   const [rollupEnabled, setRollupEnabled] = useState(true);
   const [regionalSegmentation, setRegionalSegmentation] = useState(false);
@@ -136,14 +179,41 @@ export default function Settings() {
         contactEmail: contactEmail.trim(),
         leadership: nextLeadership,
         brandName: brandName.trim(),
+        productName: productName.trim(),
         ...(trimmedLogoUrl ? { logoUrl: trimmedLogoUrl } : { logoUrl: "" }),
         brandColor,
       },
     });
     toast({
       title: "Enterprise credentials saved",
-      description: "Licenses, certifications, contact, leadership, and white-label branding stored on your organization profile.",
+      description: "White-label branding, licenses, certifications, contact, and leadership stored on your organization profile.",
     });
+  };
+
+  const handleSendInvite = () => {
+    const email = inviteEmail.trim().toLowerCase();
+    if (!email) {
+      toast({ title: "Email required", variant: "destructive" });
+      return;
+    }
+    createInvite.mutate(
+      { email, role: inviteRole },
+      {
+        onSuccess: (data) => {
+          setInviteEmail("");
+          toast({
+            title: "Invite sent",
+            description: `Share the accept link with ${email}. Link copied to clipboard when available.`,
+          });
+          if (data.acceptUrl && navigator.clipboard?.writeText) {
+            void navigator.clipboard.writeText(data.acceptUrl);
+          }
+        },
+        onError: (err: Error) => {
+          toast({ title: "Invite failed", description: err.message, variant: "destructive" });
+        },
+      },
+    );
   };
 
   const handleSaveProfile = () => {
@@ -190,6 +260,7 @@ export default function Settings() {
             <TabsTrigger value="addon" className="data-[state=active]:bg-[#E2E8F0] data-[state=active]:text-slate-900">ContractorConnect</TabsTrigger>
             <TabsTrigger value="preferences" className="data-[state=active]:bg-[#E2E8F0] data-[state=active]:text-slate-900">App Preferences</TabsTrigger>
             <TabsTrigger value="enterprise" className="data-[state=active]:bg-[#E2E8F0] data-[state=active]:text-slate-900">Enterprise & White Label</TabsTrigger>
+            {live && <TabsTrigger value="team" className="data-[state=active]:bg-[#E2E8F0] data-[state=active]:text-slate-900">Team</TabsTrigger>}
           </TabsList>
 
           {/* Company Profile Tab */}
@@ -509,8 +580,8 @@ export default function Settings() {
                   Enterprise Credentials
                 </h3>
                 <p className="text-slate-500 mt-1">
-                  Licenses, certifications, contacts, leadership, and optional white-label branding persist on your organization profile.
-                  Multi-location rollups and role-based access remain Phase 5.
+                  Licenses, certifications, contacts, leadership, and white-label branding persist on your organization profile.
+                  Team invites are on the Team tab; multi-location rollups remain Phase 5.
                 </p>
               </div>
             </div>
@@ -522,7 +593,7 @@ export default function Settings() {
                   White Label
                 </CardTitle>
                 <CardDescription className="text-slate-500">
-                  Optional brand name, logo URL, and accent color shown on your business profile header. URL only — no file upload.
+                  Brand name, product title override, logo URL, and accent color — saved together and applied to your workspace sidebar and business profile.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
@@ -540,6 +611,24 @@ export default function Settings() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="productName" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      Product name override
+                    </Label>
+                    <Input
+                      id="productName"
+                      value={productName}
+                      onChange={(e) => setProductName(e.target.value)}
+                      placeholder="BidIntelligenceOS"
+                      className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] px-3 py-2 flex items-start gap-2">
+                  <Globe className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                  Custom domain (DNS verification and TLS) is deferred to a later Phase 5 slice — use logo URL for now; file upload is not required when a hosted logo link is available.
+                </p>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="logoUrl" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       Logo URL
                     </Label>
@@ -1169,6 +1258,140 @@ export default function Settings() {
             </>
             )}
           </TabsContent>
+
+          {live && (
+          <TabsContent value="team" className="space-y-6">
+            <div>
+              <h3 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
+                <Users className="h-6 w-6 text-[#0284C7]" />
+                Team & Invites
+              </h3>
+              <p className="text-slate-500 mt-1">
+                Organization members and pending invites. Owners and admins can invite teammates with scoped roles.
+              </p>
+            </div>
+
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <CardTitle className="text-lg text-slate-900">Members</CardTitle>
+                <CardDescription className="text-slate-500">
+                  Active users in your organization from organization_members.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-2">
+                {members.length === 0 ? (
+                  <p className="text-sm text-slate-500">No members loaded.</p>
+                ) : (
+                  members.map((m) => (
+                    <div
+                      key={m.userId}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] px-4 py-3"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{m.name || m.email}</p>
+                        <p className="text-xs text-slate-500">{m.email}</p>
+                      </div>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-[#0284C7]">{m.role}</span>
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+
+            {teamAdmin ? (
+              <>
+                <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+                  <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                    <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                      <UserPlus className="h-5 w-5 text-[#0284C7]" />
+                      Invite teammate
+                    </CardTitle>
+                    <CardDescription className="text-slate-500">
+                      Sends a one-time accept link (7-day expiry). Invitee signs in with Clerk, then opens the link or accepts from Settings.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-6 space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="inviteEmail">Email</Label>
+                        <Input
+                          id="inviteEmail"
+                          type="email"
+                          value={inviteEmail}
+                          onChange={(e) => setInviteEmail(e.target.value)}
+                          placeholder="teammate@company.com"
+                          className="bg-[#F1F5F9] border-[#E2E8F0]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="inviteRole">Role</Label>
+                        <Select value={inviteRole} onValueChange={setInviteRole}>
+                          <SelectTrigger id="inviteRole" className="bg-[#F1F5F9] border-[#E2E8F0]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="member">Member</SelectItem>
+                            <SelectItem value="viewer">Viewer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleSendInvite}
+                      disabled={createInvite.isPending}
+                      className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold"
+                    >
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Send invite
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+                  <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                    <CardTitle className="text-lg text-slate-900">Pending invites</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-6 space-y-2">
+                    {pendingInvites.length === 0 ? (
+                      <p className="text-sm text-slate-500">No pending invites.</p>
+                    ) : (
+                      pendingInvites.map((inv) => (
+                        <div
+                          key={inv.id}
+                          className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-white px-4 py-3"
+                        >
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">{inv.email}</p>
+                            <p className="text-xs text-slate-500">
+                              {inv.role} · expires {new Date(inv.expiresAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={revokeInvite.isPending}
+                            onClick={() =>
+                              revokeInvite.mutate(inv.id, {
+                                onSuccess: () => toast({ title: "Invite revoked" }),
+                              })
+                            }
+                          >
+                            Revoke
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              <p className="text-sm text-slate-500 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] px-4 py-3">
+                Only organization owners and admins can send invites. Your role: {user?.role ?? "unknown"}.
+              </p>
+            )}
+          </TabsContent>
+          )}
         </Tabs>
       </div>
     </Layout>

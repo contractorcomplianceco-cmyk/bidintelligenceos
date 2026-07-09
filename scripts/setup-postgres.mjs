@@ -18,12 +18,16 @@ if (!url) {
   process.exit(1);
 }
 
-const sqlPath = path.join(root, "deploy/postgres/001_init.sql");
-const sql = fs.readFileSync(sqlPath, "utf8");
+const migrations = ["001_init.sql", "002_org_invites.sql"];
 const pool = new pg.Pool({ connectionString: url });
 
 try {
-  await pool.query(sql);
+  for (const file of migrations) {
+    const sqlPath = path.join(root, "deploy/postgres", file);
+    const sql = fs.readFileSync(sqlPath, "utf8");
+    await pool.query(sql);
+    console.log(`Applied ${file}`);
+  }
   console.log("Postgres schema + RLS applied.");
 } finally {
   await pool.end();

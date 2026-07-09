@@ -1,14 +1,16 @@
 import { Router } from "express";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../../db/client.js";
-import { organizations } from "../../db/schema.js";
+import { organizationMembers, organizations, users } from "../../db/schema.js";
 import { nowIso } from "../../lib/ids.js";
 import { requireAuth, type AuthedRequest } from "../../middleware/auth.js";
 import { orgScopeMiddleware } from "../../middleware/org-scope.js";
+import orgInvitesRoutes from "./org-invites.js";
 
 const router = Router();
 router.use(requireAuth);
+router.use("/invites", orgInvitesRoutes);
 router.use(orgScopeMiddleware);
 
 const licenseEntrySchema = z.object({
@@ -37,6 +39,7 @@ const orgProfileSchema = z
     brandName: z.string().optional(),
     logoUrl: z.union([z.string().url(), z.literal("")]).optional(),
     brandColor: z.union([z.string().regex(/^#[0-9A-Fa-f]{6}$/), z.literal("")]).optional(),
+    productName: z.string().optional(),
   })
   .passthrough();
 
@@ -46,12 +49,38 @@ const profileSchema = z.object({
   profile: orgProfileSchema.optional(),
 });
 
-/** Honest single-user member list from session until multi-member RBAC ships. */
+/** Organization members from organization_members join. */
 router.get("/members", async (req, res) => {
-  const { userId, orgId, email, role } = (req as AuthedRequest).auth;
-  res.json({
-    members: [{ userId, email, role, orgId }],
+  const { orgId } = (req as AuthedRequest).auth;
+  const db = getDb();
+  const memberRows = await db
+    .select()
+    .from(organizationMembers)
+    .where(eq(organizationMembers.orgId, orgId));
+
+  if (memberRows.length === 0) {
+    res.json({ members: [] });
+    return;
+  }
+
+  const userRows = await db
+    .select()
+    .from(users)
+    .where(inArray(users.id, memberRows.map((m) => m.userId)));
+
+  const userById = new Map(userRows.map((u) => [u.id, u]));
+  const members = memberRows.map((m) => {
+    const user = userById.get(m.userId);
+    return {
+      userId: m.userId,
+      email: user?.email ?? "",
+      name: user?.name ?? "",
+      role: m.role,
+      orgId: m.orgId,
+    };
   });
+
+  res.json({ members });
 });
 
 router.get("/profile", async (req, res) => {

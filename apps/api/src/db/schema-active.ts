@@ -7,6 +7,7 @@ const active = usePg ? pg : sqlite;
 export const users = active.users;
 export const organizations = active.organizations;
 export const organizationMembers = active.organizationMembers;
+export const orgInvites = active.orgInvites;
 export const bids = active.bids;
 export const jobs = active.jobs;
 export const bidAnalyses = active.bidAnalyses;

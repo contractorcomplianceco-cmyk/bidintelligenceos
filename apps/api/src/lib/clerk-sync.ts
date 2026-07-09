@@ -1,13 +1,50 @@
 import { clerkClient, getAuth } from "@clerk/express";
 import type { Request } from "express";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb, withPgOrgScope } from "../db/client.js";
-import { organizationMembers, organizations, users } from "../db/schema.js";
+import { orgInvites, organizationMembers, organizations, users } from "../db/schema.js";
 import type { AuthPayload } from "./auth.js";
 import { isClerkAuthEnabled, mapClerkRole } from "./clerk-config.js";
 import { nextId, nowIso } from "./ids.js";
+import { normalizeMemberRole } from "./rbac.js";
 
 const CLERK_PASSWORD_PLACEHOLDER = "!clerk-sso!";
+
+async function acceptPendingInviteForEmail(userId: string, email: string): Promise<string | null> {
+  const db = getDb();
+  const pending = await db
+    .select()
+    .from(orgInvites)
+    .where(and(eq(orgInvites.email, email.toLowerCase()), eq(orgInvites.status, "pending")))
+    .limit(1);
+  const invite = pending[0];
+  if (!invite) return null;
+  if (new Date(invite.expiresAt).getTime() < Date.now()) return null;
+
+  const ts = nowIso();
+  const role = normalizeMemberRole(invite.role);
+  await withPgOrgScope(invite.orgId, async () => {
+    const scopedDb = getDb();
+    const existing = await scopedDb
+      .select()
+      .from(organizationMembers)
+      .where(and(eq(organizationMembers.orgId, invite.orgId), eq(organizationMembers.userId, userId)))
+      .limit(1);
+    if (!existing[0]) {
+      await scopedDb.insert(organizationMembers).values({
+        id: nextId("CCA-MEM"),
+        orgId: invite.orgId,
+        userId,
+        role,
+      });
+    }
+    await scopedDb
+      .update(orgInvites)
+      .set({ status: "accepted", acceptedAt: ts, acceptedByUserId: userId, updatedAt: ts })
+      .where(eq(orgInvites.id, invite.id));
+  });
+  return invite.orgId;
+}
 
 export async function resolveClerkAuthPayload(req: Request): Promise<AuthPayload | null> {
   if (!isClerkAuthEnabled()) return null;
@@ -27,7 +64,6 @@ export async function resolveClerkAuthPayload(req: Request): Promise<AuthPayload
     email.split("@")[0] ||
     "CCA User";
 
-  const role = mapClerkRole(email);
   const db = getDb();
   const ts = nowIso();
 
@@ -42,11 +78,22 @@ export async function resolveClerkAuthPayload(req: Request): Promise<AuthPayload
     });
   }
 
-  const memberships = await db
+  let memberships = await db
     .select()
     .from(organizationMembers)
     .where(eq(organizationMembers.userId, userId))
     .limit(1);
+
+  if (!memberships[0]) {
+    const invitedOrgId = await acceptPendingInviteForEmail(userId, email);
+    if (invitedOrgId) {
+      memberships = await db
+        .select()
+        .from(organizationMembers)
+        .where(eq(organizationMembers.userId, userId))
+        .limit(1);
+    }
+  }
 
   let orgId = memberships[0]?.orgId;
   if (!orgId) {
@@ -64,15 +111,23 @@ export async function resolveClerkAuthPayload(req: Request): Promise<AuthPayload
         updatedAt: ts,
       });
     }
+    const initialRole = mapClerkRole(email);
     await withPgOrgScope(orgId, async () => {
       await getDb().insert(organizationMembers).values({
         id: nextId("CCA-MEM"),
         orgId,
         userId,
-        role,
+        role: initialRole,
       });
     });
+    memberships = await db
+      .select()
+      .from(organizationMembers)
+      .where(and(eq(organizationMembers.userId, userId), eq(organizationMembers.orgId, orgId)))
+      .limit(1);
   }
 
-  return { userId, orgId, email, role };
+  const role = memberships[0]?.role ?? mapClerkRole(email);
+
+  return { userId, orgId: orgId!, email, role };
 }
