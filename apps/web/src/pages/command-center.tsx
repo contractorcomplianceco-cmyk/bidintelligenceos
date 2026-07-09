@@ -10,9 +10,9 @@ import { useLiveData } from "@/lib/data-mode";
 import { DemoDataBadge } from "@/components/demo-data-badge";
 import { useCommandCenterProjection } from "@/hooks/use-command-center";
 import { useJobs } from "@/hooks/use-jobs";
-import { useOpsScheduling, useOpsPermits, useOpsLabor } from "@/hooks/use-ops";
+import { useOpsScheduling, useOpsPermits, useOpsLabor, useOpsCostRoi, useOpsWeather } from "@/hooks/use-ops";
 import { buildLiveBriefing } from "@/lib/live-operations";
-import { buildLiveWinRateSeries, hasLiveChartData } from "@/lib/live-analytics";
+import { buildLiveWinRateSeries, buildLiveCostSnapshot, hasLiveChartData } from "@/lib/live-analytics";
 import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
   jobDeployments,
@@ -130,7 +130,15 @@ export default function CommandCenter() {
   const { data: liveSchedule = [] } = useOpsScheduling();
   const { data: livePermits = [] } = useOpsPermits();
   const { data: liveLabor } = useOpsLabor();
+  const { data: liveCostData } = useOpsCostRoi();
+  const { data: liveWeather = [] } = useOpsWeather();
   const { data: researchPreview, isLoading: researchLoading } = useResearchExportReadyPreview("FL", 8);
+
+  const liveCostSeries = useMemo(
+    () => (live && liveCostData?.records?.length ? buildLiveCostSnapshot(liveCostData.records) : []),
+    [live, liveCostData],
+  );
+  const liveJobsiteWeather = live ? liveWeather : jobsiteWeather;
 
   const dailyBriefing = live
     ? buildLiveBriefing(projection, liveRose?.stats, liveRose?.insights ?? [], user?.name)
@@ -745,7 +753,8 @@ export default function CommandCenter() {
           </Card>
         </div>
 
-        {/* VoiceConnect Feed — connected add-on */}
+        {/* VoiceConnect Feed — connected add-on (demo fixtures only) */}
+        {!live && (
         <Card className="bg-white border-[#E2E8F0] shadow-sm overflow-hidden">
           <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
@@ -813,8 +822,10 @@ export default function CommandCenter() {
             </div>
           </CardContent>
         </Card>
+        )}
 
-        {/* Opportunity Radar — MarketWatchOS connected add-on */}
+        {/* Opportunity Radar — MarketWatchOS connected add-on (demo fixtures only) */}
+        {!live && (
         <Card className="bg-white border-[#E2E8F0] shadow-sm overflow-hidden">
           <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
@@ -904,6 +915,7 @@ export default function CommandCenter() {
             </p>
           </CardContent>
         </Card>
+        )}
 
         {/* Row: Win Rate Over Time + Pipeline Value Breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1320,8 +1332,8 @@ export default function CommandCenter() {
               </Link>
             </CardHeader>
             <CardContent className="p-4 flex-1 flex flex-col">
-              {live ? (
-                <OpsModuleEmpty module="Cost tracking" description="Job cost-to-date feeds from deployments — add jobs with cost data in Phase 4." />
+              {live && liveCostSeries.length === 0 ? (
+                <OpsModuleEmpty module="Cost tracking" description="Deploy won bids with budget and cost-to-date in job payload to populate cost tracking." />
               ) : (
               <>
               <div className="flex gap-4 mb-4 text-[10px] font-bold uppercase tracking-widest">
@@ -1335,7 +1347,7 @@ export default function CommandCenter() {
               <div className="h-48 w-full mt-auto">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-                    data={costToDateSeries}
+                    data={live ? liveCostSeries : costToDateSeries}
                     margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
                   >
                     <defs>
@@ -1411,14 +1423,14 @@ export default function CommandCenter() {
               </Link>
             </CardHeader>
             <CardContent className="p-0 flex-1 flex flex-col">
-              {live ? (
+              {live && liveJobsiteWeather.length === 0 ? (
                 <div className="p-4">
-                  <OpsModuleEmpty module="Weather watch" description="Jobsite weather feeds from active deployments — coming in Phase 4." />
+                  <OpsModuleEmpty module="Weather watch" description="Record won jobs in deployment to monitor weather-sensitive work." />
                 </div>
               ) : (
               <>
               <div className="divide-y divide-[#E2E8F0]">
-                {jobsiteWeather.map((site) => (
+                {liveJobsiteWeather.map((site) => (
                   <div key={site.jobId} className="p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div className="min-w-0">

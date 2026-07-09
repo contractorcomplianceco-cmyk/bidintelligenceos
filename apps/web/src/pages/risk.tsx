@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
-import { useOpsRisk } from "@/hooks/use-ops";
+import { useOpsRisk, useOpsCostRoi } from "@/hooks/use-ops";
 import { DemoDataBadge } from "@/components/demo-data-badge";
 import { OpsModuleEmpty } from "@/components/ops-module-empty";
+import { AnalyticsChartEmpty } from "@/components/analytics-chart-empty";
 import {
   riskItems as seedRisks,
   changeOrders as seedChangeOrders,
@@ -112,9 +113,32 @@ export default function Risk() {
   const { isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
   const { data: riskData } = useOpsRisk();
+  const { data: costData } = useOpsCostRoi();
   const riskItems = live ? (riskData?.risks ?? []) : seedRisks;
   const changeOrders = live ? (riskData?.changeOrders ?? []) : seedChangeOrders;
   const riskStats = live ? (riskData?.stats ?? seedRiskStats) : seedRiskStats;
+  const liveProfitFade = useMemo(() => {
+    if (!live || !costData?.records?.length) return [];
+    return costData.records
+      .filter((r) => r.profitFadeRisk === "High" || r.profitFadeRisk === "Medium")
+      .map((r) => {
+        const baselineMargin = r.grossMargin + (r.actualCost > r.estimatedCost ? 5 : 2);
+        return {
+          jobId: r.jobId,
+          jobName: r.jobName,
+          baselineMargin,
+          currentMargin: r.grossMargin,
+          trend: [
+            { week: "Start", projected: baselineMargin },
+            { week: "Now", projected: r.grossMargin },
+          ],
+          fadeDrivers: [
+            r.actualCost > r.estimatedCost ? "Cost overrun" : "Margin pressure",
+            r.changeOrders > 0 ? "Change orders" : "Budget burn",
+          ],
+        };
+      });
+  }, [live, costData]);
   const [severityFilter, setSeverityFilter] = useState<RiskSeverity | "All">("All");
   const [categoryFilter, setCategoryFilter] = useState<RiskCategory | "All">("All");
   const [selectedCoId, setSelectedCoId] = useState<string>(
@@ -398,11 +422,15 @@ export default function Risk() {
             </span>
           </CardHeader>
           <CardContent className="p-4">
+            {live && liveProfitFade.length === 0 ? (
+              <AnalyticsChartEmpty label="Profit-fade watch requires jobs with budget and cost-to-date" />
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {profitFadeSignals.map((signal) => (
+              {(live ? liveProfitFade : profitFadeSignals).map((signal) => (
                 <ProfitFadeCard key={signal.jobId} signal={signal} />
               ))}
             </div>
+            )}
           </CardContent>
         </Card>
 

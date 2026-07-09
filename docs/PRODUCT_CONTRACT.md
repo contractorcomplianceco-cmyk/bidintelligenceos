@@ -16,7 +16,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs + live ROSEOS brief when signed in; ops tiles from `/api/v1/ops/*` when jobs exist |
+| Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs + live ROSEOS brief when signed in; ops tiles from `/api/v1/ops/*` when jobs exist; add-on demo cards hidden for authed users |
 | Daily Briefings | `/briefings` | **partial live** | Live brief from command center + ROSEOS when signed in; demo fixtures otherwise |
 | Alerts | `/alerts` | **partial live** | Pipeline + ROSEOS + ops alerts (`/api/v1/ops/alerts`) when signed in |
 
@@ -40,8 +40,8 @@ Living map of marketing promises → routes → data status. Update when a modul
 | Labor & Subs | `/labor` | **live** | Crew/subs from job payload via `/api/v1/ops/labor` |
 | Permits | `/permits` | **partial live** | Job payload permits + jurisdiction/compliance-derived items via `/api/v1/ops/permits` |
 | Weather | `/weather` | **partial live** | Placeholder forecast per active job; external feed optional |
-| Cost & ROI | `/cost-roi` | **partial live** | Budget/cost from job payload via `/api/v1/ops/cost-roi` |
-| Risk & Change Orders | `/risk` | **partial live** | Derived risks from jobs/bids via `/api/v1/ops/risk`; profit-fade charts demo |
+| Cost & ROI | `/cost-roi` | **partial live** | Job table + portfolio snapshot from `/api/v1/ops/cost-roi`; labor burn time-series demo |
+| Risk & Change Orders | `/risk` | **partial live** | Risks from jobs/bids/scores via `/api/v1/ops/risk`; profit-fade from live cost when available |
 | Job Closeout | `/closeout` | **partial live** | Won/completed jobs (completion ≥70% on won bids) via `/api/v1/ops/closeout`; punch list demo |
 
 ## Intelligence
@@ -49,7 +49,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
 | ROSEOS | `/roseos` | **partial live** | Live pipeline insights + Rose Brain brief when authenticated |
-| Analytics | `/analytics` | **partial live** | Win/loss KPIs from API when signed in; charts demo |
+| Analytics | `/analytics` | **partial live** | Win/loss KPIs + bid outcome charts from API when signed in; margin/ROI charts from `/api/v1/ops/cost-roi` when jobs exist; honest empty states otherwise |
 | Bid DNA | `/bid-dna` | demo | Seed |
 | Market Watch | `/market-watch` | demo | Seed |
 | Scope analyzer | `/scope-analyzer` | **partial live** | Live brief when `?bidId=` + signed in |

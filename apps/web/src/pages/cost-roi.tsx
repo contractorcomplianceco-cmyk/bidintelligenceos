@@ -9,6 +9,8 @@ import { useLiveData } from "@/lib/data-mode";
 import { useOpsCostRoi } from "@/hooks/use-ops";
 import { DemoDataBadge } from "@/components/demo-data-badge";
 import { OpsModuleEmpty } from "@/components/ops-module-empty";
+import { AnalyticsChartEmpty } from "@/components/analytics-chart-empty";
+import { buildLiveCostSnapshot } from "@/lib/live-analytics";
 import {
   DollarSign,
   TrendingUp,
@@ -108,6 +110,11 @@ export default function CostRoi() {
         jobId: r.jobId,
       })),
     [costRecords]
+  );
+
+  const liveCostSnapshot = useMemo(
+    () => (live ? buildLiveCostSnapshot(costRecords) : []),
+    [live, costRecords],
   );
 
   const activeRecords = selectedJob
@@ -241,10 +248,13 @@ export default function CostRoi() {
                   Actual
                 </div>
               </div>
+              {live && liveCostSnapshot.length === 0 ? (
+                <AnalyticsChartEmpty label="Cost-to-date trend requires job budget fields on deployments" />
+              ) : (
               <div className="h-56 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-                    data={costToDateSeries}
+                    data={live ? liveCostSnapshot : costToDateSeries}
                     margin={{ top: 0, right: 0, left: -10, bottom: 0 }}
                   >
                     <defs>
@@ -275,6 +285,7 @@ export default function CostRoi() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
+              )}
             </CardContent>
           </Card>
 
@@ -285,6 +296,10 @@ export default function CostRoi() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 flex-1">
+              {live ? (
+                <AnalyticsChartEmpty label="Historical labor burn requires time-series capture on jobs" />
+              ) : (
+              <>
               <div className="flex gap-4 mb-3 text-[10px] font-bold uppercase tracking-widest">
                 <div className="flex items-center gap-1.5 text-slate-500">
                   <span className="w-2 h-2 rounded-full bg-[#8A96B0]" />
@@ -312,6 +327,8 @@ export default function CostRoi() {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
+              </>
+              )}
             </CardContent>
           </Card>
         </div>
