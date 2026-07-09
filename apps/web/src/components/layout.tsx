@@ -36,6 +36,8 @@ import {
   Network,
   Landmark,
   Compass,
+  Database,
+  Activity,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
@@ -82,6 +84,8 @@ const navGroups: NavGroup[] = [
     title: "Bid Lifecycle",
     items: [
       { href: "/bids", label: "Bid Intelligence", icon: Radar },
+      { href: "/bid-library", label: "Bid Library", icon: Database },
+      { href: "/monitoring", label: "Bid Monitoring", icon: Activity },
       { href: "/package-builder", label: "Bid Package Builder", icon: PackageOpen },
       { href: "/won-jobs", label: "Won Jobs", icon: Trophy },
       { href: "/government", label: "Government Contracting", icon: Landmark, badge: "GOV" },
