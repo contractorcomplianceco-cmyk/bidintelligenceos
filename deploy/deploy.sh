@@ -22,28 +22,9 @@ sleep 2
 curl -sf "http://127.0.0.1:5001/api/health" | head -c 200
 echo ""
 
-smoke_password_configured() {
-  if [[ -n "${BIOS_SMOKE_PASSWORD:-}" ]]; then
-    return 0
-  fi
-  if [[ ! -f "$ROOT/.env" ]]; then
-    return 1
-  fi
-  local val
-  val="$(
-    grep -E '^BIOS_SMOKE_PASSWORD=' "$ROOT/.env" 2>/dev/null \
-      | head -1 \
-      | cut -d= -f2- \
-      | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"
-  )"
-  [[ -n "$val" ]]
-}
-
-echo "==> Post-deploy smoke (optional)..."
-if smoke_password_configured; then
-  NODE_PATH="$ROOT/apps/api/node_modules" node scripts/smoke-team-url.mjs
-else
-  echo "Skipping post-deploy smoke (BIOS_SMOKE_PASSWORD not set)."
-fi
+echo "==> Post-deploy smoke..."
+# Clerk mode: smoke uses public health/config/login checks (no secrets).
+# Legacy mode: set BIOS_SMOKE_PASSWORD in shell or .env for login + authed API checks.
+NODE_PATH="$ROOT/apps/api/node_modules" node scripts/smoke-team-url.mjs
 
 echo "Done. bid-intelligence-os is live on :5001"
