@@ -465,12 +465,24 @@ export async function buildCloseoutProjection(orgId: string) {
 
   const jobsOut = closeoutRows.map((row) => {
     const payload = parsePayload(row);
+    const jobId = `co-${row.id}`;
     const stageName = String(payload.closeoutStage ?? "Punch List");
     const stageIndex = Math.max(0, CLOSEOUT_STAGES.indexOf(stageName as (typeof CLOSEOUT_STAGES)[number]));
     const projectedRoi = Number(payload.projectedRoi ?? 0);
     const finalRoi = Number(payload.finalRoi ?? projectedRoi);
+    const punchList = parseCloseoutPunchList(payload, jobId, row.name);
+    const closeoutDocs = parseCloseoutDocs(payload);
+    const openPunch =
+      punchList.length > 0
+        ? punchList.filter((p) => p.status === "Open" || p.status === "In Progress").length
+        : Number(payload.punchItemsRemaining ?? 0);
+    const docsComplete =
+      closeoutDocs.length > 0
+        ? closeoutDocs.filter((d) => d.status === "Complete").length
+        : Number(payload.docsComplete ?? 0);
+    const docsTotal = closeoutDocs.length > 0 ? closeoutDocs.length : Number(payload.docsTotal ?? 5);
     return {
-      id: `co-${row.id}`,
+      id: jobId,
       deploymentId: row.id,
       name: row.name,
       client: row.client,
@@ -485,12 +497,14 @@ export async function buildCloseoutProjection(orgId: string) {
       targetCloseout: String(payload.targetCloseout ?? row.targetCompletion),
       projectedRoi,
       finalRoi,
-      punchItemsRemaining: Number(payload.punchItemsRemaining ?? 0),
+      punchItemsRemaining: openPunch,
+      punchList,
+      closeoutDocs,
       retainageAmount: Number(payload.retainageAmount ?? Math.round(row.contractValue * 0.05)),
       retainageStatus: String(payload.retainageStatus ?? "Held"),
       changeOrdersValue: Number(payload.changeOrdersValue ?? 0),
-      docsComplete: Number(payload.docsComplete ?? 0),
-      docsTotal: Number(payload.docsTotal ?? 5),
+      docsComplete,
+      docsTotal,
       feedsBidDna: {
         headline: String(
           payload.closeoutHeadline ??
@@ -503,7 +517,7 @@ export async function buildCloseoutProjection(orgId: string) {
   });
 
   const stats = {
-    jobsInCloseout: jobsOut.length,
+    jobsInCloseout: jobsOut.filter((j) => j.stage !== "Complete").length,
     punchItemsOpen: jobsOut.reduce((s, j) => s + j.punchItemsRemaining, 0),
     retainageOutstanding: jobsOut
       .filter((j) => j.retainageStatus !== "Released")
@@ -514,7 +528,67 @@ export async function buildCloseoutProjection(orgId: string) {
       jobsOut.length > 0 ? jobsOut.reduce((s, j) => s + j.projectedRoi, 0) / jobsOut.length : 0,
   };
 
-  return { jobs: jobsOut, stats, jobCount: rows.length };
+  const bidDnaFeedSeries = jobsOut
+    .filter((j) => j.projectedRoi > 0 || j.finalRoi > 0)
+    .map((j) => ({
+      name: j.name.split(" ").slice(0, 2).join(" "),
+      projected: j.projectedRoi,
+      final: j.finalRoi,
+      jobId: j.id,
+    }));
+
+  const completionChart = jobsOut.map((j) => ({
+    name: j.name.split(" ").slice(0, 2).join(" "),
+    completion: j.completion,
+    stage: j.stage,
+    jobId: j.id,
+  }));
+
+  return {
+    jobs: jobsOut,
+    stats,
+    punchList: jobsOut.flatMap((j) => j.punchList),
+    bidDnaFeedSeries,
+    completionChart,
+    jobCount: rows.length,
+  };
+}
+
+function parseCloseoutPunchList(
+  payload: Record<string, unknown>,
+  jobId: string,
+  jobName: string,
+) {
+  const raw = payload.punchList;
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item, i) => {
+    const p = item as Record<string, unknown>;
+    return {
+      id: String(p.id ?? `pl-${jobId}-${i}`),
+      jobId,
+      jobName,
+      item: String(p.item ?? p.description ?? "Punch item"),
+      trade: String(p.trade ?? "General"),
+      status: String(p.status ?? "Open"),
+      assignee: String(p.assignee ?? "Unassigned"),
+      priority: String(p.priority ?? "Medium"),
+      dueDate: String(p.dueDate ?? "TBD"),
+    };
+  });
+}
+
+function parseCloseoutDocs(payload: Record<string, unknown>) {
+  const raw = payload.closeoutDocs ?? payload.closeoutChecklist;
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item, i) => {
+    const d = item as Record<string, unknown>;
+    return {
+      id: String(d.id ?? `doc-${i}`),
+      requirement: String(d.requirement ?? d.name ?? "Document"),
+      description: String(d.description ?? ""),
+      status: String(d.status ?? "Pending"),
+    };
+  });
 }
 
 export async function buildCostRoiProjection(orgId: string) {
