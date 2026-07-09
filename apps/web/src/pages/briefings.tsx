@@ -16,6 +16,7 @@ import { useCommandCenterProjection } from "@/hooks/use-command-center";
 import { useRoseOsSummary } from "@/hooks/use-bids";
 import { buildLiveBriefing } from "@/lib/live-operations";
 import { DemoDataBadge } from "@/components/demo-data-badge";
+import { useArchiveBriefing, useBriefingArchive } from "@/hooks/use-briefings";
 import {
   Empty,
   EmptyDescription,
@@ -76,7 +77,15 @@ interface ArchivedBriefing {
   highlight: AlertSeverity;
 }
 
-const briefingArchive: ArchivedBriefing[] = [
+function topHighlight(items: BriefingItem[]): AlertSeverity {
+  const order: AlertSeverity[] = ["Critical", "High", "Medium", "Info"];
+  for (const level of order) {
+    if (items.some((i) => i.priority === level)) return level;
+  }
+  return "Info";
+}
+
+const demoBriefingArchive: ArchivedBriefing[] = [
   {
     id: "arch-1",
     date: "Monday, June 30, 2025",
@@ -114,6 +123,8 @@ export default function Briefings() {
   const live = useLiveData(isAuthenticated);
   const { data: projection } = useCommandCenterProjection();
   const { data: roseSummary } = useRoseOsSummary();
+  const { data: archiveData, isLoading: archiveLoading } = useBriefingArchive();
+  const archiveBriefing = useArchiveBriefing();
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
 
   const dailyBriefing = live
@@ -132,12 +143,23 @@ export default function Briefings() {
     });
   };
 
+  const archiveEntries = live ? (archiveData?.archive ?? []) : demoBriefingArchive;
+
   const handleGenerate = () => {
     const stamp = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     setGeneratedAt(stamp);
+    if (live) {
+      archiveBriefing.mutate({
+        date: dailyBriefing.date,
+        summary: dailyBriefing.summary,
+        highlight: topHighlight(dailyBriefing.items),
+      });
+    }
     toast({
       title: "Briefing regenerated",
-      description: `Refreshed with the latest operational signals for ${verticalConfig.name}.`,
+      description: live
+        ? `Saved to your archive and refreshed for ${verticalConfig.name}.`
+        : `Refreshed with the latest operational signals for ${verticalConfig.name}.`,
     });
   };
 
@@ -358,7 +380,9 @@ export default function Briefings() {
             </span>
           </CardHeader>
           <CardContent className="p-0 divide-y divide-[#E2E8F0]">
-            {isAuthenticated ? (
+            {archiveLoading && live ? (
+              <div className="p-8 text-center text-sm text-slate-500">Loading archive…</div>
+            ) : archiveEntries.length === 0 ? (
               <div className="p-8">
                 <Empty>
                   <EmptyHeader>
@@ -367,13 +391,15 @@ export default function Briefings() {
                     </EmptyMedia>
                     <EmptyTitle>No archived briefings</EmptyTitle>
                     <EmptyDescription>
-                      Prior briefings will appear here once the archive API is available.
+                      {live
+                        ? "Generate today's briefing to save snapshots to your team archive."
+                        : "Sign in to build your briefing archive from live pipeline data."}
                     </EmptyDescription>
                   </EmptyHeader>
                 </Empty>
               </div>
             ) : (
-            briefingArchive.map((brief) => {
+            archiveEntries.map((brief) => {
               const style = severityStyles[brief.highlight];
               return (
                 <div

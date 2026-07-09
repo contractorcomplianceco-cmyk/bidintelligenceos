@@ -8,6 +8,7 @@ import researchRoutes from "./research.js";
 import commandCenterRoutes from "./command-center.js";
 import opsRoutes from "./ops.js";
 import integrationsRoutes from "./integrations.js";
+import briefingsRoutes from "./briefings.js";
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use("/research", researchRoutes);
 router.use("/command-center", commandCenterRoutes);
 router.use("/ops", opsRoutes);
 router.use("/integrations", integrationsRoutes);
+router.use("/briefings", briefingsRoutes);
 
 export default router;
