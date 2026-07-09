@@ -41,7 +41,7 @@ smoke_password_configured() {
 
 echo "==> Post-deploy smoke (optional)..."
 if smoke_password_configured; then
-  node scripts/smoke-team-url.mjs
+  NODE_PATH="$ROOT/apps/api/node_modules" node scripts/smoke-team-url.mjs
 else
   echo "Skipping post-deploy smoke (BIOS_SMOKE_PASSWORD not set)."
 fi
