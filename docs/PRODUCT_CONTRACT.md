@@ -17,8 +17,8 @@ Living map of marketing promises → routes → data status. Update when a modul
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
 | Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs + live ROSEOS brief when signed in; ops tiles from `/api/v1/ops/*` when jobs exist; add-on demo cards hidden for authed users |
-| Daily Briefings | `/briefings` | **partial live** | Live brief from command center + ROSEOS when signed in; demo fixtures otherwise |
-| Alerts | `/alerts` | **partial live** | Pipeline + ROSEOS + ops alerts (`/api/v1/ops/alerts`) when signed in |
+| Daily Briefings | `/briefings` | **partial live** | Live brief from pipeline tasks, ROSEOS, and compliance counts when signed in; demo fixtures otherwise |
+| Alerts | `/alerts` | **partial live** | Overdue follow-ups, compliance gaps, ROSEOS insights, and ops alerts (`/api/v1/ops/alerts`) when signed in |
 
 ## Bid lifecycle
 
