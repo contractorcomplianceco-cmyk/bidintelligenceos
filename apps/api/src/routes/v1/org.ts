@@ -43,6 +43,14 @@ const profileSchema = z.object({
   profile: orgProfileSchema.optional(),
 });
 
+/** Honest single-user member list from session until multi-member RBAC ships. */
+router.get("/members", async (req, res) => {
+  const { userId, orgId, email, role } = (req as AuthedRequest).auth;
+  res.json({
+    members: [{ userId, email, role, orgId }],
+  });
+});
+
 router.get("/profile", async (req, res) => {
   const { orgId } = (req as AuthedRequest).auth;
   const db = getDb();

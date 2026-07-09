@@ -27,12 +27,48 @@ Deferred work extracted from [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) and 
 |---------|---------|----------------|
 | White label | Prototype UI only | Brand color, product name override, custom domain, logo upload — persisted and applied across workspace + client exports |
 | Multi-location | Prototype UI only | Franchise rollups, regional segmentation, location KPIs |
-| RBAC & invites | Not built | Role templates, permission grants, user invites |
+| RBAC & invites | **stub** | Role templates, permission grants, user invites; `GET /api/v1/org/members` returns session user only (honest single-member list until multi-user) |
 | `GET/PATCH /api/v1/org/profile` | **partial live** | Extend `organizations.profile_json` beyond `licenses`, `certifications`, `phone`, `contactEmail`, `leadership` |
 
 **Routes:** `/settings` (Enterprise & White Label tab), `/business-profile` (reads persisted org fields).
 
 **Acceptance:** Authed owners can configure branding and locations; invite users with scoped roles; business profile reflects saved enterprise data without demo fixtures.
+
+#### RBAC stub — `org_invites` (planned schema, no migration yet)
+
+Pending Clerk cutover and multi-user membership work. Drizzle/Postgres shape aligned with existing `organization_members` conventions (`TEXT` ids, ISO `created_at`/`updated_at`, `org_id` RLS).
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | `TEXT` PK | e.g. `CCA-INV-…` via `nextId` |
+| `org_id` | `TEXT` NOT NULL FK → `organizations(id)` | Tenant scope; RLS via `app.org_id` |
+| `email` | `TEXT` NOT NULL | Invitee email (lowercased on insert) |
+| `role` | `TEXT` NOT NULL DEFAULT `'member'` | Target role on accept — `owner`, `admin`, `member`, `viewer` (final enum TBD) |
+| `invited_by_user_id` | `TEXT` NOT NULL FK → `users(id)` | Creator of the invite |
+| `token_hash` | `TEXT` NOT NULL UNIQUE | SHA-256 of single-use accept token (raw token never stored) |
+| `status` | `TEXT` NOT NULL DEFAULT `'pending'` | `pending` \| `accepted` \| `revoked` \| `expired` |
+| `expires_at` | `TEXT` NOT NULL | ISO timestamp; default 7 days from create |
+| `accepted_at` | `TEXT` | Set when invitee joins |
+| `accepted_by_user_id` | `TEXT` FK → `users(id)` | User who accepted (may differ from invite email if Clerk links accounts) |
+| `created_at` | `TEXT` NOT NULL | |
+| `updated_at` | `TEXT` NOT NULL | |
+
+**Indexes (planned):** `org_invites_org_idx` on `org_id`; unique partial on `(org_id, email)` where `status = 'pending'` to block duplicate open invites.
+
+**Planned routes (not built):**
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `POST` | `/api/v1/org/invites` | Owner/admin creates invite; returns one-time accept URL |
+| `GET` | `/api/v1/org/invites` | List pending invites for org |
+| `DELETE` | `/api/v1/org/invites/:id` | Revoke pending invite |
+| `POST` | `/api/v1/org/invites/accept` | Accept token → insert `organization_members`, mark invite accepted |
+
+**Live stub today:**
+
+| Method | Path | Behavior |
+|--------|------|----------|
+| `GET` | `/api/v1/org/members` | Returns `[{ userId, email, role, orgId }]` for the authenticated session user only — no join to `organization_members` yet; honest single-user list until multi-member queries ship |
 
 ---
 
