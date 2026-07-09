@@ -4,7 +4,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 **Last verified:** 2026-07-08  
 **Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)  
-**Verified at:** `9d5173e`+ (post-deploy smoke hook; leadership/export gates at `f8cd1f3`)
+**Verified at:** `bed6850`+ (post-deploy smoke hook; leadership/export gates at `f8cd1f3`; Phase 5 roadmap in `docs/PHASE_5_ROADMAP.md`)
 
 **Legend:** `live` = persisted API data when signed in · `partial live` = mix of live API + demo fixtures or honest empty · `demo` = seed fixtures / marketing showcase only · `planned` = not built
 

@@ -3,7 +3,7 @@
 Deferred work extracted from [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) and production alignment notes. Phase 4 (ops APIs, org profile partial enterprise fields, human-review export gates) is live on the team URL; this doc tracks what remains.
 
 **Last updated:** 2026-07-08  
-**Baseline:** `main` at `006ba93`+ (through org leadership/contact + export-until-reviewed gates)  
+**Baseline:** `main` at **`bed6850`**+ (post-deploy smoke hook; leadership/export gates at `f8cd1f3`; Carmen checklist in alignment doc)  
 **Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)
 
 ## Related docs
@@ -11,7 +11,8 @@ Deferred work extracted from [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) and 
 | Doc | Purpose |
 |-----|---------|
 | [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) | Live vs demo module map; Phase 5 (deferred) table |
-| [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md) | GitHub `main` alignment record; Audit-Risk-Model PR #2 status; Carmen checklist |
+| [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md) | GitHub `main` alignment record (tip **`bed6850`**); Audit-Risk-Model PR #2 status; Carmen checklist (post-deploy smoke, export gate, this roadmap) |
+| [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Post-deploy smoke** | `./deploy/deploy.sh` runs `scripts/smoke-team-url.mjs` when `BIOS_SMOKE_PASSWORD` is set |
 | [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Clerk cutover checklist** | Step-by-step Clerk production cutover for `bidintelligence.cagteam.net` |
 
 ---
