@@ -1,18 +1,28 @@
+import { useMemo } from "react";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useResearchExportReadyPreview } from "@/hooks/use-bids";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
-  radarAlerts,
-  jobSignals,
-  bidSignals,
-  marketSignals,
+  buildLiveMarketSignals,
+  buildLiveRadarAlerts,
+  hasLiveMarketWatch,
+} from "@/lib/live-market-watch";
+import {
+  radarAlerts as seedRadarAlerts,
+  jobSignals as seedJobSignals,
+  bidSignals as seedBidSignals,
+  marketSignals as seedMarketSignals,
   type RadarAlert,
   type AlertLevel,
   type RegionHeat,
   type CompetitionDensity,
   type SignalSummary,
 } from "@core/market-watch";
-import { Link } from "wouter";
 import {
   Radar,
   Radio,
@@ -85,15 +95,36 @@ function TrendIcon({ trend }: { trend: SignalSummary["trend"] }) {
 
 export default function MarketWatch() {
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: researchPreview, isLoading: researchLoading } = useResearchExportReadyPreview("FL", 12, live);
+
+  const useLiveFeed = live && hasLiveMarketWatch(researchPreview);
+
+  const liveSignals = useMemo(
+    () => (useLiveFeed && researchPreview ? buildLiveMarketSignals(researchPreview) : null),
+    [useLiveFeed, researchPreview],
+  );
+
+  const radarAlerts = useMemo(() => {
+    if (!live) return seedRadarAlerts;
+    if (!useLiveFeed || !researchPreview) return [];
+    return buildLiveRadarAlerts(researchPreview);
+  }, [live, useLiveFeed, researchPreview]);
+
+  const jobSignals = live ? (liveSignals?.jobSignals ?? []) : seedJobSignals;
+  const bidSignals = live ? (liveSignals?.bidSignals ?? []) : seedBidSignals;
+  const marketSignals = live ? (liveSignals?.marketSignals ?? []) : seedMarketSignals;
 
   const activeAlerts = radarAlerts.length;
   const highOpportunity = radarAlerts.filter(
     (a) => a.level === "high" || a.opportunityScore >= 80
   ).length;
   const criticalWindows = radarAlerts.filter((a) => a.level === "critical-window").length;
-  const avgScore = Math.round(
-    radarAlerts.reduce((sum, a) => sum + a.opportunityScore, 0) / radarAlerts.length
-  );
+  const avgScore =
+    radarAlerts.length > 0
+      ? Math.round(radarAlerts.reduce((sum, a) => sum + a.opportunityScore, 0) / radarAlerts.length)
+      : 0;
 
   const sortedAlerts = [...radarAlerts].sort(
     (a, b) => b.opportunityScore - a.opportunityScore
@@ -101,10 +132,49 @@ export default function MarketWatch() {
 
   const sendToPipeline = (alert: RadarAlert) => {
     toast({
-      title: "Sent to Bid Pipeline",
-      description: `"${alert.title}" (${alert.trade}) routed to BidIntelligenceOS for review. Decision-support only — verify before committing resources.`,
+      title: live ? "Preview only" : "Sent to Bid Pipeline",
+      description: live
+        ? `"${alert.title}" is a read-only Research Hub preview — verify jurisdiction rules before routing to bids.`
+        : `"${alert.title}" (${alert.trade}) routed to BidIntelligenceOS for review. Decision-support only — verify before committing resources.`,
     });
   };
+
+  if (live && researchLoading) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+          <p className="text-sm text-slate-500">Loading market signals from Research Hub preview…</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (live && !useLiveFeed) {
+    return (
+      <Layout>
+        <div className="space-y-6 max-w-[1600px] mx-auto">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 flex items-center gap-3 tracking-tight">
+              <Radar className="h-7 w-7" style={{ color: AMBER }} />
+              MarketWatchOS — Opportunity Radar
+            </h1>
+            <p className="text-slate-500 mt-2 max-w-3xl text-sm">
+              Live public-signal radar is not connected yet. When the Research Hub bridge is configured,
+              jurisdiction export-ready previews appear here as read-only market signals.
+            </p>
+          </div>
+          <OpsModuleEmpty
+            module="Opportunity Radar"
+            description={
+              researchPreview?.configured
+                ? "Research Hub is configured but no export-ready rows are available yet. Check back after jurisdiction research is validated."
+                : "Configure the server-side Research Hub bridge to populate live market signals. Demo fixtures are available in interactive demo sessions."
+            }
+          />
+        </div>
+      </Layout>
+    );
+  }
 
   const kpis = [
     { label: "Active alerts", value: activeAlerts, icon: Radio, color: AMBER },
@@ -134,6 +204,12 @@ export default function MarketWatch() {
           </div>
           <CardContent className="p-6 relative z-10">
             <div className="flex flex-wrap items-center gap-2 mb-3">
+              {!live && <DemoDataBadge />}
+              {useLiveFeed && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200 px-3 py-1 text-[10px] font-bold uppercase tracking-widest">
+                  Research Hub signals
+                </span>
+              )}
               <span
                 className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-widest"
                 style={{
@@ -165,10 +241,13 @@ export default function MarketWatch() {
               Find the work before it hits the street.
             </p>
             <p className="text-slate-500 mt-2 max-w-3xl leading-relaxed text-sm">
-              Real-time detection of job and bid opportunities from lawful, public signals — storm
-              events, permit spikes, claim surges, RFP releases, and material/labor shifts — scored
-              by trade and region and routed straight into your bid pipeline.
+              {live
+                ? "Read-only jurisdiction signals from the Research Hub export-ready bridge — scored for bid qualification review. Full public-signal radar (storms, permits, RFPs) ships when MarketWatchOS API is connected."
+                : "Real-time detection of job and bid opportunities from lawful, public signals — storm events, permit spikes, claim surges, RFP releases, and material/labor shifts — scored by trade and region and routed straight into your bid pipeline."}
             </p>
+            {live && researchPreview?.note ? (
+              <p className="text-[11px] text-teal-700 mt-2">{researchPreview.note}</p>
+            ) : null}
           </CardContent>
         </Card>
 
@@ -310,10 +389,10 @@ export default function MarketWatch() {
                       <button
                         onClick={() => sendToPipeline(alert)}
                         className="shrink-0 inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-semibold text-white transition-colors hover:brightness-110"
-                        style={{ backgroundColor: "#2563EB" }}
+                        style={{ backgroundColor: live ? "#64748B" : "#2563EB" }}
                       >
                         <Send className="w-3.5 h-3.5" />
-                        Send to Bid Pipeline
+                        {live ? "Preview only" : "Send to Bid Pipeline"}
                       </button>
                     </div>
                   </div>
@@ -430,11 +509,9 @@ export default function MarketWatch() {
                 Lawful, public signals — decision-support only
               </h4>
               <p className="text-[12px] text-slate-500 leading-relaxed max-w-4xl">
-                MarketWatchOS detects opportunities from lawful, public data sources only (weather
-                services, municipal permit feeds, public procurement portals, and published economic
-                indices). Opportunity scores and competition signals are decision-support guidance —
-                no outcome is guaranteed and every alert requires human review before you commit bid
-                resources.
+                {live
+                  ? "Live preview rows are sanitized export-ready jurisdiction research from Research Hub. Raw notes, statutes, and credentials never reach the browser. Opportunity scores are decision-support guidance — no outcome is guaranteed and every alert requires human review before you commit bid resources."
+                  : "MarketWatchOS detects opportunities from lawful, public data sources only (weather services, municipal permit feeds, public procurement portals, and published economic indices). Opportunity scores and competition signals are decision-support guidance — no outcome is guaranteed and every alert requires human review before you commit bid resources."}
               </p>
             </div>
           </CardContent>

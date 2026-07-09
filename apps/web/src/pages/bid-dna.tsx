@@ -1,7 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useBids, useWinLossAnalytics } from "@/hooks/use-bids";
+import { useOpsCloseout } from "@/hooks/use-ops";
+import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
+import { buildLiveBidDna } from "@/lib/live-bid-dna";
 import {
   bidDnaProfiles,
   dnaLearnings,
@@ -115,40 +122,88 @@ function VarianceChip({ pct }: { pct: number }) {
 
 export default function BidDna() {
   const { verticalConfig } = useAppContext();
-  const [selected, setSelected] = useState<BidDnaProfile>(
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: closeoutData } = useOpsCloseout();
+  const { data: allBids = [] } = useBids();
+  const { data: winLoss } = useWinLossAnalytics();
+
+  const wonBids = useMemo(() => allBids.filter((b) => b.status === "Won"), [allBids]);
+
+  const liveView = useMemo(
     () =>
-      bidDnaProfiles.find((p) => p.vertical === verticalConfig.id) ??
-      bidDnaProfiles[0]
+      live
+        ? buildLiveBidDna(closeoutData?.jobs ?? [], wonBids, winLoss)
+        : null,
+    [live, closeoutData?.jobs, wonBids, winLoss],
   );
+
+  const profiles = live && liveView ? liveView.profiles : bidDnaProfiles;
+  const stats = live && liveView ? liveView.stats : dnaStats;
+  const learnings = live && liveView ? liveView.learnings : dnaLearnings;
+  const accuracySeries =
+    live && liveView && liveView.accuracySeries.length > 0
+      ? liveView.accuracySeries
+      : estimateAccuracySeries;
+
+  const [selected, setSelected] = useState<BidDnaProfile>(() => profiles[0]);
   const [statusFilter, setStatusFilter] = useState<LearningStatus | "all">("all");
+
+  useEffect(() => {
+    if (profiles.length > 0 && !profiles.find((p) => p.id === selected.id)) {
+      setSelected(profiles[0]);
+    }
+  }, [profiles, selected.id]);
 
   const barData = useMemo(
     () =>
-      bidDnaProfiles.map((p) => ({
+      profiles.map((p) => ({
         name: p.jobType.split(" ").slice(0, 2).join(" "),
         estimated: p.estimatedCost,
         actual: p.actualCost,
         id: p.id,
       })),
-    []
+    [profiles],
   );
 
   const trendData = useMemo(
     () =>
       selected.accuracyTrend.map((a, i) => ({
-        quarter: estimateAccuracySeries[i]?.quarter ?? `Q${i + 1}`,
+        quarter: accuracySeries[i]?.quarter ?? `Q${i + 1}`,
         accuracy: a,
       })),
-    [selected]
+    [selected, accuracySeries],
   );
 
   const filteredLearnings = useMemo<DnaLearning[]>(
     () =>
       statusFilter === "all"
-        ? dnaLearnings
-        : dnaLearnings.filter((l) => l.status === statusFilter),
-    [statusFilter]
+        ? learnings
+        : learnings.filter((l) => l.status === statusFilter),
+    [learnings, statusFilter],
   );
+
+  if (live && liveView && !liveView.hasData) {
+    return (
+      <Layout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 flex items-center gap-3">
+              <Dna className="w-8 h-8 text-[#0284C7]" />
+              Bid DNA
+            </h1>
+            <p className="text-slate-500 mt-2 text-sm lg:text-base leading-relaxed">
+              Learning engine for {verticalConfig.name} — derived from completed jobs and bid outcomes.
+            </p>
+          </div>
+          <OpsModuleEmpty
+            module="Bid DNA learning data"
+            description="Complete jobs in closeout or record scored bid outcomes to populate estimate-vs-actual profiles and learned adjustments."
+          />
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -176,6 +231,7 @@ export default function BidDna() {
                 duration — then surfaces learned adjustments for your{" "}
                 {verticalConfig.name} estimators to review and apply.
               </p>
+              {!live && <DemoDataBadge />}
             </div>
             <div className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9]/60 px-3 py-2 shrink-0">
               <Info className="w-3.5 h-3.5 text-[#0284C7] shrink-0" />
@@ -201,11 +257,11 @@ export default function BidDna() {
                 </span>
               </div>
               <div className="text-3xl font-bold text-slate-900 tracking-tight">
-                {dnaStats.overallAccuracy.toFixed(1)}%
+                {stats.overallAccuracy.toFixed(1)}%
               </div>
               <p className="text-[10px] text-[#22C55E] mt-1 font-medium tracking-wide flex items-center gap-1">
                 <ArrowUpRight className="w-3 h-3" />+
-                {dnaStats.accuracyDeltaQoQ.toFixed(1)} pts quarter-over-quarter
+                {stats.accuracyDeltaQoQ.toFixed(1)} pts quarter-over-quarter
               </p>
             </CardContent>
           </Card>
@@ -222,10 +278,10 @@ export default function BidDna() {
                 </span>
               </div>
               <div className="text-3xl font-bold text-slate-900 tracking-tight">
-                {dnaStats.jobsAnalyzed}
+                {stats.jobsAnalyzed}
               </div>
               <p className="text-[10px] text-slate-500 mt-1 font-medium tracking-wide">
-                Across {bidDnaProfiles.length} job-type profiles
+                Across {profiles.length} job-type profiles
               </p>
             </CardContent>
           </Card>
@@ -242,11 +298,11 @@ export default function BidDna() {
                 </span>
               </div>
               <div className="text-3xl font-bold text-slate-900 tracking-tight">
-                {dnaStats.activeLearnings}
+                {stats.activeLearnings}
               </div>
               <p className="text-[10px] text-slate-500 mt-1 font-medium tracking-wide">
-                {dnaStats.suggestedLearnings} suggested ·{" "}
-                {dnaStats.underReviewLearnings} under review
+                {stats.suggestedLearnings} suggested ·{" "}
+                {stats.underReviewLearnings} under review
               </p>
             </CardContent>
           </Card>
@@ -263,7 +319,7 @@ export default function BidDna() {
                 </span>
               </div>
               <div className="text-3xl font-bold text-slate-900 tracking-tight">
-                {dnaStats.marginOfErrorImprovement.toFixed(1)} pts
+                {stats.marginOfErrorImprovement.toFixed(1)} pts
               </div>
               <p className="text-[10px] text-slate-500 mt-1 font-medium tracking-wide">
                 Mean variance reduced since baseline
@@ -294,7 +350,7 @@ export default function BidDna() {
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-                    data={estimateAccuracySeries}
+                    data={accuracySeries}
                     margin={{ top: 0, right: 0, left: -10, bottom: 0 }}
                   >
                     <defs>
@@ -480,7 +536,7 @@ export default function BidDna() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E2E8F0]">
-                {bidDnaProfiles.map((p) => (
+                {profiles.map((p) => (
                   <tr
                     key={p.id}
                     onClick={() => setSelected(p)}

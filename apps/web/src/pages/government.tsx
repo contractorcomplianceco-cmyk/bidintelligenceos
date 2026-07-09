@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   REGISTRATION_ITEMS,
@@ -135,6 +136,12 @@ export default function Government() {
   const ringDeg = (GOV_READINESS / 100) * 360;
 
   return (
+    <OpsModuleGate
+      title="Government Contracting"
+      subtitle="SAM registration, set-aside certifications, and federal/state opportunity tracking."
+      module="Government contracting pipeline"
+      icon={<Landmark className="h-7 w-7" style={{ color: GOV_ACCENT }} />}
+    >
     <Layout>
       <div className="space-y-6 max-w-[1600px] mx-auto">
         {/* Header */}
@@ -493,5 +500,6 @@ export default function Government() {
         </Card>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }

@@ -121,3 +121,106 @@ export function buildLiveCostSnapshot(
     },
   ];
 }
+
+export type LiveLearningInsight = {
+  key: "momentum" | "strength" | "loss" | "fade";
+  title: string;
+  body: string;
+  tone: string;
+};
+
+export function hasLiveLearningLoop(bids: Bid[], winLoss?: WinLossAnalytics): boolean {
+  if (winLoss?.summary.decided !== undefined) return winLoss.summary.decided >= 3;
+  return decidedBids(bids).length >= 3;
+}
+
+export function buildLiveLearningLoopInsights(
+  bids: Bid[],
+  winLoss: WinLossAnalytics | undefined,
+  lossReasons: { reason: string; count: number }[],
+  outcomeByType: { type: string; won: number; lost: number }[],
+  options?: {
+    currentWinRate?: number | null;
+    winRateDelta?: number;
+    fadeRiskCount?: number;
+    fadeRiskLabels?: string[];
+    marginDelta?: number;
+  },
+): LiveLearningInsight[] {
+  if (!hasLiveLearningLoop(bids, winLoss)) return [];
+
+  const totalWon = winLoss
+    ? (winLoss.byOutcome.find((b) => b.outcome === "won")?.count ?? 0)
+    : bids.filter((b) => b.status === "Won").length;
+  const totalLost = winLoss
+    ? (winLoss.byOutcome.find((b) => b.outcome === "lost")?.count ?? 0)
+    : bids.filter((b) => b.status === "Lost").length;
+  const currentWinRate =
+    options?.currentWinRate ??
+    winLoss?.summary.winRate ??
+    (totalWon + totalLost > 0 ? Math.round((totalWon / (totalWon + totalLost)) * 100) : 0);
+  const winRateDelta = options?.winRateDelta ?? 0;
+
+  const bestType =
+    outcomeByType.length > 0
+      ? [...outcomeByType].sort(
+          (a, b) => b.won / (b.won + b.lost || 1) - a.won / (a.won + a.lost || 1),
+        )[0]
+      : { type: "General", won: totalWon, lost: totalLost };
+
+  const weakestType =
+    outcomeByType.length > 0
+      ? [...outcomeByType].sort(
+          (a, b) => a.won / (a.won + a.lost || 1) - b.won / (b.won + b.lost || 1),
+        )[0]
+      : bestType;
+
+  const topLossReason =
+    lossReasons.length > 0
+      ? lossReasons[0]
+      : { reason: "Unrecorded loss factor", count: totalLost };
+
+  const bestRate = Math.round((bestType.won / (bestType.won + bestType.lost || 1)) * 100);
+  const weakRate = Math.round((weakestType.won / (weakestType.won + weakestType.lost || 1)) * 100);
+  const fadeCount = options?.fadeRiskCount ?? 0;
+  const fadeLabels = options?.fadeRiskLabels ?? [];
+  const marginDelta = options?.marginDelta ?? 0;
+
+  const insights: LiveLearningInsight[] = [
+    {
+      key: "momentum",
+      title: winRateDelta >= 0 ? "Win rate momentum is positive" : "Win rate needs attention",
+      body: `Win rate is ${currentWinRate}% (${winRateDelta >= 0 ? "+" : ""}${winRateDelta}pp vs prior period). ${
+        winRateDelta >= 0
+          ? `Sustaining responsiveness on ${bestType.type} bids is compounding results.`
+          : `Review qualification and follow-up cadence on ${weakestType.type} bids to recover momentum.`
+      }`,
+      tone: winRateDelta >= 0 ? "#22C55E" : "#EF4444",
+    },
+    {
+      key: "strength",
+      title: `${bestType.type} is the strongest vertical`,
+      body: `${bestType.type} converts at ${bestRate}% (${bestType.won} won / ${bestType.lost} lost). Prioritize similar scopes in the pipeline.`,
+      tone: "#38BDF8",
+    },
+    {
+      key: "loss",
+      title: `"${topLossReason.reason}" drives the most losses`,
+      body: `${topLossReason.count} loss${topLossReason.count === 1 ? "" : "es"} tied to this factor. ${weakestType.type} lags at ${weakRate}% win rate — revisit qualification and pricing posture there.`,
+      tone: "#EF4444",
+    },
+  ];
+
+  if (fadeCount > 0) {
+    insights.push({
+      key: "fade",
+      title: "Profit-fade pattern detected on active jobs",
+      body: `${fadeCount} active job${fadeCount === 1 ? "" : "s"} flagged High profit-fade risk${
+        fadeLabels.length ? ` (${fadeLabels.join(", ")})` : ""
+      }. Margin trend is ${marginDelta >= 0 ? "up" : "down"} ${Math.abs(marginDelta)}pp overall — change orders and labor burn need active recovery.`,
+      tone: "#F59E0B",
+    });
+  }
+
+  return insights;
+}

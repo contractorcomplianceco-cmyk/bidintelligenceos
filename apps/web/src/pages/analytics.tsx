@@ -18,7 +18,9 @@ import {
   buildLiveOutcomeByType,
   buildLiveOutcomeTimeline,
   buildLiveWinRateSeries,
+  buildLiveLearningLoopInsights,
   hasLiveChartData,
+  hasLiveLearningLoop,
   hasLiveOutcomeTimeline,
 } from "@/lib/live-analytics";
 import {
@@ -180,6 +182,37 @@ export default function Analytics() {
   const fadeRiskJobs = live
     ? (costData?.records ?? []).filter((r) => r.profitFadeRisk === "High")
     : costRecords.filter((r) => r.profitFadeRisk === "High");
+
+  const showLearningLoop = !live || hasLiveLearningLoop(allBids, winLoss);
+
+  const liveInsights = useMemo(() => {
+    if (!live || !showLearningLoop) return [];
+    return buildLiveLearningLoopInsights(allBids, winLoss, liveLossReasons, liveOutcomeByType, {
+      currentWinRate: liveWinRate,
+      winRateDelta,
+      fadeRiskCount: fadeRiskJobs.length,
+      fadeRiskLabels: fadeRiskJobs.map((j) => j.jobName.split(" ")[0]),
+      marginDelta,
+    });
+  }, [
+    live,
+    showLearningLoop,
+    allBids,
+    winLoss,
+    liveLossReasons,
+    liveOutcomeByType,
+    liveWinRate,
+    winRateDelta,
+    fadeRiskJobs,
+    marginDelta,
+  ]);
+
+  const insightIconMap = {
+    momentum: TrendingUp,
+    strength: Trophy,
+    loss: TrendingDown,
+    fade: DollarSign,
+  } as const;
 
   const insights = [
     {
@@ -539,31 +572,51 @@ export default function Analytics() {
         </Card>
 
         {/* Post-job learning loop */}
-        {!live && (
+        {showLearningLoop && (
         <Card className="bg-white border-[#E2E8F0]">
           <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-bold text-slate-900 tracking-wide flex items-center gap-2">
               <Lightbulb className="w-4 h-4 text-[#F59E0B]" />
               POST-JOB LEARNING LOOP
             </CardTitle>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">AI-synthesized insights</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+              {live ? "Synthesized from live outcomes" : "AI-synthesized insights"}
+            </span>
           </CardHeader>
           <CardContent className="p-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {insights.map((ins) => (
-                <div key={ins.title} className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 flex gap-3">
-                  <div
-                    className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: `${ins.tone}1A` }}
-                  >
-                    <ins.icon className="w-5 h-5" style={{ color: ins.tone }} />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 mb-1">{ins.title}</h4>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">{ins.body}</p>
-                  </div>
-                </div>
-              ))}
+              {live
+                ? liveInsights.map((ins) => {
+                    const Icon = insightIconMap[ins.key] ?? Lightbulb;
+                    return (
+                      <div key={ins.title} className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 flex gap-3">
+                        <div
+                          className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: `${ins.tone}1A` }}
+                        >
+                          <Icon className="w-5 h-5" style={{ color: ins.tone }} />
+                        </div>
+                        <div>
+                          <h4 className="text-xs font-bold text-slate-900 mb-1">{ins.title}</h4>
+                          <p className="text-[11px] text-slate-500 leading-relaxed">{ins.body}</p>
+                        </div>
+                      </div>
+                    );
+                  })
+                : insights.map((ins) => (
+                    <div key={ins.title} className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 flex gap-3">
+                      <div
+                        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ backgroundColor: `${ins.tone}1A` }}
+                      >
+                        <ins.icon className="w-5 h-5" style={{ color: ins.tone }} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900 mb-1">{ins.title}</h4>
+                        <p className="text-[11px] text-slate-500 leading-relaxed">{ins.body}</p>
+                      </div>
+                    </div>
+                  ))}
             </div>
             <div className="mt-4 flex items-center gap-2 text-[11px] text-slate-500 border-t border-[#E2E8F0] pt-4">
               <ArrowRight className="w-3.5 h-3.5 text-[#0284C7]" />

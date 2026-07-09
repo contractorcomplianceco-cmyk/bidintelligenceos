@@ -133,9 +133,10 @@ export type ResearchExportReadyPreview = {
   reason?: string;
 };
 
-export function useResearchExportReadyPreview(state = "FL", limit = 8) {
+export function useResearchExportReadyPreview(state = "FL", limit = 8, enabled = true) {
   return useQuery({
     queryKey: ["research-export-ready", state, limit],
+    enabled,
     queryFn: () =>
       apiFetch<ResearchExportReadyPreview>(
         `/api/v1/research/export-ready?state=${encodeURIComponent(state)}&limit=${limit}`,

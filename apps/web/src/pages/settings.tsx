@@ -12,6 +12,10 @@ import { Settings as SettingsIcon, User, Bell, DownloadCloud, Building2, MapPin,
 import { useAppContext } from "@/lib/context";
 import { VERTICALS } from "@core/verticals";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+import { useLiveData } from "@/lib/data-mode";
+import { useOrgProfile, useUpdateOrgProfile } from "@/hooks/use-org";
+import { DemoDataBadge } from "@/components/demo-data-badge";
 import { useState } from "react";
 import {
   BRAND_COLORS,
@@ -23,9 +27,46 @@ import {
 export default function Settings() {
   const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
+  const live = useLiveData(isAuthenticated);
+  const { data: org } = useOrgProfile();
+  const updateOrg = useUpdateOrgProfile();
+
+  const profile = (org?.profile ?? {}) as Record<string, string>;
+  const demoCompanyName = "Acme Commercial Trades";
+  const demoContractorType = "General/Specialty";
+  const demoServices = "HVAC, Electrical, Facilities Maintenance";
+  const demoAreas = "Greater Seattle Area, Bellevue, Tacoma";
+  const demoJobSize = "$50k - $500k";
+  const demoCrew = "15 active field personnel";
+  const demoMargin = "18% - 25%";
+  const demoOverhead = "12%";
+  const demoBonding = "Standard $2M liability. Custom bonding available for municipal projects.";
+  const demoLicense = "WA State L&I fully compliant. Electrical administrator assigned.";
+
+  const [companyName, setCompanyName] = useState("");
+  const [contractorType, setContractorType] = useState("");
+  const [services, setServices] = useState("");
+  const [areas, setAreas] = useState("");
+  const [jobSize, setJobSize] = useState("");
+  const [crew, setCrew] = useState("");
+  const [margin, setMargin] = useState("");
+  const [overhead, setOverhead] = useState("");
+  const [bonding, setBonding] = useState("");
+  const [license, setLicense] = useState("");
+
+  const companyNameValue = live ? (org?.name ?? companyName) : companyName || demoCompanyName;
+  const contractorTypeValue = live ? (profile.contractorType ?? contractorType) : contractorType || demoContractorType;
+  const servicesValue = live ? (profile.services ?? services) : services || demoServices;
+  const areasValue = live ? (profile.serviceAreas ?? areas) : areas || demoAreas;
+  const jobSizeValue = live ? (profile.preferredJobSize ?? jobSize) : jobSize || demoJobSize;
+  const crewValue = live ? (profile.crewCapacity ?? crew) : crew || demoCrew;
+  const marginValue = live ? (profile.targetMargin ?? margin) : margin || demoMargin;
+  const overheadValue = live ? (profile.overheadAssumptions ?? overhead) : overhead || demoOverhead;
+  const bondingValue = live ? (profile.bondingNotes ?? bonding) : bonding || demoBonding;
+  const licenseValue = live ? (profile.licenseNotes ?? license) : license || demoLicense;
 
   const [brandColor, setBrandColor] = useState(BRAND_COLORS[0].hex);
-  const [productName, setProductName] = useState("BidIntelligenceOS");
   const [customDomain, setCustomDomain] = useState("bids.yourcompany.com");
   const [rollupEnabled, setRollupEnabled] = useState(true);
   const [regionalSegmentation, setRegionalSegmentation] = useState(false);

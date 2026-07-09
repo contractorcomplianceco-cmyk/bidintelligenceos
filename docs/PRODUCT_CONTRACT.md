@@ -29,7 +29,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 | New bid intake | `/new-bid` | **live** | Draft + document upload + ROSEOS scope analysis |
 | Package Builder | `/package-builder` | **live** | Section preview from uploaded bid documents + compliance gates via `/api/v1/ops/package-builder`; demo templates for anonymous sessions |
 | Won Jobs | `/won-jobs` | **live** | Jobs from `/api/v1/jobs`; convert won bids via `POST /api/v1/jobs/from-bid/:bidId` |
-| Government Contracting | `/government` | demo | Seed |
+| Government Contracting | `/government` | **partial live** | Demo fixtures for anonymous/demo sessions; `OpsModuleEmpty` for authed users (no seed contracts) |
 | Bid Library | `/bid-library` | **partial live** | Orphan route (not in nav). Live bids list from `/api/v1/bids` when signed in; demo fixtures otherwise; `OpsModuleEmpty` when authed with no bids |
 | Bid Monitoring | `/monitoring` | **partial live** | Orphan route (not in nav). Active pipeline from `/api/v1/bids` + jobs KPIs + `/api/health` when signed in; demo fixtures otherwise |
 
@@ -51,17 +51,17 @@ Living map of marketing promises → routes → data status. Update when a modul
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
 | ROSEOS | `/roseos` | **partial live** | Live pipeline insights + Rose Brain brief when authenticated |
-| Analytics | `/analytics` | **partial live** | Win/loss KPIs + bid outcome charts from API when signed in; margin/ROI charts from `/api/v1/ops/cost-roi` when jobs exist; honest empty states otherwise |
-| Bid DNA | `/bid-dna` | demo | Seed |
-| Market Watch | `/market-watch` | demo | Seed |
+| Analytics | `/analytics` | **partial live** | Win/loss KPIs + bid outcome charts from API when signed in; margin/ROI charts from `/api/v1/ops/cost-roi` when jobs exist; post-job learning loop from live outcomes when ≥3 decided bids (hidden when insufficient); honest empty states otherwise |
+| Bid DNA | `/bid-dna` | **partial live** | Derived from closeout jobs, won bids, and score history when signed in; demo fixtures otherwise; `OpsModuleEmpty` when authed with no learning data |
+| Market Watch | `/market-watch` | **partial live** | Demo fixtures for anonymous sessions; read-only Research Hub export-ready preview when bridge configured; honest empty for authed users without bridge data |
 | Scope analyzer | `/scope-analyzer` | **partial live** | Live brief when `?bidId=` + signed in |
 
 ## Account
 
-| Module | Route | Status |
-|--------|-------|--------|
-| Business profile | `/business-profile` | live |
-| Settings | `/settings` | demo |
+| Module | Route | Status | Notes |
+|--------|-------|--------|-------|
+| Business profile | `/business-profile` | live | |
+| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; empty fields for missing data; enterprise tab demo-only |
 
 ## Guardrails
 
