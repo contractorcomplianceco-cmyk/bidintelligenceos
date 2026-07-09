@@ -306,9 +306,42 @@ Dual-driver support: set `DATABASE_URL` for Postgres + RLS; omit for SQLite dev.
    pm2 describe bid-intelligence-os | grep -E 'exec mode|restarts|uptime'
    ```
 
-### Health monitor (`bid-intelligence-health-monitor`)
+### CCA uptime monitoring (`bid-intelligence-health-monitor`)
 
-- PM2 app runs `scripts/monitor-bid-intelligence-health.mjs` every **15 minutes** (`sleep 900`).
-- Alerts email Carmen at `carmenaburoda@gmail.com` when local/public health or required PM2 apps fail (cooldown 1h).
-- One-off check: `node scripts/monitor-bid-intelligence-health.mjs`
-- Required PM2 apps: `bid-intelligence-os`, `bid-intelligence-health-monitor` (override with `BIOS_PM2_APPS`).
+BidIntelligenceOS follows the CCA uptime rule: durable PM2 process manager, 15-minute health checks, and email alerts to Carmen on failure (no secrets or live customer data in alert body).
+
+| Item | Value |
+|------|-------|
+| Monitor script | `scripts/monitor-bid-intelligence-health.mjs` |
+| PM2 app | `bid-intelligence-health-monitor` (defined in `deploy/ecosystem.config.cjs`) |
+| Interval | Every **15 minutes** (`sleep 900` loop) |
+| Alert recipient | `carmenaburoda@gmail.com` (`BIOS_ALERT_EMAIL` or `CCA_UPTIME_EMAIL`) |
+| Mail helper | `/home/ubuntu/scripts/cca-uptime-sendmail.py` (Zoho SMTP via `profitpulse/scripts/uptime-alert-settings`) |
+| Alert cooldown | 1 hour (`BIOS_ALERT_COOLDOWN_MS`, default 3600000) |
+| Retries before alert | 3 attempts, 15s apart |
+
+**Checks on each run**
+
+1. PM2 apps online: `bid-intelligence-os`, `bid-intelligence-health-monitor` (override with `BIOS_PM2_APPS`)
+2. Local API health: `http://127.0.0.1:5001/api/health`
+3. Public site: `https://ccabidintelligence.com/`
+4. Public API health: `https://ccabidintelligence.com/api/health`
+
+**Verify (no test email sent)**
+
+```bash
+pm2 list | grep bid-intelligence
+node scripts/monitor-bid-intelligence-health.mjs   # exit 0 + "health OK" when healthy
+pm2 logs bid-intelligence-health-monitor --lines 20 --nostream
+```
+
+A healthy run prints `BidIntelligenceOS health OK` and does **not** send email. Alerts fire only after all retries fail; subject is `[CCA] BidIntelligenceOS health alert`. Do not force a failure to test email delivery in production.
+
+**Start / persist**
+
+```bash
+pm2 start deploy/ecosystem.config.cjs --only bid-intelligence-health-monitor
+pm2 save
+```
+
+Both `bid-intelligence-os` and `bid-intelligence-health-monitor` must stay online. `./deploy/deploy.sh` reloads the API and leaves the monitor running.
