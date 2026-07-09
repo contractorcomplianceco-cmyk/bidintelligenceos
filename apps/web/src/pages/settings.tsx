@@ -16,6 +16,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { useOrgProfile, useUpdateOrgProfile } from "@/hooks/use-org";
 import { DemoDataBadge } from "@/components/demo-data-badge";
+import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import { useState } from "react";
 import {
   BRAND_COLORS,
@@ -27,7 +28,7 @@ import {
 export default function Settings() {
   const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const live = useLiveData(isAuthenticated);
   const { data: org } = useOrgProfile();
   const updateOrg = useUpdateOrgProfile();
@@ -55,21 +56,53 @@ export default function Settings() {
   const [bonding, setBonding] = useState("");
   const [license, setLicense] = useState("");
 
-  const companyNameValue = live ? (org?.name ?? companyName) : companyName || demoCompanyName;
-  const contractorTypeValue = live ? (profile.contractorType ?? contractorType) : contractorType || demoContractorType;
-  const servicesValue = live ? (profile.services ?? services) : services || demoServices;
-  const areasValue = live ? (profile.serviceAreas ?? areas) : areas || demoAreas;
-  const jobSizeValue = live ? (profile.preferredJobSize ?? jobSize) : jobSize || demoJobSize;
-  const crewValue = live ? (profile.crewCapacity ?? crew) : crew || demoCrew;
-  const marginValue = live ? (profile.targetMargin ?? margin) : margin || demoMargin;
-  const overheadValue = live ? (profile.overheadAssumptions ?? overhead) : overhead || demoOverhead;
-  const bondingValue = live ? (profile.bondingNotes ?? bonding) : bonding || demoBonding;
-  const licenseValue = live ? (profile.licenseNotes ?? license) : license || demoLicense;
+  const companyNameValue = live ? (companyName || org?.name || "") : companyName || demoCompanyName;
+  const contractorTypeValue = live ? (contractorType || profile.contractorType || "") : contractorType || demoContractorType;
+  const servicesValue = live ? (services || profile.services || "") : services || demoServices;
+  const areasValue = live ? (areas || profile.serviceAreas || "") : areas || demoAreas;
+  const jobSizeValue = live ? (jobSize || profile.preferredJobSize || "") : jobSize || demoJobSize;
+  const crewValue = live ? (crew || profile.crewCapacity || "") : crew || demoCrew;
+  const marginValue = live ? (margin || profile.targetMargin || "") : margin || demoMargin;
+  const overheadValue = live ? (overhead || profile.overheadAssumptions || "") : overhead || demoOverhead;
+  const bondingValue = live ? (bonding || profile.bondingNotes || "") : bonding || demoBonding;
+  const licenseValue = live ? (license || profile.licenseNotes || "") : license || demoLicense;
+
+  const userNameParts = (live ? user?.name ?? "" : "Jordan P.").trim().split(/\s+/);
+  const firstName = live ? userNameParts[0] ?? "" : "Jordan";
+  const lastName = live ? userNameParts.slice(1).join(" ") : "P.";
+  const email = live ? user?.email ?? "" : "jordan@acmetrades.com";
 
   const [brandColor, setBrandColor] = useState(BRAND_COLORS[0].hex);
+  const [productName, setProductName] = useState("BidIntelligenceOS");
   const [customDomain, setCustomDomain] = useState("bids.yourcompany.com");
   const [rollupEnabled, setRollupEnabled] = useState(true);
   const [regionalSegmentation, setRegionalSegmentation] = useState(false);
+
+  const handleSaveProfile = () => {
+    if (live) {
+      updateOrg.mutate({
+        name: companyNameValue,
+        vertical,
+        profile: {
+          contractorType: contractorTypeValue,
+          services: servicesValue,
+          serviceAreas: areasValue,
+          preferredJobSize: jobSizeValue,
+          crewCapacity: crewValue,
+          targetMargin: marginValue,
+          overheadAssumptions: overheadValue,
+          bondingNotes: bondingValue,
+          licenseNotes: licenseValue,
+        },
+      });
+    }
+    toast({
+      title: "Profile saved",
+      description: live
+        ? "Organization profile updated from live settings."
+        : "Demo profile saved locally for this session.",
+    });
+  };
 
   return (
     <Layout>
@@ -80,6 +113,7 @@ export default function Settings() {
              Settings & Configuration
           </h2>
           <p className="text-slate-500 mt-2 text-lg">Manage your company profile, ContractorConnect integration, and preferences.</p>
+          {!live && <DemoDataBadge />}
         </div>
 
         <Tabs defaultValue="profile" className="space-y-6">
@@ -141,24 +175,24 @@ export default function Settings() {
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="companyName" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Company Name</Label>
-                        <Input id="companyName" defaultValue="Acme Commercial Trades" className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
+                        <Input id="companyName" value={companyNameValue} onChange={(e) => setCompanyName(e.target.value)} placeholder={live ? "Company name" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="contractorType" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Contractor Type</Label>
-                        <Input id="contractorType" defaultValue="General/Specialty" className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
+                        <Input id="contractorType" value={contractorTypeValue} onChange={(e) => setContractorType(e.target.value)} placeholder={live ? "Contractor type" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="services" className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                         <Wrench className="w-3.5 h-3.5" /> Trades / Services
                       </Label>
-                      <Input id="services" defaultValue="HVAC, Electrical, Facilities Maintenance" className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
+                      <Input id="services" value={servicesValue} onChange={(e) => setServices(e.target.value)} placeholder={live ? "Trades / services" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="areas" className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
                         <MapPin className="w-3.5 h-3.5" /> Service Areas
                       </Label>
-                      <Input id="areas" defaultValue="Greater Seattle Area, Bellevue, Tacoma" className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
+                      <Input id="areas" value={areasValue} onChange={(e) => setAreas(e.target.value)} placeholder={live ? "Service areas" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
                     </div>
                   </CardContent>
                 </Card>
@@ -172,19 +206,19 @@ export default function Settings() {
                     <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <Label htmlFor="jobSize" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Preferred Job Size ($)</Label>
-                        <Input id="jobSize" defaultValue="$50k - $500k" className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8]" />
+                        <Input id="jobSize" value={jobSizeValue} onChange={(e) => setJobSize(e.target.value)} placeholder={live ? "Preferred job size" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8]" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="crew" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Crew Capacity</Label>
-                        <Input id="crew" defaultValue="15 active field personnel" className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8]" />
+                        <Input id="crew" value={crewValue} onChange={(e) => setCrew(e.target.value)} placeholder={live ? "Crew capacity" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8]" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="margin" className="text-xs font-semibold text-[#0284C7] uppercase tracking-wider">Target Margin Range (%)</Label>
-                        <Input id="margin" defaultValue="18% - 25%" className="bg-[#F1F5F9] border-[#38BDF8]/50 text-slate-700 focus-visible:ring-[#38BDF8]" />
+                        <Input id="margin" value={marginValue} onChange={(e) => setMargin(e.target.value)} placeholder={live ? "Target margin" : undefined} className="bg-[#F1F5F9] border-[#38BDF8]/50 text-slate-700 focus-visible:ring-[#38BDF8]" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="overhead" className="text-xs font-semibold text-[#0284C7] uppercase tracking-wider">Overhead Assumptions (%)</Label>
-                        <Input id="overhead" defaultValue="12%" className="bg-[#F1F5F9] border-[#38BDF8]/50 text-slate-700 focus-visible:ring-[#38BDF8]" />
+                        <Input id="overhead" value={overheadValue} onChange={(e) => setOverhead(e.target.value)} placeholder={live ? "Overhead assumptions" : undefined} className="bg-[#F1F5F9] border-[#38BDF8]/50 text-slate-700 focus-visible:ring-[#38BDF8]" />
                       </div>
                     </div>
                   </CardContent>
@@ -199,13 +233,13 @@ export default function Settings() {
                   <CardContent className="space-y-5 pt-6">
                     <div className="space-y-2">
                       <Label htmlFor="bonding" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bonding/Insurance Notes</Label>
-                      <Textarea id="bonding" defaultValue="Standard $2M liability. Custom bonding available for municipal projects." className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 resize-none h-24 focus-visible:ring-[#38BDF8]" />
+                      <Textarea id="bonding" value={bondingValue} onChange={(e) => setBonding(e.target.value)} placeholder={live ? "Bonding / insurance notes" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 resize-none h-24 focus-visible:ring-[#38BDF8]" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="license" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">License Notes</Label>
-                      <Textarea id="license" defaultValue="WA State L&I fully compliant. Electrical administrator assigned." className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 resize-none h-24 focus-visible:ring-[#38BDF8]" />
+                      <Textarea id="license" value={licenseValue} onChange={(e) => setLicense(e.target.value)} placeholder={live ? "License notes" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 resize-none h-24 focus-visible:ring-[#38BDF8]" />
                     </div>
-                    <Button className="w-full mt-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold h-11">
+                    <Button onClick={handleSaveProfile} disabled={live && updateOrg.isPending} className="w-full mt-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold h-11">
                       <Save className="w-4 h-4 mr-2" />
                       Save Profile
                     </Button>
@@ -305,15 +339,15 @@ export default function Settings() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">First Name</Label>
-                    <Input defaultValue="Jordan" className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
+                    <Input defaultValue={firstName} placeholder={live ? "First name" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Last Name</Label>
-                    <Input defaultValue="P." className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
+                    <Input defaultValue={lastName} placeholder={live ? "Last name" : undefined} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
                   </div>
                   <div className="space-y-2 col-span-2">
                     <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Email Address</Label>
-                    <Input defaultValue="jordan@acmetrades.com" type="email" className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
+                    <Input defaultValue={email} placeholder={live ? "Email address" : undefined} type="email" readOnly={live} className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700 focus-visible:ring-[#38BDF8] font-medium" />
                   </div>
                 </div>
               </CardContent>
@@ -398,6 +432,13 @@ export default function Settings() {
 
           {/* Enterprise & White Label Tab */}
           <TabsContent value="enterprise" className="space-y-6">
+            {live ? (
+              <OpsModuleEmpty
+                module="Enterprise & White Label"
+                description="Multi-location rollups, white-label branding, and role-based access are demo-only until enterprise settings are persisted."
+              />
+            ) : (
+            <>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h3 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
@@ -706,6 +747,8 @@ export default function Settings() {
                 </div>
               </CardContent>
             </Card>
+            </>
+            )}
           </TabsContent>
         </Tabs>
       </div>
