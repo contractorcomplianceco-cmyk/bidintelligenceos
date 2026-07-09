@@ -2,6 +2,7 @@ import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 import { computeComplianceEligibility } from "./compliance-eligibility.js";
 import { getDb } from "../db/client.js";
 import { bidDocuments, bidScores, bids, jobs } from "../db/schema.js";
+import { fetchLiveWeatherForJobsite } from "./open-meteo-weather.js";
 import { parseStateFromLocation } from "./state-parse.js";
 
 type JobRow = typeof jobs.$inferSelect;
@@ -353,45 +354,85 @@ export async function buildLaborProjection(orgId: string) {
   };
 }
 
+function mapStoredForecast(stored: Record<string, unknown> | undefined) {
+  return (stored?.forecast as unknown[])?.length
+    ? (stored!.forecast as Record<string, unknown>[]).map((d) => ({
+        label: String(d.label ?? "Day"),
+        condition: String(d.condition ?? "Partly Cloudy"),
+        high: Number(d.high ?? 88),
+        low: Number(d.low ?? 72),
+        rainRisk: Number(d.rainRisk ?? 20),
+        windMph: Number(d.windMph ?? 10),
+      }))
+    : null;
+}
+
+function placeholderRecommendation(status: string) {
+  return status === "Delayed"
+    ? "Job flagged delayed — review weather-sensitive tasks before remobilizing."
+    : "Could not geocode jobsite location. Verify city/state on the job record or check conditions locally.";
+}
+
 export async function buildWeatherProjection(orgId: string) {
   const rows = await loadOrgJobs(orgId);
   const active = rows.filter((r) => r.status !== "Completed");
 
-  const sites = active.map((row) => {
-    const payload = parsePayload(row);
-    const stored = payload.weather as Record<string, unknown> | undefined;
-    const rainRisk = (stored?.rainRisk as string) ?? riskBandFromStatus(row.status);
-    const windRisk = (stored?.windRisk as string) ?? "Low";
-    const heatRisk = (stored?.heatRisk as string) ?? "Moderate";
-    const forecast = (stored?.forecast as unknown[])?.length
-      ? (stored!.forecast as Record<string, unknown>[]).map((d) => ({
-          label: String(d.label ?? "Day"),
-          condition: String(d.condition ?? "Partly Cloudy"),
-          high: Number(d.high ?? 88),
-          low: Number(d.low ?? 72),
-          rainRisk: Number(d.rainRisk ?? 20),
-          windMph: Number(d.windMph ?? 10),
-        }))
-      : placeholderForecast();
+  const sites = await Promise.all(
+    active.map(async (row) => {
+      const payload = parsePayload(row);
+      const stored = payload.weather as Record<string, unknown> | undefined;
+      const weatherSensitiveTasks =
+        (stored?.weatherSensitiveTasks as string[]) ??
+        (payload.weatherSensitive ? [row.currentPhase || "Field work"] : []);
 
-    return {
-      jobId: row.id,
-      jobName: row.name,
-      location: row.location || "Jobsite",
-      rainRisk,
-      windRisk,
-      heatRisk,
-      forecast,
-      recommendation:
-        String(stored?.recommendation) ||
-        (row.status === "Delayed"
-          ? "Job flagged delayed — review weather-sensitive tasks before remobilizing."
-          : "External forecast feed not connected. Add weather data to job payload or verify conditions locally."),
-      weatherSensitiveTasks: (stored?.weatherSensitiveTasks as string[]) ??
-        (payload.weatherSensitive ? [row.currentPhase || "Field work"] : []),
-      liveData: Boolean(stored?.forecast),
-    };
-  });
+      const storedForecast = mapStoredForecast(stored);
+      if (storedForecast) {
+        return {
+          jobId: row.id,
+          jobName: row.name,
+          location: row.location || "Jobsite",
+          rainRisk: (stored?.rainRisk as string) ?? riskBandFromStatus(row.status),
+          windRisk: (stored?.windRisk as string) ?? "Low",
+          heatRisk: (stored?.heatRisk as string) ?? "Moderate",
+          forecast: storedForecast,
+          recommendation:
+            String(stored?.recommendation) ||
+            placeholderRecommendation(row.status),
+          weatherSensitiveTasks,
+          liveData: true,
+        };
+      }
+
+      const live = await fetchLiveWeatherForJobsite(row.location, payload);
+      if (live) {
+        return {
+          jobId: row.id,
+          jobName: row.name,
+          location: row.location || "Jobsite",
+          rainRisk: live.rainRisk,
+          windRisk: live.windRisk,
+          heatRisk: live.heatRisk,
+          forecast: live.forecast,
+          recommendation: live.recommendation,
+          weatherSensitiveTasks,
+          liveData: true,
+        };
+      }
+
+      return {
+        jobId: row.id,
+        jobName: row.name,
+        location: row.location || "Jobsite",
+        rainRisk: riskBandFromStatus(row.status),
+        windRisk: "Low" as const,
+        heatRisk: "Moderate" as const,
+        forecast: placeholderForecast(),
+        recommendation: placeholderRecommendation(row.status),
+        weatherSensitiveTasks,
+        liveData: false,
+      };
+    })
+  );
 
   return { sites, jobCount: active.length };
 }
