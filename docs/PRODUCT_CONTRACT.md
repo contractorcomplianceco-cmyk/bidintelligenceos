@@ -4,7 +4,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 **Last verified:** 2026-07-08  
 **Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)  
-**Verified at:** `7162e4a`+ (through business-profile org leadership/contact read)
+**Verified at:** `7143e5a`+ (through org leadership/contact + export-until-reviewed gates)
 
 **Legend:** `live` = persisted API data when signed in · `partial live` = mix of live API + demo fixtures or honest empty · `demo` = seed fixtures / marketing showcase only · `planned` = not built
 
