@@ -516,6 +516,9 @@ export async function buildCloseoutProjection(orgId: string) {
     };
   });
 
+  const docsComplete = jobsOut.reduce((s, j) => s + j.docsComplete, 0);
+  const docsTotal = jobsOut.reduce((s, j) => s + j.docsTotal, 0);
+
   const stats = {
     jobsInCloseout: jobsOut.filter((j) => j.stage !== "Complete").length,
     punchItemsOpen: jobsOut.reduce((s, j) => s + j.punchItemsRemaining, 0),
@@ -526,6 +529,8 @@ export async function buildCloseoutProjection(orgId: string) {
       jobsOut.length > 0 ? jobsOut.reduce((s, j) => s + j.finalRoi, 0) / jobsOut.length : 0,
     avgProjectedRoi:
       jobsOut.length > 0 ? jobsOut.reduce((s, j) => s + j.projectedRoi, 0) / jobsOut.length : 0,
+    docsCompletePct: docsTotal > 0 ? (docsComplete / docsTotal) * 100 : 0,
+    jobsFeedingBidDna: jobsOut.length,
   };
 
   const bidDnaFeedSeries = jobsOut
@@ -816,7 +821,13 @@ export async function buildRiskProjection(orgId: string) {
 }
 
 function buildLivePackageSections(
-  bid: { name: string; recipient: string | null; amount: number | null; type: string | null },
+  bid: {
+    name: string;
+    recipient: string | null;
+    amount: number | null;
+    type: string | null;
+    scopeSummary?: string | null;
+  },
   bidDocs: { fileName: string; extractionStatus: string; extractedText: string | null }[],
   complianceItems: { label: string; status: string }[],
   humanReviewed: boolean,
@@ -830,15 +841,18 @@ function buildLivePackageSections(
         (d.extractedText!.length > 600 ? "…" : ""),
     }));
 
+  const scopeSummary = bid.scopeSummary?.trim();
   const scopeBullets =
     docExcerpts.length > 0
       ? docExcerpts.flatMap((d) => [`Source: ${d.fileName}`, d.excerpt])
-      : bidDocs.length > 0
-        ? bidDocs.map(
-            (d) =>
-              `${d.fileName} — ${d.extractionStatus === "done" ? "extracted, pending review" : "processing"}`,
-          )
-        : ["Upload bid documents to populate scope sections from live extraction."];
+      : scopeSummary
+        ? scopeSummary.split(/\n+/).filter(Boolean)
+        : bidDocs.length > 0
+          ? bidDocs.map(
+              (d) =>
+                `${d.fileName} — ${d.extractionStatus === "done" ? "extracted, pending review" : "processing"}`,
+            )
+          : ["Upload bid documents to populate scope sections from live extraction."];
 
   const complianceContent =
     complianceItems.length > 0
