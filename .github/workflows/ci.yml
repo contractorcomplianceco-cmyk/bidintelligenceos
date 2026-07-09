@@ -4,13 +4,11 @@ on:
   push:
     branches:
       - main
-      - master
-      - "feat/**"
+      - feat/bidos-production-2026-07
   pull_request:
     branches:
       - main
-      - master
-      - "feat/**"
+      - feat/bidos-production-2026-07
 
 jobs:
   check:
@@ -29,3 +27,4 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run check:security
+      - run: npm run smoke:dry-run
