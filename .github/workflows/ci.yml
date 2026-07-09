@@ -16,8 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Private sibling repo — unauthenticated clone fails (exit 128). Requires org/repo
+      # secret GH_PAT (classic PAT or fine-grained token with read on Audit-Risk-Model).
       - name: Checkout Audit-Risk-Model (sibling for @workspace/cca-core)
-        run: git clone --depth 1 "https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model.git" ../Audit-Risk-Model
+        uses: actions/checkout@v4
+        with:
+          repository: contractorcomplianceco-cmyk/Audit-Risk-Model
+          path: ../Audit-Risk-Model
+          token: ${{ secrets.GH_PAT }}
 
       - uses: actions/setup-node@v4
         with:
