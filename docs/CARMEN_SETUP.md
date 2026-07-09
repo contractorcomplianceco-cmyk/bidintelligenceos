@@ -1,6 +1,6 @@
 # Carmen setup guide — click by click
 
-What **you** need to do outside the codebase to finish Rose plan Phase 3+. The app is deployed at **https://ccabidintelligence.com**; demo stays at **https://demo.ccabidintelligence.com**.
+What **you** need to do outside the codebase to finish Rose plan Phase 3+. The team app is at **https://bidintelligence.cagteam.net** (auth: **Clerk**); demo stays at **https://demo.ccabidintelligence.com**.
 
 ---
 
@@ -9,7 +9,7 @@ What **you** need to do outside the codebase to finish Rose plan Phase 3+. The a
 - Postgres `bid_intelligence` + RLS
 - PM2 `bid-intelligence-os` on port 5001
 - Health monitor emails on failure
-- Legacy login works today (email/password at `/login`)
+- Clerk shared auth live (`AUTH_ENABLED=true`; Sign in/up at `/login`)
 
 ---
 
@@ -33,7 +33,9 @@ What **you** need to do outside the codebase to finish Rose plan Phase 3+. The a
 
 ---
 
-## Step 2 — Clerk shared auth (optional, ~20 min)
+## Step 2 — Clerk shared auth — **complete**
+
+Clerk cutover is done on the team URL. Production uses one Clerk application for the CCA suite (`AUTH_ENABLED=true`). Reference only if rotating keys or onboarding a new environment:
 
 Use one Clerk application for the whole CCA suite.
 
@@ -62,7 +64,7 @@ cd /home/ubuntu/projects/bid-intelligence-os
 ```
 
 9. Browser test:
-   - Open **https://ccabidintelligence.com/login**
+   - Open **https://bidintelligence.cagteam.net/login**
    - You should see **Clerk** Sign in (not email/password form).
    - Sign up / sign in → Command Center loads your org data.
 
@@ -155,7 +157,7 @@ Exit `0` = all checks passed; `1` = failure (no secrets in output). Smoke users:
 
 | # | Action | Expected |
 |---|--------|----------|
-| 1 | Visit https://ccabidintelligence.com/api/health | `"status":"ok"`, `"database":{"driver":"postgres"}` |
+| 1 | Visit https://bidintelligence.cagteam.net/api/health | `"status":"ok"`, `"database":{"driver":"postgres"}` |
 | 2 | `/login` → register or sign in | Lands on Command Center |
 | 3 | **Bids** → **New bid** | Saves; appears in list |
 | 4 | Upload PDF or DOCX on bid | Extraction status `ready` or `metadata_only` |

@@ -60,19 +60,13 @@ Module-by-module checklist: [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md). Clic
 
 ---
 
-## Human steps — Clerk & Audit (pending)
+## Human steps — Clerk & Audit
 
-### Clerk shared-auth cutover — **not enabled**
+### Clerk shared-auth cutover — **complete**
 
-Production still uses **legacy smoke-test auth** (`AUTH_ENABLED=false`). Do **not** set `AUTH_ENABLED=true` until redirect URLs are configured.
+Production on the team URL uses **Clerk** (`AUTH_ENABLED=true`). Sign in/up at `/login`; legacy email/password login is disabled when Clerk is enabled.
 
-1. **Preflight (read-only):** `node scripts/clerk-cutover-preflight.mjs --check-only`
-2. Clerk Dashboard — allowed origins & redirect URLs for `bidintelligence.cagteam.net` only (not `bidintelligence.docs.cagteam.net` — no DNS)
-3. Server `.env` — Clerk keys, `VITE_CLERK_*`, `ADMIN_EMAILS` (never commit secrets)
-4. Deploy: `./deploy/deploy.sh` (rebuild required for `VITE_*`)
-5. Verify Clerk UI at `/login`, user sync, then decommission smoke-test users if desired
-
-Full checklist: [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Clerk cutover checklist — `bidintelligence.cagteam.net`**.
+Key rotation or new env: [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Clerk cutover checklist — `bidintelligence.cagteam.net`**; preflight: `node scripts/clerk-cutover-preflight.mjs --check-only`.
 
 ### Audit-Risk-Model PR #2 — **OPEN, awaiting Rose sign-off**
 
@@ -90,7 +84,7 @@ Details: [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md) § A
 |---|--------|
 | 1 | Run smoke: `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` |
 | 2 | Export gate: on `/package-builder`, confirm PDF/DOCX blocked until **Approve for use** on bid score |
-| 3 | Clerk preflight when ready: `node scripts/clerk-cutover-preflight.mjs --check-only` |
+| 3 | Clerk `/login` — Sign in/up on team URL (cutover complete) |
 | 4 | PM2: `pm2 describe bid-intelligence-os` — expect **fork_mode** + `tsx` (see runbook if restart loop) |
 
 Expanded table: [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md) § **Carmen — condensed action checklist**.
@@ -115,7 +109,7 @@ Expanded table: [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.m
 
 Summary pointer for Slack/email:
 
-> GitHub unrelated histories resolved — old promo `main` on `archive/main-promo-video-pre-bidos-2026-07`; production line is now `main` (Tier 1 + Phase 4 live at https://bidintelligence.cagteam.net). Pending: Clerk cutover (`deploy/RUNBOOK.md`), Audit-Risk-Model [PR #2](https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model/pull/2) awaiting your sign-off. Plan completion summary: `docs/PLAN_COMPLETION_2026-07.md`.
+> GitHub unrelated histories resolved — old promo `main` on `archive/main-promo-video-pre-bidos-2026-07`; production line is now `main` (Tier 1 + Phase 4 live at https://bidintelligence.cagteam.net; auth: Clerk). Pending: Audit-Risk-Model [PR #2](https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model/pull/2) awaiting your sign-off. Plan completion summary: `docs/PLAN_COMPLETION_2026-07.md`.
 
 ---
 

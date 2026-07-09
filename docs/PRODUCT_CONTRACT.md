@@ -2,8 +2,9 @@
 
 Living map of marketing promises → routes → data status. Update when a module goes live.
 
-**Last verified:** 2026-07-08  
+**Last verified:** 2026-07-09  
 **Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)  
+**Auth:** Clerk (`AUTH_ENABLED=true` on team URL)  
 **Verified at:** `afe436e`+ (VoiceConnect Phase 5 status stub; PDF export gate at `7dcfc57`; post-deploy smoke + dry-run; Phase 5 roadmap in `docs/PHASE_5_ROADMAP.md`)
 
 **Legend:** `live` = persisted API data when signed in · `partial live` = mix of live API + demo fixtures or honest empty · `demo` = seed fixtures / marketing showcase only · `planned` = not built
