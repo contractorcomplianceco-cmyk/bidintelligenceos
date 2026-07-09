@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,10 +11,10 @@ import { DemoDataBadge } from "@/components/demo-data-badge";
 import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
   closeoutJobs as seedCloseoutJobs,
-  punchListItems,
-  closeoutChecklist,
+  punchListItems as seedPunchListItems,
+  closeoutChecklist as seedCloseoutChecklist,
   closeoutStats as seedCloseoutStats,
-  bidDnaFeedSeries,
+  bidDnaFeedSeries as seedBidDnaFeedSeries,
   CLOSEOUT_STAGES,
   type CloseoutJob,
   type CloseoutStage,
@@ -103,8 +103,50 @@ export default function Closeout() {
   const live = useLiveData(isAuthenticated);
   const { data: closeoutData } = useOpsCloseout();
   const closeoutJobs = live ? (closeoutData?.jobs ?? []) : seedCloseoutJobs;
-  const closeoutStats = live ? (closeoutData?.stats ?? seedCloseoutStats) : seedCloseoutStats;
-  const [selectedJobId, setSelectedJobId] = useState<string>(closeoutJobs[0]?.id ?? "");
+  const closeoutStats = live
+    ? (closeoutData?.stats ?? {
+        jobsInCloseout: 0,
+        punchItemsOpen: 0,
+        retainageOutstanding: 0,
+        avgFinalRoi: 0,
+        avgProjectedRoi: 0,
+        docsCompletePct: 0,
+        jobsFeedingBidDna: 0,
+      })
+    : seedCloseoutStats;
+  const bidDnaFeedSeries = live ? (closeoutData?.bidDnaFeedSeries ?? []) : seedBidDnaFeedSeries;
+  const completionChart = live ? (closeoutData?.completionChart ?? []) : [];
+  const [selectedJobId, setSelectedJobId] = useState<string>("");
+
+  useEffect(() => {
+    if (closeoutJobs[0]?.id && !selectedJobId) {
+      setSelectedJobId(closeoutJobs[0].id);
+    }
+  }, [closeoutJobs, selectedJobId]);
+
+  const selectedJob: CloseoutJob | undefined =
+    closeoutJobs.find((j) => j.id === selectedJobId) ?? closeoutJobs[0];
+
+  const jobPunch = useMemo(() => {
+    if (live) {
+      const liveJob = closeoutData?.jobs.find((j) => j.id === selectedJobId);
+      return liveJob?.punchList ?? [];
+    }
+    return seedPunchListItems.filter((p) => p.jobId === selectedJobId);
+  }, [live, closeoutData?.jobs, selectedJobId]);
+
+  const jobCloseoutDocs = useMemo(() => {
+    if (live) {
+      const liveJob = closeoutData?.jobs.find((j) => j.id === selectedJobId);
+      return liveJob?.closeoutDocs ?? [];
+    }
+    return seedCloseoutChecklist.map((item) => ({
+      id: item.id,
+      requirement: item.requirement,
+      description: item.description,
+      status: item.statusByJob[selectedJobId] ?? "Pending",
+    }));
+  }, [live, closeoutData?.jobs, selectedJobId]);
 
   if (live && closeoutJobs.length === 0) {
     return (
@@ -128,13 +170,9 @@ export default function Closeout() {
     );
   }
 
-  const selectedJob: CloseoutJob =
-    closeoutJobs.find((j) => j.id === selectedJobId) ?? closeoutJobs[0]!;
-
-  const jobPunch = useMemo(
-    () => punchListItems.filter((p) => p.jobId === selectedJobId),
-    [selectedJobId]
-  );
+  if (!selectedJob) {
+    return null;
+  }
 
   const stats = closeoutStats;
 
@@ -220,6 +258,40 @@ export default function Closeout() {
             </Card>
           ))}
         </div>
+
+        {/* Completion chart — live payload when present */}
+        {live && completionChart.length > 0 && (
+          <Card className="bg-white border-[#E2E8F0] shadow-sm">
+            <CardHeader className="p-4 border-b border-[#E2E8F0]">
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
+                Job Completion
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5">
+              <div className="h-48 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={completionChart} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                    <XAxis dataKey="name" stroke="#64748B" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis
+                      stroke="#64748B"
+                      fontSize={10}
+                      tickLine={false}
+                      axisLine={false}
+                      domain={[0, 100]}
+                      tickFormatter={(v) => `${v}%`}
+                    />
+                    <RechartsTooltip
+                      contentStyle={{ backgroundColor: "#FFFFFF", borderColor: "#E2E8F0", fontSize: "12px" }}
+                      formatter={(v: number) => `${v}%`}
+                    />
+                    <Bar dataKey="completion" fill="#38BDF8" radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Closeout pipeline cards */}
         <div>
@@ -401,7 +473,9 @@ export default function Closeout() {
             <CardContent className="p-0">
               {jobPunch.length === 0 ? (
                 <div className="p-6 text-sm text-slate-500">
-                  No open punch items — this job is clear for the next closeout stage.
+                  {live
+                    ? "No punch list items in job payload — add a punchList array to track open items."
+                    : "No open punch items — this job is clear for the next closeout stage."}
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -443,7 +517,7 @@ export default function Closeout() {
                           </td>
                           <td className="px-4 py-3">
                             <span
-                              className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${PUNCH_STYLES[p.status]}`}
+                              className={`inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest border ${PUNCH_STYLES[p.status as PunchStatus] ?? PUNCH_STYLES.Open}`}
                             >
                               {p.status}
                             </span>
@@ -466,36 +540,44 @@ export default function Closeout() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-3">
-              {closeoutChecklist.map((item) => {
-                const status = item.statusByJob[selectedJobId] ?? "Pending";
-                return (
-                  <div
-                    key={item.id}
-                    className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3"
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-start gap-2 min-w-0">
-                        <div className="mt-0.5">
-                          <DocIcon status={status} />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[13px] font-semibold text-slate-900">
-                            {item.requirement}
+              {jobCloseoutDocs.length === 0 ? (
+                <div className="text-sm text-slate-500">
+                  {live
+                    ? "No closeout documentation in job payload — add closeoutDocs or closeoutChecklist."
+                    : "No documentation requirements configured."}
+                </div>
+              ) : (
+                jobCloseoutDocs.map((item) => {
+                  const status = item.status as DocStatus;
+                  return (
+                    <div
+                      key={item.id}
+                      className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start gap-2 min-w-0">
+                          <div className="mt-0.5">
+                            <DocIcon status={status} />
                           </div>
-                          <div className="text-[11px] text-slate-500 mt-0.5">
-                            {item.description}
+                          <div className="min-w-0">
+                            <div className="text-[13px] font-semibold text-slate-900">
+                              {item.requirement}
+                            </div>
+                            <div className="text-[11px] text-slate-500 mt-0.5">
+                              {item.description}
+                            </div>
                           </div>
                         </div>
+                        <span
+                          className={`shrink-0 inline-flex px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${DOC_STYLES[status] ?? DOC_STYLES.Pending}`}
+                        >
+                          {item.status}
+                        </span>
                       </div>
-                      <span
-                        className={`shrink-0 inline-flex px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest border ${DOC_STYLES[status]}`}
-                      >
-                        {status}
-                      </span>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
               <button
                 onClick={() =>
                   toast({
@@ -548,6 +630,13 @@ export default function Closeout() {
                   </div>
                 </div>
                 <div className="h-56 w-full">
+                  {bidDnaFeedSeries.length === 0 ? (
+                    <div className="h-full flex items-center justify-center text-sm text-slate-500">
+                      {live
+                        ? "Add projectedRoi and finalRoi to job payloads to populate the Bid DNA feed chart."
+                        : "No ROI data available."}
+                    </div>
+                  ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={bidDnaFeedSeries}
@@ -587,6 +676,7 @@ export default function Closeout() {
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
+                  )}
                 </div>
               </div>
 

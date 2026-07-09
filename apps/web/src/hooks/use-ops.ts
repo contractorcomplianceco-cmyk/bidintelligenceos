@@ -74,6 +74,15 @@ export type OpsAlert = {
   resolved: boolean;
 };
 
+export type LivePackageSection = {
+  id: string;
+  type: string;
+  title: string;
+  required?: boolean;
+  enabled: boolean;
+  content?: unknown;
+};
+
 export type LivePackage = {
   id: string;
   bidId: string;
@@ -97,7 +106,39 @@ export type LivePackage = {
   humanReviewed: boolean;
   verdict: string;
   complianceItems: { label: string; status: string }[];
-  sections: { id: string; type: string; title: string; required?: boolean; enabled: boolean }[];
+  sections: LivePackageSection[];
+};
+
+export type OpsPunchListItem = {
+  id: string;
+  jobId: string;
+  jobName: string;
+  item: string;
+  trade: string;
+  status: string;
+  assignee: string;
+  priority: string;
+  dueDate: string;
+};
+
+export type OpsCloseoutDoc = {
+  id: string;
+  requirement: string;
+  description: string;
+  status: string;
+};
+
+export type OpsCloseoutJob = CloseoutJob & {
+  punchList?: OpsPunchListItem[];
+  closeoutDocs?: OpsCloseoutDoc[];
+};
+
+export type OpsCloseoutResponse = {
+  jobs: OpsCloseoutJob[];
+  stats: typeof demoCloseoutStats;
+  punchList: OpsPunchListItem[];
+  bidDnaFeedSeries: { name: string; projected: number; final: number; jobId: string }[];
+  completionChart: { name: string; completion: number; stage: string; jobId: string }[];
 };
 
 function mapScheduleEvent(e: OpsScheduleEvent): ScheduleEvent {
@@ -206,11 +247,16 @@ export function useOpsCloseout() {
 
   return useQuery({
     queryKey,
-    queryFn: async (): Promise<{
-      jobs: CloseoutJob[];
-      stats: typeof demoCloseoutStats;
-    }> => {
-      if (!live) return { jobs: demoCloseoutJobs, stats: demoCloseoutStats };
+    queryFn: async (): Promise<OpsCloseoutResponse> => {
+      if (!live) {
+        return {
+          jobs: demoCloseoutJobs,
+          stats: demoCloseoutStats,
+          punchList: [],
+          bidDnaFeedSeries: [],
+          completionChart: [],
+        };
+      }
       return apiFetch("/api/v1/ops/closeout");
     },
     staleTime: 60_000,
@@ -301,6 +347,7 @@ export function useOpsPackageBuilder() {
             title: s.title,
             required: s.required,
             enabled: true,
+            content: s.content,
           })),
         }));
       }
