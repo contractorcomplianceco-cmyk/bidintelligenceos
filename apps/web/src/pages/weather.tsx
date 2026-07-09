@@ -99,6 +99,8 @@ export default function Weather() {
   const { data: liveSites } = useOpsWeather();
   const jobsiteWeather = live ? (liveSites ?? []) : seedWeather;
   const [rescheduled, setRescheduled] = useState<Record<string, boolean>>({});
+  const liveForecastCount = jobsiteWeather.filter((s) => s.liveData).length;
+  const placeholderCount = jobsiteWeather.length - liveForecastCount;
 
   if (live && jobsiteWeather.length === 0) {
     return (
@@ -110,12 +112,12 @@ export default function Weather() {
               Weather Watch
             </h2>
             <p className="text-slate-500 mt-1.5">
-              Jobsite weather placeholders for active {verticalConfig.name} deployments.
+              Live Open-Meteo forecasts keyed to active job site locations for {verticalConfig.name} operations.
             </p>
           </div>
           <OpsModuleEmpty
             module="No active jobsites"
-            description="Record won jobs in deployment to monitor weather-sensitive work. External forecast API optional."
+            description="Record won jobs in deployment to monitor weather-sensitive work at each jobsite."
           />
         </div>
       </Layout>
@@ -146,9 +148,22 @@ export default function Weather() {
               Weather Watch
             </h2>
             <p className="text-slate-500 mt-1.5">
-              5-day jobsite forecasts, weather-risk bands, and schedule impact for active {verticalConfig.name} operations.
+              {live
+                ? "5-day Open-Meteo forecasts, weather-risk bands, and schedule impact for active jobsites."
+                : `5-day jobsite forecasts, weather-risk bands, and schedule impact for active ${verticalConfig.name} operations.`}
             </p>
             {!live && <DemoDataBadge />}
+            {live && jobsiteWeather.length > 0 && (
+              <p className="text-xs text-slate-500 mt-2">
+                {liveForecastCount > 0
+                  ? `${liveForecastCount} site${liveForecastCount === 1 ? "" : "s"} on live Open-Meteo feed`
+                  : null}
+                {liveForecastCount > 0 && placeholderCount > 0 ? " · " : null}
+                {placeholderCount > 0
+                  ? `${placeholderCount} site${placeholderCount === 1 ? "" : "s"} using placeholder (geocode unavailable)`
+                  : null}
+              </p>
+            )}
           </div>
           <div className="rounded-lg border border-[#E2E8F0] bg-white px-4 py-2.5">
             <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Sites Monitored</div>
@@ -195,7 +210,20 @@ export default function Weather() {
             <Card key={site.jobId} className="bg-white border-[#E2E8F0] shadow-sm">
               <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center justify-between gap-4">
                 <div>
-                  <CardTitle className="text-base font-bold text-slate-900">{site.jobName}</CardTitle>
+                  <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2 flex-wrap">
+                    {site.jobName}
+                    {live && (
+                      <span
+                        className={`text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded ${
+                          site.liveData
+                            ? "text-[#22C55E] bg-[#22C55E]/10"
+                            : "text-slate-500 bg-slate-100"
+                        }`}
+                      >
+                        {site.liveData ? "Live forecast" : "Placeholder"}
+                      </span>
+                    )}
+                  </CardTitle>
                   <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
                     <MapPin className="w-3.5 h-3.5" />
                     {site.location}
@@ -298,8 +326,9 @@ export default function Weather() {
         <div className="rounded-lg border border-[#E2E8F0] bg-white p-3 flex items-center gap-2">
           <Info className="w-3.5 h-3.5 text-slate-500 shrink-0" />
           <p className="text-[11px] text-slate-500">
-            Forecast data is decision-support guidance only. Projections require user verification before committing crews or
-            equipment.
+            {live
+              ? "Live forecasts from Open-Meteo (no API key) keyed to job site city/state. Decision-support only — verify conditions before committing crews or equipment."
+              : "Forecast data is decision-support guidance only. Projections require user verification before committing crews or equipment."}
           </p>
         </div>
       </div>

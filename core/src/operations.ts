@@ -364,6 +364,8 @@ export interface JobsiteWeather {
   forecast: WeatherDay[];
   recommendation: string;
   weatherSensitiveTasks: string[];
+  /** True when forecast came from Open-Meteo or job payload, not placeholder. */
+  liveData?: boolean;
 }
 
 export const jobsiteWeather: JobsiteWeather[] = [
