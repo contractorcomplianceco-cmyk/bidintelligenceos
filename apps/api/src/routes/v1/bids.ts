@@ -13,6 +13,7 @@ import { hashBidScoreInputs, logScoreAccess } from "../../lib/score-access-log.j
 import { computeWinLossAnalytics } from "../../lib/win-loss-analytics.js";
 import { parseStateFromLocation } from "../../lib/state-parse.js";
 import { buildPackageBuilderProjection } from "../../lib/ops-projection.js";
+import { generatePackageDocx, packageDocxFilename } from "../../lib/package-docx-export.js";
 import { generatePackagePdf, packagePdfFilename } from "../../lib/package-pdf-export.js";
 import { requireAuth, type AuthedRequest } from "../../middleware/auth.js";
 import { orgScopeMiddleware } from "../../middleware/org-scope.js";
@@ -220,8 +221,8 @@ router.post("/:id/package/export", async (req, res) => {
   }
 
   const format = String((req.body as { format?: string } | undefined)?.format ?? "PDF").toUpperCase();
-  if (format !== "PDF") {
-    res.status(501).json({ status: "planned", message: "DOCX export is Phase 5 — PDF available now" });
+  if (format !== "PDF" && format !== "DOCX") {
+    res.status(400).json({ error: "Unsupported export format; use PDF or DOCX" });
     return;
   }
 
@@ -232,14 +233,28 @@ router.post("/:id/package/export", async (req, res) => {
     return;
   }
 
-  const pdf = await generatePackagePdf({
+  const exportOptions = {
     bidName: bid.name,
     recipient: bid.recipient || pkg.recipient || "Client",
     projectType: bid.type,
     location: bid.location,
     sections: pkg.sections,
-  });
+  };
 
+  if (format === "DOCX") {
+    const docx = await generatePackageDocx(exportOptions);
+    const filename = packageDocxFilename(bid.name, bid.id);
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    );
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Length", String(docx.length));
+    res.send(docx);
+    return;
+  }
+
+  const pdf = await generatePackagePdf(exportOptions);
   const filename = packagePdfFilename(bid.name, bid.id);
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);

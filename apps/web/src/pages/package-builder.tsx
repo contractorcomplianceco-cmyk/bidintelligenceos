@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { samplePackages, BidPackageData } from "@core/bid-packages";
 import { Checkbox } from "@/components/ui/checkbox";
 import { clientExportBlocked, CLIENT_EXPORT_BLOCKED_MSG } from "@/lib/client-export-gate";
-import { apiDownload, apiFetch, ApiError } from "@/lib/api-client";
+import { apiDownload, ApiError } from "@/lib/api-client";
 
 type BuilderSection = {
   id: string;
@@ -313,19 +313,25 @@ export default function PackageBuilder() {
     }
     if (format === "DOCX" && live && selectedLivePkg) {
       try {
-        await apiFetch<{ status: string; message: string }>(
+        const { blob, filename } = await apiDownload(
           `/api/v1/bids/${selectedLivePkg.bidId}/package/export`,
-          { method: "POST", body: JSON.stringify({ format: "DOCX" }) },
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ format: "DOCX" }),
+          },
         );
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = filename ?? `${selectedLivePkg.bidId}-package.docx`;
+        anchor.click();
+        URL.revokeObjectURL(url);
+        toast({
+          title: "DOCX exported",
+          description: "Client-facing package downloaded.",
+        });
       } catch (e) {
-        if (e instanceof ApiError && e.status === 501) {
-          const body = e.body as { message?: string } | undefined;
-          toast({
-            title: "DOCX export — Phase 5",
-            description: body?.message ?? "DOCX pipeline Phase 5",
-          });
-          return;
-        }
         toast({
           title: "Export failed",
           description: e instanceof ApiError ? e.message : "Could not export package",
