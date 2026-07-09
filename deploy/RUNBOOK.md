@@ -103,7 +103,24 @@ ADMIN_EMAILS=owner@example.com           # comma-separated → owner role
 - Web: `@clerk/clerk-react` Sign in/up at `/login` and `/register`
 - Legacy `/api/v1/auth/login` returns 400 when Clerk is enabled
 
-**Team URL:** `https://bidintelligence.cagteam.net` (DNS A → `3.129.68.79`). Do not use `bidintelligence.docs.cagteam.net` unless that subdomain is added in DNS — it currently does not resolve.
+### Team URL (production)
+
+**Use:** `https://bidintelligence.cagteam.net` (DNS A → `3.129.68.79`).
+
+**Do not use:** `bidintelligence.docs.cagteam.net`. An nginx vhost for that hostname exists on the server (`deploy/nginx/bidintelligence.docs.cagteam.net.conf` → `/etc/nginx/sites-enabled/`), but **there is no DNS record** — the subdomain does not resolve. Treat the vhost as orphaned; do not point users, Clerk redirects, smoke tests, or env vars at it.
+
+#### Safe removal of orphaned `bidintelligence.docs.cagteam.net` vhost (doc only — do not run without Carmen approval)
+
+1. Confirm team traffic uses `https://bidintelligence.cagteam.net` only (`curl -sS https://bidintelligence.cagteam.net/api/health`, `node scripts/smoke-team-url.mjs`, Clerk preflight).
+2. Verify no env or Clerk Dashboard URLs reference `bidintelligence.docs.cagteam.net` (`node scripts/clerk-cutover-preflight.mjs --check-only`).
+3. On the server, inspect active config (read-only): `ls -l /etc/nginx/sites-enabled/ | grep bidintelligence.docs` and `sudo nginx -t`.
+4. **After Carmen approves:** disable the vhost symlink, test, reload:
+   - `sudo rm /etc/nginx/sites-enabled/bidintelligence.docs.cagteam.net.conf`
+   - `sudo nginx -t && sudo systemctl reload nginx`
+5. Optionally revoke the unused Let's Encrypt cert: `sudo certbot delete --cert-name bidintelligence.docs.cagteam.net`
+6. Remove `deploy/nginx/bidintelligence.docs.cagteam.net.conf` from the repo in a follow-up docs PR once the server config is gone.
+
+Do **not** remove or edit live nginx config during routine deploys.
 
 ### Clerk cutover checklist — `bidintelligence.cagteam.net` (not enabled yet)
 
