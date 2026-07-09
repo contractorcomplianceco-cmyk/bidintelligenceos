@@ -16,6 +16,9 @@ import {
 } from "@/hooks/use-bids";
 import { Loader2, ShieldCheck, ShieldAlert, Lock, CheckCircle2, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth-context";
+
+const AI_REVIEW_LABEL = "Powered by AI · Reviewed by humans";
 
 function parseStateFromLocation(location: string): string | null {
   const trimmed = location.trim();
@@ -141,6 +144,7 @@ function ScoreBody({
   locking,
   recordingOutcome,
   canRun,
+  canApprove,
 }: {
   score?: BidScoreSnapshot | null;
   onCompute: () => void;
@@ -152,6 +156,7 @@ function ScoreBody({
   locking?: boolean;
   recordingOutcome?: boolean;
   canRun: boolean;
+  canApprove: boolean;
 }) {
   if (!score) {
     return (
@@ -221,7 +226,10 @@ function ScoreBody({
         ))}
       </div>
 
-      <p className="text-xs text-slate-500 border-t border-[#E2E8F0] pt-3">{score.disclaimer}</p>
+      <p className="text-xs text-slate-500 border-t border-[#E2E8F0] pt-3">
+        {AI_REVIEW_LABEL}
+        {!score.humanReviewed && " — pending admin approval before client-facing use."}
+      </p>
 
       <div className="flex flex-wrap gap-2">
         {canRun && (
@@ -230,10 +238,10 @@ function ScoreBody({
             Recompute score
           </Button>
         )}
-        {canRun && !score.humanReviewed && (
+        {canApprove && !score.humanReviewed && (
           <Button type="button" onClick={onApprove} disabled={approving} className="bg-teal-700 hover:bg-teal-600">
             {approving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <ShieldCheck className="w-4 h-4 mr-2" />}
-            Approve for client use
+            Mark reviewed
           </Button>
         )}
         {canRun && score.humanReviewed && (
@@ -267,6 +275,8 @@ type Props =
 
 export function BidIntelligencePanel(props: Props) {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const canApprove = user?.role === "owner";
   const stateCode = useMemo(
     () => parseStateFromLocation(props.mode === "state" ? props.location : props.location),
     [props.location, props.mode],
@@ -367,7 +377,12 @@ export function BidIntelligencePanel(props: Props) {
               <ShieldAlert className="w-4 h-4 text-amber-600" />
               Bid Intelligence Score
             </CardTitle>
-            <CardDescription>12-category model — Strong Go / Conditional Go / Executive Review / No-Go.</CardDescription>
+            <CardDescription className="space-y-2">
+              <span className="block">12-category model — Strong Go / Conditional Go / Executive Review / No-Go.</span>
+              <span className="block text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                {AI_REVIEW_LABEL}
+              </span>
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {!live ? (
@@ -388,6 +403,7 @@ export function BidIntelligencePanel(props: Props) {
                 locking={lockScore.isPending}
                 recordingOutcome={recordOutcome.isPending}
                 canRun={live && !!bidId}
+                canApprove={canApprove}
               />
             )}
           </CardContent>

@@ -19,6 +19,9 @@ const router = Router();
 router.use(requireAuth);
 router.use(orgScopeMiddleware);
 
+const AI_REVIEW_DISCLAIMER =
+  "Powered by AI · Reviewed by humans — required before client-facing use.";
+
 const bidInputSchema = z.object({
   name: z.string().min(1),
   recipient: z.string().optional(),
@@ -109,7 +112,7 @@ router.get("/:id/score", async (req, res) => {
     compliance: JSON.parse(row.complianceJson),
     aiGenerated: Boolean(row.aiGenerated),
     humanReviewed: Boolean(row.humanReviewed),
-    disclaimer: "Decision-support only. Human reviewer approval required before client-facing use.",
+    disclaimer: AI_REVIEW_DISCLAIMER,
   };
   res.json({
     score: serializePublicBidScore(stored, {
@@ -141,7 +144,11 @@ router.post("/:id/score", async (req, res) => {
 });
 
 router.post("/:id/score/approve", async (req, res) => {
-  const { orgId, userId } = (req as unknown as AuthedRequest).auth;
+  const { orgId, userId, role } = (req as unknown as AuthedRequest).auth;
+  if (role !== "owner") {
+    res.status(403).json({ error: "Admin approval required" });
+    return;
+  }
   const bid = await loadBidForOrg(req.params.id, orgId);
   if (!bid) {
     res.status(404).json({ error: "Bid not found" });

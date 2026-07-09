@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { Badge } from "@/components/ui/badge";
 import { Link, useParams, useLocation } from "wouter";
 import {
   ArrowLeft,
@@ -20,7 +21,7 @@ import {
 } from "lucide-react";
 import { bidDetails, documentReadiness, competitorSignals } from "@core/data";
 import { useToast } from "@/hooks/use-toast";
-import { useBid } from "@/hooks/use-bids";
+import { useBid, useBidScore } from "@/hooks/use-bids";
 import { useLiveData } from "@/lib/data-mode";
 import { useAuth } from "@/lib/auth-context";
 import { BidIntelligencePanel } from "@/components/bid-intelligence-panel";
@@ -48,7 +49,9 @@ export default function BidDetail() {
   const { isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
   const { data: bid, isLoading } = useBid(params.id);
+  const { data: scoreData } = useBidScore(params.id, live);
   const detail = bid ? bidDetails[bid.id] : undefined;
+  const scoreReviewed = scoreData?.score?.humanReviewed ?? (bid as { humanReviewed?: boolean })?.humanReviewed ?? false;
 
   if (isLoading) {
     return (
@@ -177,6 +180,36 @@ export default function BidDetail() {
             </div>
           </div>
         </div>
+
+        {live && (
+          <div
+            className={`rounded-xl border px-4 py-3 flex flex-wrap items-center justify-between gap-3 ${
+              scoreReviewed
+                ? "border-emerald-200 bg-emerald-50"
+                : "border-amber-200 bg-amber-50"
+            }`}
+          >
+            <div className="space-y-1">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                Powered by AI · Reviewed by humans
+              </p>
+              <p className={`text-sm font-medium ${scoreReviewed ? "text-emerald-900" : "text-amber-900"}`}>
+                {scoreReviewed
+                  ? "Human-reviewed — approved for client-facing use."
+                  : "Pending human review — AI output only; not for client-facing use."}
+              </p>
+            </div>
+            {scoreReviewed ? (
+              <Badge className="bg-emerald-100 text-emerald-800 border border-emerald-200 gap-1">
+                <CheckCircle2 className="w-3 h-3" /> Reviewed
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="gap-1 text-amber-800 border-amber-300">
+                <Lock className="w-3 h-3" /> Pending review
+              </Badge>
+            )}
+          </div>
+        )}
 
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
