@@ -56,6 +56,9 @@ app.get("/api/health", (_req, res) => {
     auth: isClerkAuthEnabled() ? "clerk" : "legacy",
     storage: process.env.BIOS_S3_BUCKET ? "s3" : "local",
     auditEngine: Boolean(process.env.AUDIT_ENGINE_API_URL?.trim() || process.env.CCA_AUDIT_API_URL?.trim()),
+    videoConnect: Boolean(
+      process.env.VIDEO_CONNECT_API_URL?.trim() || process.env.CCA_VIDEO_CONNECT_API_URL?.trim(),
+    ),
     roseBrain: isRoseBrainEnabled(),
     database: db,
     note: isProd

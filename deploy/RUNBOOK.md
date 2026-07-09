@@ -87,6 +87,21 @@ AUDIT_ENGINE_API_TOKEN=   # optional Bearer (Clerk session JWT or service token)
 - Scoring engine: `@workspace/cca-core` (`computeBidScore`) — server-only
 - See `docs/CCA_INTEGRATION_MAP.md`
 
+## VideoConnect add-on bridge
+
+Live walkthrough status and capture UI when the external VideoConnect API is configured:
+
+```env
+VIDEO_CONNECT_API_URL=https://your-video-connect-api-host
+VIDEO_CONNECT_API_TOKEN=   # optional Bearer for protected VideoConnect API
+VIDEO_CONNECT_APP_URL=     # optional capture UI URL (defaults to VIDEO_CONNECT_API_URL)
+```
+
+- `GET /api/v1/integrations/video-connect/status` — configured / connected / available states for authed team users
+- `GET /api/v1/integrations/video-connect/walkthroughs` — proxies walkthrough list when connected (expects `/api/health` and `/api/walkthroughs` on the VideoConnect service)
+- `GET /api/health` → `videoConnect: true` when `VIDEO_CONNECT_API_URL` is set
+- Authed users without env see honest empty state on `/video-connect`; anonymous sessions keep demo fixtures
+
 ## Shared CCA auth (Clerk)
 
 Optional — when unset, legacy email/password JWT cookies continue to work.

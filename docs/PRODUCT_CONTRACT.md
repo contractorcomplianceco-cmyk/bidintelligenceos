@@ -13,9 +13,9 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Status | Count | Sections |
 |--------|------:|----------|
-| **partial live** | 18 | Operations (2), Bid lifecycle partials (4), Job execution partials (4), Intelligence (5), Account (2) |
+| **partial live** | 19 | Operations (2), Bid lifecycle partials (4), Job execution partials (4), Intelligence (5), Account (2), Add-ons (1) |
 | **live** | 9 | Bid Intelligence, New bid intake, Package Builder, Won Jobs, Job Deployment, Scheduling, Labor & Subs, Job Closeout, ROSEOS |
-| **demo** | 11 | Add-ons marketplace (6), Orphan routes (5) |
+| **demo** | 10 | Add-ons marketplace (5), Orphan routes (5) |
 | **planned** | 0 | — |
 
 Public marketing surfaces (3) are **live** as static/demo-entry experiences — not counted above.
@@ -78,7 +78,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 |--------|-------|--------|-------|
 | Add-On Marketplace | `/add-ons` | demo | Catalog of connected and coming-soon add-ons; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | VoiceConnect | `/voice-connect` | **demo** | Demo fixtures for anonymous/demo sessions; `OpsModuleEmpty` for authed team users; command bar and command-center feed hidden when signed in |
-| VideoConnect | `/video-connect` | demo | Static marketing showcase; no live API; same static walkthrough cards for all sessions (not gated) |
+| VideoConnect | `/video-connect` | **partial live** | Demo fixtures for anonymous/demo sessions; live status + walkthroughs from `VIDEO_CONNECT_API_URL` when configured and healthy; `OpsModuleEmpty` for authed team users when not configured or unreachable |
 | BuildConnect | `/build-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | ComplianceConnect | `/compliance-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | CompetitorWatchOS | `/competitor-watch` | demo | Seed fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users; coming soon |

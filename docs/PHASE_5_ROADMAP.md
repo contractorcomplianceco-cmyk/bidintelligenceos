@@ -78,7 +78,7 @@ Pending Clerk cutover and multi-user membership work. Drizzle/Postgres shape ali
 
 | Current | Phase 5 target |
 |---------|----------------|
-| Static walkthrough cards for all sessions | Live capture/upload API, visual intelligence pipeline, walkthrough-to-bid draft linked to bid intake and Package Builder |
+| **partial live** — status bridge + walkthrough proxy when `VIDEO_CONNECT_API_URL` set; demo fixtures for anonymous | Full capture/upload pipeline, visual intelligence, walkthrough-to-bid draft linked to bid intake and Package Builder |
 | Add-on marketplace entry only | Ops integration parallel to VoiceConnect pattern (honest empty / live data when signed in) |
 
 **Route:** `/video-connect`
