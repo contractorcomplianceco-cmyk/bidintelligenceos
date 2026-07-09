@@ -2,7 +2,22 @@
 
 Living map of marketing promises → routes → data status. Update when a module goes live.
 
-**Legend:** `live` = persisted API data · `demo` = seed fixtures · `planned` = not built
+**Last verified:** 2026-07-08  
+**Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)  
+**Verified at:** `9ae2d9d`+ (through `ef0f123` authed demo-seed gate pass)
+
+**Legend:** `live` = persisted API data when signed in · `partial live` = mix of live API + demo fixtures or honest empty · `demo` = seed fixtures / marketing showcase only · `planned` = not built
+
+## Status summary (authed team users)
+
+| Status | Count | Sections |
+|--------|------:|----------|
+| **live** | 8 | Bid Intelligence, New bid intake, Package Builder, Won Jobs, Job Deployment, Scheduling, Labor & Subs, Job Closeout |
+| **partial live** | 19 | Operations (3), Bid lifecycle partials (4), Job execution partials (4), Intelligence (6), Account (2) |
+| **demo** | 11 | Add-ons marketplace (6), Orphan routes (5) |
+| **planned** | 0 | — |
+
+Public marketing surfaces (3) are **live** as static/demo-entry experiences — not counted above.
 
 ## Public surfaces (unchanged)
 
@@ -16,9 +31,9 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs + live ROSEOS brief when signed in; ops tiles from `/api/v1/ops/*` when jobs exist; add-on demo cards hidden for authed users |
-| Daily Briefings | `/briefings` | **partial live** | Live brief from pipeline tasks, ROSEOS, and compliance counts when signed in; demo fixtures otherwise |
-| Alerts | `/alerts` | **partial live** | Overdue follow-ups, compliance gaps, ROSEOS insights, and ops alerts (`/api/v1/ops/alerts`) when signed in |
+| Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs + live ROSEOS brief when signed in; ops tiles from `/api/v1/ops/*` when jobs exist; VoiceConnect / MarketWatch add-on cards hidden for authed users; CompetitorWatch coming-soon card remains |
+| Daily Briefings | `/briefings` | **partial live** | Live brief from pipeline tasks, ROSEOS, and compliance counts when signed in; demo fixtures otherwise; briefing archive is demo for anonymous sessions, empty for authed (no archive API) |
+| Alerts | `/alerts` | **partial live** | Overdue follow-ups, compliance gaps, ROSEOS insights, and ops alerts (`/api/v1/ops/alerts`) when signed in; demo fixtures otherwise |
 
 ## Bid lifecycle
 
@@ -26,10 +41,10 @@ Living map of marketing promises → routes → data status. Update when a modul
 |--------|-------|--------|-------|
 | Bid Intelligence | `/bids`, `/bids/:id` | **live** | API CRUD, Go/No-Go score workflow, outcome recording when authenticated |
 | Bid Fit | `/bid-fit` | **partial live** | Live 12-category score when `?bidId=` + signed in; demo otherwise |
-| New bid intake | `/new-bid` | **live** | Draft + document upload + ROSEOS scope analysis |
+| New bid intake | `/new-bid` | **live** | Draft + document upload + ROSEOS scope analysis (requires sign-in to persist) |
 | Package Builder | `/package-builder` | **live** | Section preview from uploaded bid documents + compliance gates via `/api/v1/ops/package-builder`; demo templates for anonymous sessions |
 | Won Jobs | `/won-jobs` | **live** | Jobs from `/api/v1/jobs`; convert won bids via `POST /api/v1/jobs/from-bid/:bidId` |
-| Government Contracting | `/government` | **partial live** | Demo fixtures for anonymous/demo sessions; live pipeline from Public/GC bids + jurisdiction compliance when signed in; `OpsModuleEmpty` when authed with no qualifying bids or jurisdiction data (no seed contracts) |
+| Government Contracting | `/government` | **partial live** | Demo fixtures for anonymous/demo sessions; live pipeline from Public/GC bids + jurisdiction compliance when signed in; `OpsModuleEmpty` when authed with no qualifying bids or jurisdiction data |
 | Bid Library | `/bid-library` | **partial live** | Orphan route (not in nav). Live bids list from `/api/v1/bids` when signed in; demo fixtures otherwise; `OpsModuleEmpty` when authed with no bids |
 | Bid Monitoring | `/monitoring` | **partial live** | Orphan route (not in nav). Active pipeline from `/api/v1/bids` + jobs KPIs + `/api/health` when signed in; demo fixtures otherwise |
 
@@ -38,11 +53,11 @@ Living map of marketing promises → routes → data status. Update when a modul
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
 | Job Deployment | `/deployment` | **live** | Jobs + permits from `/api/v1/jobs` and `/api/v1/ops/permits` when signed in |
-| Scheduling | `/scheduling` | **live** | Schedule events from `/api/v1/ops/scheduling` (job payload milestones) |
-| Labor & Subs | `/labor` | **live** | Crew/subs from job payload via `/api/v1/ops/labor` |
+| Scheduling | `/scheduling` | **live** | Schedule events from `/api/v1/ops/scheduling` (job payload milestones); `OpsModuleEmpty` when authed with no events |
+| Labor & Subs | `/labor` | **live** | Crew/subs from job payload via `/api/v1/ops/labor`; `OpsModuleEmpty` when authed with no crew data |
 | Permits | `/permits` | **partial live** | Job payload permits + jurisdiction/compliance-derived items via `/api/v1/ops/permits` |
 | Weather | `/weather` | **partial live** | Open-Meteo 5-day forecast per active job (geocoded from site city/state); placeholder fallback when geocode fails |
-| Cost & ROI | `/cost-roi` | **partial live** | Job table + portfolio snapshot from `/api/v1/ops/cost-roi`; labor burn time-series demo |
+| Cost & ROI | `/cost-roi` | **partial live** | Job table + portfolio snapshot from `/api/v1/ops/cost-roi`; labor burn time-series remains demo seed even when signed in |
 | Risk & Change Orders | `/risk` | **partial live** | Risks from jobs/bids/scores via `/api/v1/ops/risk`; profit-fade from live cost when available |
 | Job Closeout | `/closeout` | **live** | Won/completed jobs via `/api/v1/ops/closeout`; punch list, closeout docs, and completion chart from job payload when present; honest empty otherwise |
 
@@ -50,11 +65,11 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| ROSEOS | `/roseos` | **partial live** | Live pipeline insights + Rose Brain brief when authenticated |
+| ROSEOS | `/roseos` | **partial live** | Live executive brief + Rose Brain when `/api/v1/intelligence/roseos/summary` returns data; section insight cards and verdict counts still render demo seed for authed users (known gap) |
 | Analytics | `/analytics` | **partial live** | Win/loss KPIs + bid outcome charts from API when signed in; margin/ROI charts from `/api/v1/ops/cost-roi` when jobs exist; post-job learning loop from live outcomes when ≥3 decided bids (hidden when insufficient); honest empty states otherwise |
 | Bid DNA | `/bid-dna` | **partial live** | Derived from closeout jobs, won bids, and score history when signed in; demo fixtures otherwise; `OpsModuleEmpty` when authed with no learning data |
-| Market Watch | `/market-watch` | **partial live** | Demo fixtures for anonymous sessions; read-only Research Hub export-ready preview when bridge configured; honest empty for authed users without bridge data |
-| Scope analyzer | `/scope-analyzer` | **partial live** | Live brief when `?bidId=` + signed in |
+| Market Watch | `/market-watch` | **partial live** | Demo fixtures for anonymous sessions; read-only Research Hub export-ready preview when bridge configured; `OpsModuleEmpty` for authed users without bridge data |
+| Scope analyzer | `/scope-analyzer` | **partial live** | Live brief when `?bidId=` + signed in; demo payload otherwise |
 
 ## Add-ons (demo marketplace)
 
@@ -62,7 +77,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 |--------|-------|--------|-------|
 | Add-On Marketplace | `/add-ons` | demo | Catalog of connected and coming-soon add-ons; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | VoiceConnect | `/voice-connect` | **demo** | Demo fixtures for anonymous/demo sessions; `OpsModuleEmpty` for authed team users; command bar and command-center feed hidden when signed in |
-| VideoConnect | `/video-connect` | demo | Marketing showcase; no live API |
+| VideoConnect | `/video-connect` | demo | Static marketing showcase; no live API; same static walkthrough cards for all sessions (not gated) |
 | BuildConnect | `/build-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | ComplianceConnect | `/compliance-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | CompetitorWatchOS | `/competitor-watch` | demo | Seed fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users; coming soon |
@@ -71,8 +86,8 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Business profile | `/business-profile` | live | |
-| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; empty fields for missing data; enterprise tab shows `OpsModuleEmpty` for authed users (verified) |
+| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses, certifications, leadership, and identity fields empty until org profile is populated |
+| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; empty fields for missing data; enterprise tab shows `OpsModuleEmpty` for authed users |
 
 ## Orphan routes (not in nav)
 
