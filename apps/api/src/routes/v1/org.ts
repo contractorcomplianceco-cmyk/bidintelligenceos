@@ -34,6 +34,8 @@ const orgProfileSchema = z
     phone: z.string().optional(),
     contactEmail: z.string().optional(),
     leadership: z.array(leadershipEntrySchema).optional(),
+    brandName: z.string().optional(),
+    logoUrl: z.union([z.string().url(), z.literal("")]).optional(),
   })
   .passthrough();
 

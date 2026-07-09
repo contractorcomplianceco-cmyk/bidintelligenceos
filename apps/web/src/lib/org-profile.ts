@@ -19,6 +19,19 @@ export function parseStringField(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+/** Returns trimmed URL string when value is a valid http(s) URL; otherwise empty. */
+export function parseUrlField(value: unknown): string {
+  const trimmed = parseStringField(value);
+  if (!trimmed) return "";
+  try {
+    const url = new URL(trimmed);
+    if (url.protocol === "http:" || url.protocol === "https:") return trimmed;
+  } catch {
+    /* invalid URL */
+  }
+  return "";
+}
+
 export function parseServiceAreas(value: unknown): string[] {
   if (typeof value === "string") {
     return value

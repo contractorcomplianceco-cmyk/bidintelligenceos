@@ -23,7 +23,7 @@ import {
   ENTERPRISE_PERMISSIONS,
   ENTERPRISE_ROLES,
 } from "@core/enterprise";
-import { parseCertifications, parseLeadershipEntries, parseLicenseEntries, parseStringField, type LeadershipEntry, type LicenseEntry } from "@/lib/org-profile";
+import { parseCertifications, parseLeadershipEntries, parseLicenseEntries, parseStringField, parseUrlField, type LeadershipEntry, type LicenseEntry } from "@/lib/org-profile";
 
 export default function Settings() {
   const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
@@ -77,6 +77,8 @@ export default function Settings() {
   const [phone, setPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [leadership, setLeadership] = useState<LeadershipEntry[]>([]);
+  const [brandName, setBrandName] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
     if (!live || !org) return;
@@ -85,6 +87,8 @@ export default function Settings() {
     setPhone(parseStringField(org.profile?.phone));
     setContactEmail(parseStringField(org.profile?.contactEmail));
     setLeadership(parseLeadershipEntries(org.profile?.leadership));
+    setBrandName(parseStringField(org.profile?.brandName));
+    setLogoUrl(parseUrlField(org.profile?.logoUrl));
   }, [live, org?.id, org?.profile]);
 
   const [brandColor, setBrandColor] = useState(BRAND_COLORS[0].hex);
@@ -113,6 +117,15 @@ export default function Settings() {
         ...(entry.email?.trim() ? { email: entry.email.trim() } : {}),
       }))
       .filter((entry) => entry.name.length > 0);
+    const trimmedLogoUrl = logoUrl.trim();
+    if (trimmedLogoUrl && !parseUrlField(trimmedLogoUrl)) {
+      toast({
+        title: "Invalid logo URL",
+        description: "Logo URL must be a valid http or https link.",
+        variant: "destructive",
+      });
+      return;
+    }
     updateOrg.mutate({
       profile: {
         ...profile,
@@ -121,11 +134,13 @@ export default function Settings() {
         phone: phone.trim(),
         contactEmail: contactEmail.trim(),
         leadership: nextLeadership,
+        brandName: brandName.trim(),
+        ...(trimmedLogoUrl ? { logoUrl: trimmedLogoUrl } : { logoUrl: "" }),
       },
     });
     toast({
       title: "Enterprise credentials saved",
-      description: "Licenses, certifications, contact, and leadership stored on your organization profile.",
+      description: "Licenses, certifications, contact, leadership, and white-label branding stored on your organization profile.",
     });
   };
 
@@ -492,11 +507,73 @@ export default function Settings() {
                   Enterprise Credentials
                 </h3>
                 <p className="text-slate-500 mt-1">
-                  Licenses, certifications, contacts, and leadership persist on your organization profile.
-                  White-label branding, multi-location rollups, and role-based access remain Phase 5.
+                  Licenses, certifications, contacts, leadership, and optional white-label branding persist on your organization profile.
+                  Multi-location rollups and role-based access remain Phase 5.
                 </p>
               </div>
             </div>
+
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                  <Palette className="h-5 w-5 text-[#0284C7]" />
+                  White Label
+                </CardTitle>
+                <CardDescription className="text-slate-500">
+                  Optional brand name and logo URL shown on your business profile header. URL only — no file upload.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="brandName" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      Brand name
+                    </Label>
+                    <Input
+                      id="brandName"
+                      value={brandName}
+                      onChange={(e) => setBrandName(e.target.value)}
+                      placeholder="Your client-facing brand"
+                      className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="logoUrl" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      Logo URL
+                    </Label>
+                    <Input
+                      id="logoUrl"
+                      type="url"
+                      value={logoUrl}
+                      onChange={(e) => setLogoUrl(e.target.value)}
+                      placeholder="https://cdn.example.com/logo.png"
+                      className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700"
+                    />
+                  </div>
+                </div>
+                {(brandName.trim() || parseUrlField(logoUrl)) && (
+                  <div className="flex items-center gap-4 rounded-xl border border-[#E2E8F0] bg-[#F1F5F9] p-4">
+                    {parseUrlField(logoUrl) ? (
+                      <img
+                        src={parseUrlField(logoUrl)}
+                        alt={brandName.trim() || "Brand logo"}
+                        className="h-14 w-14 rounded-lg border border-[#E2E8F0] bg-white object-contain shrink-0"
+                      />
+                    ) : (
+                      <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-[#E2E8F0] bg-white shrink-0">
+                        <Building2 className="h-7 w-7 text-[#0284C7]" />
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-sm font-semibold text-slate-700">Header preview</p>
+                      <p className="text-xs text-slate-500">
+                        {brandName.trim() || "Brand name not set"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
             <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
               <CardHeader className="border-b border-[#E2E8F0] pb-4">

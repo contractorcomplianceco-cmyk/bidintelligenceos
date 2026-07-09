@@ -20,6 +20,7 @@ import {
   parseLicenseEntries,
   parseServiceAreas,
   parseStringField,
+  parseUrlField,
   initialsFromName,
 } from "@/lib/org-profile";
 import { useWinLossAnalytics } from "@/hooks/use-bids";
@@ -196,19 +197,34 @@ export default function BusinessProfile() {
   const contactEmail = live ? parseStringField(org?.profile?.contactEmail) : "ops@cornerstonebuilders.com";
   const hasContact = Boolean(contactPhone || contactEmail);
 
+  const brandName = live ? parseStringField(org?.profile?.brandName) : "";
+  const logoUrl = live ? parseUrlField(org?.profile?.logoUrl) : "";
+  const headerTitle = brandName || companyName;
+
   return (
     <Layout>
       <div className="space-y-6 max-w-[1500px] mx-auto">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#E2E8F0] bg-white shrink-0">
-              <Building2 className="h-7 w-7 text-[#0284C7]" />
-            </div>
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={brandName || companyName}
+                className="h-14 w-14 rounded-xl border border-[#E2E8F0] bg-white object-contain shrink-0"
+              />
+            ) : (
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#E2E8F0] bg-white shrink-0">
+                <Building2 className="h-7 w-7 text-[#0284C7]" />
+              </div>
+            )}
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
-                {companyName}
+                {headerTitle}
               </h1>
+              {brandName && brandName !== companyName && (
+                <p className="text-sm text-slate-500 mt-0.5">{companyName}</p>
+              )}
               <p className="text-slate-500 mt-1">
                 Company profile powering bid-fit for the{" "}
                 <span className="text-[#0284C7] font-semibold">{verticalConfig.name}</span> workflow.
