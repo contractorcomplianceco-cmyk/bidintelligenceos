@@ -25,6 +25,7 @@ import {
   parseUrlField,
   initialsFromName,
 } from "@/lib/org-profile";
+import { groupLocationsByRegion } from "@/lib/location-rollups";
 import { useWinLossAnalytics } from "@/hooks/use-bids";
 import { useJobs } from "@/hooks/use-jobs";
 import { DemoDataBadge } from "@/components/demo-data-badge";
@@ -161,6 +162,7 @@ export default function BusinessProfile() {
   ];
   const serviceAreas = live ? parseServiceAreas(org?.profile?.serviceAreas) : demoServiceAreas;
   const locations = live ? parseLocationEntries(org?.profile?.locations) : [];
+  const locationGroups = groupLocationsByRegion(locations);
 
   const differentiators = live
     ? []
@@ -556,21 +558,37 @@ export default function BusinessProfile() {
                     No locations on file. Add offices or branches in Settings → Enterprise & White Label.
                   </p>
                 ) : (
-                  <div className="space-y-2">
-                    {locations.map((loc) => (
-                      <div
-                        key={loc.id ?? loc.name}
-                        className="flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3"
-                      >
-                        <MapPin className="w-4 h-4 text-[#0284C7] shrink-0 mt-0.5" />
-                        <div className="min-w-0">
-                          <p className="text-sm font-semibold text-slate-900">{loc.name}</p>
-                          {loc.region ? (
-                            <p className="text-xs text-slate-500">{loc.region}</p>
-                          ) : null}
-                          {loc.address ? (
-                            <p className="text-xs text-slate-500 mt-0.5">{loc.address}</p>
-                          ) : null}
+                  <div className="space-y-4">
+                    {locationGroups.map((group) => (
+                      <div key={group.region}>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">
+                          {group.region} ({group.locations.length})
+                        </p>
+                        <div className="space-y-2">
+                          {group.locations.map((loc) => (
+                            <div
+                              key={loc.id ?? loc.name}
+                              className="flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3"
+                            >
+                              <MapPin className="w-4 h-4 text-[#0284C7] shrink-0 mt-0.5" />
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-slate-900">
+                                  {loc.name}
+                                  {loc.isPrimary ? (
+                                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-emerald-700">
+                                      Primary
+                                    </span>
+                                  ) : null}
+                                </p>
+                                {loc.region && loc.region !== group.region ? (
+                                  <p className="text-xs text-slate-500">{loc.region}</p>
+                                ) : null}
+                                {loc.address ? (
+                                  <p className="text-xs text-slate-500 mt-0.5">{loc.address}</p>
+                                ) : null}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ))}

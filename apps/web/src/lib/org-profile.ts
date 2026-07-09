@@ -12,6 +12,8 @@ export type LocationEntry = {
   id?: string;
   name: string;
   region?: string;
+  parentRegion?: string;
+  isPrimary?: boolean;
   address?: string;
 };
 
@@ -33,6 +35,13 @@ export const DEFAULT_BRAND_COLOR = "#0284C7";
 export function parseBrandColor(value: unknown, fallback = DEFAULT_BRAND_COLOR): string {
   const trimmed = parseStringField(value);
   return /^#[0-9A-Fa-f]{6}$/.test(trimmed) ? trimmed : fallback;
+}
+
+/** Returns trimmed hostname when valid; otherwise empty. */
+export function parseHostnameField(value: unknown): string {
+  const trimmed = parseStringField(value);
+  if (!trimmed) return "";
+  return /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i.test(trimmed) ? trimmed : "";
 }
 
 export function parseUrlField(value: unknown): string {
@@ -101,6 +110,8 @@ export function parseLocationEntries(value: unknown): LocationEntry[] {
       id: typeof entry.id === "string" ? entry.id : `loc-${index}`,
       name: typeof entry.name === "string" ? entry.name : "",
       region: typeof entry.region === "string" ? entry.region : undefined,
+      parentRegion: typeof entry.parentRegion === "string" ? entry.parentRegion : undefined,
+      isPrimary: typeof entry.isPrimary === "boolean" ? entry.isPrimary : undefined,
       address: typeof entry.address === "string" ? entry.address : undefined,
     }))
     .filter((entry) => entry.name.trim().length > 0);

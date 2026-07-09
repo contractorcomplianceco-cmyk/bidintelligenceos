@@ -10,6 +10,9 @@ import { useLiveData } from "@/lib/data-mode";
 import { useBids, useWinLossAnalytics } from "@/hooks/use-bids";
 import { useJobs } from "@/hooks/use-jobs";
 import { useOpsCostRoi } from "@/hooks/use-ops";
+import { useOrgProfile } from "@/hooks/use-org";
+import { parseLocationEntries } from "@/lib/org-profile";
+import { groupLocationsByRegion } from "@/lib/location-rollups";
 import { DemoDataBadge } from "@/components/demo-data-badge";
 import { AnalyticsChartEmpty } from "@/components/analytics-chart-empty";
 import {
@@ -35,6 +38,7 @@ import {
   Percent,
   Trophy,
   Download,
+  Building2,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -73,8 +77,11 @@ export default function Analytics() {
   const { data: winLoss } = useWinLossAnalytics();
   const { data: liveJobsRaw } = useJobs();
   const { data: costData } = useOpsCostRoi();
+  const { data: org } = useOrgProfile();
   const liveJobs = live ? (liveJobsRaw ?? []) : jobDeployments;
   const [range, setRange] = useState<"6M" | "12M">("12M");
+  const locations = live ? parseLocationEntries(org?.profile?.locations) : [];
+  const locationGroups = groupLocationsByRegion(locations);
 
   const liveWinRateSeries = useMemo(
     () => (live ? buildLiveWinRateSeries(allBids) : []),
@@ -358,6 +365,38 @@ export default function Analytics() {
             </div>
           ))}
         </div>
+
+        {live && locations.length > 0 && (
+          <Card className="bg-white border-[#E2E8F0]">
+            <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+              <Building2 className="w-4 h-4 text-[#0284C7]" />
+              <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
+                FRANCHISE LOCATIONS ({locations.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-5">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {locationGroups.map((group) => (
+                  <div key={group.region} className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4">
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{group.region}</p>
+                    <p className="text-2xl font-bold text-slate-900 mt-1">{group.locations.length}</p>
+                    <ul className="mt-2 space-y-1 text-xs text-slate-600">
+                      {group.locations.slice(0, 4).map((loc) => (
+                        <li key={loc.id ?? loc.name}>
+                          {loc.name}
+                          {loc.isPrimary ? " · Primary" : ""}
+                        </li>
+                      ))}
+                      {group.locations.length > 4 ? (
+                        <li className="text-slate-400">+{group.locations.length - 4} more</li>
+                      ) : null}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Win Rate + Margin Trend */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
