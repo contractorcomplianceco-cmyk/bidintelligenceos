@@ -80,8 +80,8 @@ Smoke users: `carmen@ccacontact.com`, `rose@ccacontact.com` (`node scripts/seed-
 
 ```
 archive/main-promo-video-pre-bidos-2026-07  → 58352bc  (promo video era — preserved)
-main                                        → afe436e+  (BidOS production line)
-feat/bidos-production-2026-07               → afe436e+  (aligned with main)
+main                                        → 7d4e6af  (BidOS production line)  tag: team-review-2026-07-08
+feat/bidos-production-2026-07               → 7d4e6af  (aligned with main)      tag: team-review-2026-07-08
 ```
 
 ## Merge / PR record
