@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { useOrgProfile, useUpdateOrgProfile } from "@/hooks/use-org";
+import { parseCertifications, parseLicenseEntries } from "@/lib/org-profile";
 import { useWinLossAnalytics } from "@/hooks/use-bids";
 import { useJobs } from "@/hooks/use-jobs";
 import { DemoDataBadge } from "@/components/demo-data-badge";
@@ -118,18 +119,14 @@ export default function BusinessProfile() {
     "facility",
   ];
 
-  const licenses = live
-    ? []
-    : [
+  const demoLicenses = [
     { name: "TX General Contractor License", id: "GC-#TX-448120", status: "Active", expires: "Mar 2026" },
     { name: "TX Mechanical Contractor (HVAC)", id: "TACLB-#98341", status: "Active", expires: "Aug 2026" },
     { name: "TX Master Electrician", id: "ME-#221765", status: "Active", expires: "Nov 2025" },
     { name: "Roofing Contractor Registration", id: "RCAT-#7742", status: "Active", expires: "Jan 2026" },
   ];
 
-  const certifications = live
-    ? []
-    : [
+  const demoCertifications = [
     "OSHA 30 (all supervisors)",
     "EPA 608 Universal",
     "IICRC Water & Fire Restoration",
@@ -137,6 +134,9 @@ export default function BusinessProfile() {
     "Manufacturer Certified (Carrier, GAF)",
     "DBIA Design-Build",
   ];
+
+  const licenses = live ? parseLicenseEntries(org?.profile?.licenses) : demoLicenses;
+  const certifications = live ? parseCertifications(org?.profile?.certifications) : demoCertifications;
 
   const serviceAreas = live
     ? []
@@ -409,24 +409,32 @@ export default function BusinessProfile() {
               <CardContent className="p-5 space-y-3">
                 {licenses.length === 0 ? (
                   <p className="text-sm text-slate-500">
-                    {live ? "No licenses on file. Edit profile to add licensing details." : "No licenses."}
+                    {live
+                      ? "No licenses on file. Add them in Settings → Enterprise & White Label."
+                      : "No licenses."}
                   </p>
                 ) : (
-                licenses.map((l) => (
+                licenses.map((l, index) => (
                   <div
-                    key={l.id}
+                    key={l.id ?? `${l.name}-${index}`}
                     className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3"
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-xs font-semibold text-slate-900">{l.name}</span>
-                      <span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-[#22C55E]/10 text-[#22C55E]">
-                        {l.status}
-                      </span>
+                      {l.status ? (
+                        <span className="text-[9px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-[#22C55E]/10 text-[#22C55E]">
+                          {l.status}
+                        </span>
+                      ) : null}
                     </div>
-                    <div className="flex items-center justify-between mt-1.5">
-                      <span className="text-[10px] text-slate-500">{l.id}</span>
-                      <span className="text-[10px] text-slate-500">Exp {l.expires}</span>
-                    </div>
+                    {(l.id || l.expires) && (
+                      <div className="flex items-center justify-between mt-1.5">
+                        <span className="text-[10px] text-slate-500">{l.id ?? ""}</span>
+                        {l.expires ? (
+                          <span className="text-[10px] text-slate-500">Exp {l.expires}</span>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
                 ))
                 )}
@@ -442,17 +450,25 @@ export default function BusinessProfile() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-5">
-                <div className="flex flex-wrap gap-2">
-                  {certifications.map((c) => (
-                    <span
-                      key={c}
-                      className="px-2.5 py-1 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] text-[11px] font-medium text-slate-500 flex items-center gap-1.5"
-                    >
-                      <BadgeCheck className="w-3 h-3 text-[#22C55E]" />
-                      {c}
-                    </span>
-                  ))}
-                </div>
+                {certifications.length === 0 ? (
+                  <p className="text-sm text-slate-500">
+                    {live
+                      ? "No certifications on file. Add them in Settings → Enterprise & White Label."
+                      : "No certifications."}
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {certifications.map((c) => (
+                      <span
+                        key={c}
+                        className="px-2.5 py-1 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] text-[11px] font-medium text-slate-500 flex items-center gap-1.5"
+                      >
+                        <BadgeCheck className="w-3 h-3 text-[#22C55E]" />
+                        {c}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
