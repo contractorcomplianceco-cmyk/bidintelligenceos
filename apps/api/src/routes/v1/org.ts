@@ -18,11 +18,22 @@ const licenseEntrySchema = z.object({
   expires: z.string().optional(),
 });
 
+const leadershipEntrySchema = z.object({
+  name: z.string(),
+  role: z.string().optional(),
+  tenure: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().optional(),
+});
+
 /** Optional enterprise fields live in organizations.profile_json alongside company prefs. */
 const orgProfileSchema = z
   .object({
     licenses: z.array(licenseEntrySchema).optional(),
     certifications: z.array(z.string()).optional(),
+    phone: z.string().optional(),
+    contactEmail: z.string().optional(),
+    leadership: z.array(leadershipEntrySchema).optional(),
   })
   .passthrough();
 

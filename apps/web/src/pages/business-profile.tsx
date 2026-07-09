@@ -14,7 +14,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { useOrgProfile, useUpdateOrgProfile } from "@/hooks/use-org";
-import { parseCertifications, parseLicenseEntries } from "@/lib/org-profile";
+import {
+  parseCertifications,
+  parseLeadershipEntries,
+  parseLicenseEntries,
+  parseServiceAreas,
+  parseStringField,
+  initialsFromName,
+} from "@/lib/org-profile";
 import { useWinLossAnalytics } from "@/hooks/use-bids";
 import { useJobs } from "@/hooks/use-jobs";
 import { DemoDataBadge } from "@/components/demo-data-badge";
@@ -37,6 +44,8 @@ import {
   Info,
   DollarSign,
   Briefcase,
+  Phone,
+  Mail,
 } from "lucide-react";
 
 interface FieldProps {
@@ -138,9 +147,7 @@ export default function BusinessProfile() {
   const licenses = live ? parseLicenseEntries(org?.profile?.licenses) : demoLicenses;
   const certifications = live ? parseCertifications(org?.profile?.certifications) : demoCertifications;
 
-  const serviceAreas = live
-    ? []
-    : [
+  const demoServiceAreas = [
     "Austin Metro",
     "Round Rock",
     "Cedar Park",
@@ -149,6 +156,7 @@ export default function BusinessProfile() {
     "Houston / Galveston",
     "Waco Corridor",
   ];
+  const serviceAreas = live ? parseServiceAreas(org?.profile?.serviceAreas) : demoServiceAreas;
 
   const differentiators = live
     ? []
@@ -176,13 +184,17 @@ export default function BusinessProfile() {
   ];
 
   const leadership = live
-    ? []
+    ? parseLeadershipEntries(org?.profile?.leadership)
     : [
     { name: "Dana Whitfield", role: "President / Principal", tenure: "18 yrs", initials: "DW" },
     { name: "Marcus Ruiz", role: "VP Field Operations", tenure: "12 yrs", initials: "MR" },
     { name: "Priya Nair", role: "Director of Projects", tenure: "9 yrs", initials: "PN" },
     { name: "Devon Clarke", role: "Restoration Division Lead", tenure: "7 yrs", initials: "DC" },
   ];
+
+  const contactPhone = live ? parseStringField(org?.profile?.phone) : "(512) 555-0199";
+  const contactEmail = live ? parseStringField(org?.profile?.contactEmail) : "ops@cornerstonebuilders.com";
+  const hasContact = Boolean(contactPhone || contactEmail);
 
   return (
     <Layout>
@@ -481,17 +493,65 @@ export default function BusinessProfile() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-5">
-                <div className="flex flex-wrap gap-2">
-                  {serviceAreas.map((a) => (
-                    <span
-                      key={a}
-                      className="px-2.5 py-1 rounded-lg bg-[#38BDF8]/10 text-[11px] font-medium text-[#0284C7] flex items-center gap-1.5"
-                    >
-                      <MapPin className="w-3 h-3" />
-                      {a}
-                    </span>
-                  ))}
-                </div>
+                {serviceAreas.length === 0 ? (
+                  <p className="text-sm text-slate-500">
+                    {live
+                      ? "No service areas on file. Add them in Settings → Company Profile."
+                      : "No service areas."}
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {serviceAreas.map((a) => (
+                      <span
+                        key={a}
+                        className="px-2.5 py-1 rounded-lg bg-[#38BDF8]/10 text-[11px] font-medium text-[#0284C7] flex items-center gap-1.5"
+                      >
+                        <MapPin className="w-3 h-3" />
+                        {a}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Primary contact */}
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <Phone className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
+                  PRIMARY CONTACT
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-5 space-y-3">
+                {!hasContact ? (
+                  <p className="text-sm text-slate-500">
+                    {live
+                      ? "No contact details on file. Add phone or email in Settings → Enterprise & White Label."
+                      : "No contact details."}
+                  </p>
+                ) : (
+                  <>
+                    {contactPhone ? (
+                      <div className="flex items-center gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3">
+                        <Phone className="w-4 h-4 text-[#0284C7] shrink-0" />
+                        <div>
+                          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Phone</div>
+                          <div className="text-xs font-semibold text-slate-900 mt-0.5">{contactPhone}</div>
+                        </div>
+                      </div>
+                    ) : null}
+                    {contactEmail ? (
+                      <div className="flex items-center gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3">
+                        <Mail className="w-4 h-4 text-[#0284C7] shrink-0" />
+                        <div>
+                          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Email</div>
+                          <div className="text-xs font-semibold text-slate-900 mt-0.5">{contactEmail}</div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -506,19 +566,21 @@ export default function BusinessProfile() {
               <CardContent className="p-5 space-y-3">
                 {leadership.length === 0 ? (
                   <p className="text-sm text-slate-500">
-                    {live ? "Add leadership contacts when editing your organization profile." : "No leadership listed."}
+                    {live ? "No leadership on file. Add contacts in Settings → Enterprise & White Label." : "No leadership listed."}
                   </p>
                 ) : (
                 leadership.map((p) => (
                   <div key={p.name} className="flex items-center gap-3">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0BA3A8]/15 text-[#0BA3A8] text-xs font-bold shrink-0">
-                      {p.initials}
+                      {"initials" in p && p.initials ? p.initials : initialsFromName(p.name)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-semibold text-slate-900 truncate">{p.name}</div>
-                      <div className="text-[10px] text-slate-500">{p.role}</div>
+                      <div className="text-[10px] text-slate-500">{p.role ?? "—"}</div>
                     </div>
-                    <span className="text-[10px] text-slate-500 shrink-0">{p.tenure}</span>
+                    {p.tenure ? (
+                      <span className="text-[10px] text-slate-500 shrink-0">{p.tenure}</span>
+                    ) : null}
                   </div>
                 ))
                 )}

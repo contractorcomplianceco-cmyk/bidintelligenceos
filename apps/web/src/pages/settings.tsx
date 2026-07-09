@@ -23,7 +23,7 @@ import {
   ENTERPRISE_PERMISSIONS,
   ENTERPRISE_ROLES,
 } from "@core/enterprise";
-import { parseCertifications, parseLicenseEntries, type LicenseEntry } from "@/lib/org-profile";
+import { parseCertifications, parseLeadershipEntries, parseLicenseEntries, parseStringField, type LeadershipEntry, type LicenseEntry } from "@/lib/org-profile";
 
 export default function Settings() {
   const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
@@ -74,11 +74,17 @@ export default function Settings() {
 
   const [licenses, setLicenses] = useState<LicenseEntry[]>([]);
   const [certifications, setCertifications] = useState<string[]>([]);
+  const [phone, setPhone] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [leadership, setLeadership] = useState<LeadershipEntry[]>([]);
 
   useEffect(() => {
     if (!live || !org) return;
     setLicenses(parseLicenseEntries(org.profile?.licenses));
     setCertifications(parseCertifications(org.profile?.certifications));
+    setPhone(parseStringField(org.profile?.phone));
+    setContactEmail(parseStringField(org.profile?.contactEmail));
+    setLeadership(parseLeadershipEntries(org.profile?.leadership));
   }, [live, org?.id, org?.profile]);
 
   const [brandColor, setBrandColor] = useState(BRAND_COLORS[0].hex);
@@ -98,16 +104,28 @@ export default function Settings() {
       }))
       .filter((entry) => entry.name.length > 0);
     const nextCertifications = certifications.map((entry) => entry.trim()).filter(Boolean);
+    const nextLeadership = leadership
+      .map((entry) => ({
+        name: entry.name.trim(),
+        ...(entry.role?.trim() ? { role: entry.role.trim() } : {}),
+        ...(entry.tenure?.trim() ? { tenure: entry.tenure.trim() } : {}),
+        ...(entry.phone?.trim() ? { phone: entry.phone.trim() } : {}),
+        ...(entry.email?.trim() ? { email: entry.email.trim() } : {}),
+      }))
+      .filter((entry) => entry.name.length > 0);
     updateOrg.mutate({
       profile: {
         ...profile,
         licenses: nextLicenses,
         certifications: nextCertifications,
+        phone: phone.trim(),
+        contactEmail: contactEmail.trim(),
+        leadership: nextLeadership,
       },
     });
     toast({
       title: "Enterprise credentials saved",
-      description: "Licenses and certifications stored on your organization profile.",
+      description: "Licenses, certifications, contact, and leadership stored on your organization profile.",
     });
   };
 
@@ -474,8 +492,8 @@ export default function Settings() {
                   Enterprise Credentials
                 </h3>
                 <p className="text-slate-500 mt-1">
-                  Licenses and certifications persist on your organization profile. White-label branding,
-                  multi-location rollups, and role-based access remain Phase 5.
+                  Licenses, certifications, contacts, and leadership persist on your organization profile.
+                  White-label branding, multi-location rollups, and role-based access remain Phase 5.
                 </p>
               </div>
             </div>
@@ -565,6 +583,117 @@ export default function Settings() {
                   onClick={() => setLicenses((rows) => [...rows, { name: "", status: "Active" }])}
                 >
                   Add license
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                  <User className="h-5 w-5 text-[#0284C7]" />
+                  Primary Contact
+                </CardTitle>
+                <CardDescription className="text-slate-500">
+                  Main phone and email shown on your business profile.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone</Label>
+                    <Input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="(512) 555-0199"
+                      className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</Label>
+                    <Input
+                      value={contactEmail}
+                      onChange={(e) => setContactEmail(e.target.value)}
+                      placeholder="ops@yourcompany.com"
+                      className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                  <Users className="h-5 w-5 text-[#0284C7]" />
+                  Leadership
+                </CardTitle>
+                <CardDescription className="text-slate-500">
+                  Key contacts displayed on your business profile.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                {leadership.length === 0 ? (
+                  <p className="text-sm text-slate-500">No leadership contacts on file. Add your first contact below.</p>
+                ) : (
+                  leadership.map((entry, index) => (
+                    <div key={index} className="grid gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</Label>
+                        <Input
+                          value={entry.name}
+                          onChange={(e) =>
+                            setLeadership((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, name: e.target.value } : row)),
+                            )
+                          }
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Role</Label>
+                        <Input
+                          value={entry.role ?? ""}
+                          onChange={(e) =>
+                            setLeadership((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, role: e.target.value } : row)),
+                            )
+                          }
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tenure</Label>
+                        <Input
+                          value={entry.tenure ?? ""}
+                          onChange={(e) =>
+                            setLeadership((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, tenure: e.target.value } : row)),
+                            )
+                          }
+                          placeholder="12 yrs"
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Remove</Label>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full border-[#CBD5E1] bg-white text-slate-700"
+                          onClick={() => setLeadership((rows) => rows.filter((_, i) => i !== index))}
+                        >
+                          Remove contact
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <Button
+                  variant="outline"
+                  className="border-[#CBD5E1] bg-white text-slate-700"
+                  onClick={() => setLeadership((rows) => [...rows, { name: "" }])}
+                >
+                  Add leadership contact
                 </Button>
               </CardContent>
             </Card>
