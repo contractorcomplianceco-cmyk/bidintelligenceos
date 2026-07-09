@@ -25,7 +25,7 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
    git push origin origin/feat/bidos-production-2026-07:main --force-with-lease
    ```
    - Production baseline from feature branch: **`6ff2c75`** — `feat: enrich closeout stats and package scope from bid summary`
-   - Current `main` tip: **`cf630a2`** — `feat: live labor-burn chart on cost-roi`
+   - Current `main` tip: **`7162e4a`** — `feat: display org profile licenses on business-profile`
    - No PR was opened (histories were unrelated); this doc serves as the merge record.
 
 3. **Clerk cutover** remains **pending** — see `deploy/RUNBOOK.md` § Clerk cutover checklist. Production still uses legacy smoke-test auth until redirect URLs and deploy are completed.
@@ -46,7 +46,7 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
 > **What we did:**
 > - **Preserved** the old promo-video `main` on archive branch **`archive/main-promo-video-pre-bidos-2026-07`** (tip `58352bc`) — nothing was deleted:  
 >   https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/tree/archive/main-promo-video-pre-bidos-2026-07
-> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`cf630a2`**). **`main` is now the production branch.**
+> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`7162e4a`**). **`main` is now the production branch.**
 > - **Production app** remains at **https://bidintelligence.cagteam.net** (unchanged by this git operation).
 >
 > **Still pending (unchanged):** Clerk shared-auth cutover per `deploy/RUNBOOK.md` — do not enable `AUTH_ENABLED=true` until Clerk redirect URLs for `bidintelligence.cagteam.net` are configured and we run `./deploy/deploy.sh`. Preflight: `node scripts/clerk-cutover-preflight.mjs --check-only`.
@@ -64,12 +64,13 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
 | # | Action | Command / link |
 |---|--------|----------------|
 | 1 | Automated smoke (legacy auth) | `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` — health, login, bids/jobs/ops/command-center; prints `SMOKE PASS` or `SMOKE FAIL` (no secrets logged) |
-| 2 | Health check | `GET https://bidintelligence.cagteam.net/api/health` → `200` |
-| 3 | Human review approve UX | Open any bid → **Bid Intelligence** panel shows **Pending human review** until approved; use **Approve for use** on bid detail to clear lock (API: `PATCH /api/v1/bids/:id` `humanReviewApproved: true`) |
-| 4 | PM2 fork fix (restart loop) | Confirm `pm2 describe bid-intelligence-os` shows **fork_mode** + `tsx` (not `cluster` + `npm`). If restarts spike, redeploy: `./deploy/deploy.sh` — see `deploy/RUNBOOK.md` § Troubleshooting (PM2 restarts) |
-| 5 | What is live vs demo | `docs/PRODUCT_CONTRACT.md` |
-| 6 | Click-by-click setup | `docs/CARMEN_SETUP.md` |
-| 7 | Clerk cutover (not enabled) | `node scripts/clerk-cutover-preflight.mjs --check-only` then `deploy/RUNBOOK.md` § Clerk cutover |
+| 2 | **Run smoke after deploy** | After `./deploy/deploy.sh`, run `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` → expect `SMOKE PASS` before sign-off |
+| 3 | Health check | `GET https://bidintelligence.cagteam.net/api/health` → `200` |
+| 4 | Human review approve UX | Open any bid → **Bid Intelligence** panel shows **Pending human review** until approved; use **Approve for use** on bid detail to clear lock (API: `PATCH /api/v1/bids/:id` `humanReviewApproved: true`) |
+| 5 | PM2 fork fix (restart loop) | Confirm `pm2 describe bid-intelligence-os` shows **fork_mode** + `tsx` (not `cluster` + `npm`). If restarts spike, redeploy: `./deploy/deploy.sh` — see `deploy/RUNBOOK.md` § Troubleshooting (PM2 restarts) |
+| 6 | What is live vs demo | `docs/PRODUCT_CONTRACT.md` |
+| 7 | Click-by-click setup | `docs/CARMEN_SETUP.md` |
+| 8 | Clerk cutover (not enabled) | `node scripts/clerk-cutover-preflight.mjs --check-only` then `deploy/RUNBOOK.md` § Clerk cutover |
 
 Smoke users: `carmen@ccacontact.com`, `rose@ccacontact.com` (`node scripts/seed-smoke-users.mjs`).
 
@@ -77,8 +78,8 @@ Smoke users: `carmen@ccacontact.com`, `rose@ccacontact.com` (`node scripts/seed-
 
 ```
 archive/main-promo-video-pre-bidos-2026-07  → 58352bc  (promo video era — preserved)
-main                                        → cf630a2  (BidOS production line)
-feat/bidos-production-2026-07               → cf630a2  (aligned with main)
+main                                        → 7162e4a  (BidOS production line)
+feat/bidos-production-2026-07               → 7162e4a  (aligned with main)
 ```
 
 ## Merge / PR record
