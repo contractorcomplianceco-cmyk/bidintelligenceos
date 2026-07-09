@@ -1,6 +1,6 @@
 # BidIntelligenceOS — Plan completion summary (July 2026)
 
-Executive summary for **Carmen** and **Rose**. Production baseline: `main` / `feat/bidos-production-2026-07` at **`badb5c1`** (team-review tag at `7d4e6af`).
+Executive summary for **Carmen** and **Rose**. Production baseline: `main` at **`7566d3c`**.
 
 ---
 
@@ -17,7 +17,7 @@ Live on the team URL for authenticated users (see [`PRODUCT_CONTRACT.md`](./PROD
 | Intelligence | ROSEOS executive brief + insight cards |
 | Public | Marketing landing, Rose Demo modal, `/demo` hub |
 
-**9 modules live** · **18 partial live** (ops tiles, analytics, government pipeline, etc.) · **11 demo** (add-ons marketplace) · **0 planned** in contract table.
+**9 modules live** · **19 partial live** · **10 demo** (add-ons marketplace) · **0 planned** in contract table.
 
 GitHub `main` is aligned with the production line (old promo-video `main` preserved on `archive/main-promo-video-pre-bidos-2026-07`). Record: [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md).
 
@@ -27,21 +27,24 @@ Authed team routes backed by persisted API data:
 
 - `GET /api/v1/ops/scheduling`, `/permits`, `/labor`, `/weather`, `/closeout`, `/cost-roi`, `/risk`, `/package-builder`, `/alerts`
 - `POST /api/v1/jobs/from-bid/:bidId` — won bid → job deployment
-- Org profile partial enterprise fields (`licenses`, `certifications`, `phone`, `contactEmail`, `leadership`) via `GET/PATCH /api/v1/org/profile`
-- Human-review export gate — client PDF/DOCX blocked until bid score is approved (`clientExportBlocked` / **Approve for use** UX)
+- Org profile enterprise fields via `GET/PATCH /api/v1/org/profile`
 - Post-deploy smoke hook in `./deploy/deploy.sh` when `BIOS_SMOKE_PASSWORD` is set
 - CI gates on feat branches + `npm run smoke:dry-run`
 
-### Partial Phase 5 stubs (in repo, not full Phase 5)
+### Phase 5 — shipped slices (2026-07)
 
-| Stub | Commit / note |
-|------|----------------|
-| PDF export gate (toast-only; no file generation yet) | `7dcfc57` |
-| RBAC — `org_invites` schema documented; `GET /api/v1/org/members` returns session user only | `ce1ab86` |
-| VoiceConnect Phase 5 status stub | `afe436e` |
-| Clerk cutover preflight script | `scripts/clerk-cutover-preflight.mjs` |
+| Slice | Status | Notes |
+|-------|--------|-------|
+| Clerk cutover | **live** | `AUTH_ENABLED=true` on team URL |
+| PDF/DOCX export | **live** | Server-side after human review |
+| RBAC & invites | **partial live** | Create/list/revoke invites; member join |
+| White label | **partial live** | `brandName`, `productName`, `logoUrl`, `brandColor` in sidebar |
+| VoiceConnect | **partial live** | Status + captures via `VOICE_CONNECT_API_URL` |
+| VideoConnect | **partial live** | Status + walkthrough list via `VIDEO_CONNECT_API_URL` |
+| Briefing archive | **live** | Authed archive API |
+| Multi-location | **in progress** | `locations[]` in org profile (Phase 5 continuation) |
 
-Full Phase 5 scope (Clerk, full PDF pipeline, enterprise RBAC, VideoConnect live, Audit PR merge): [`PHASE_5_ROADMAP.md`](./PHASE_5_ROADMAP.md).
+Remaining Phase 5: [`PHASE_5_ROADMAP.md`](./PHASE_5_ROADMAP.md).
 
 ---
 
@@ -51,22 +54,22 @@ Full Phase 5 scope (Clerk, full PDF pipeline, enterprise RBAC, VideoConnect live
 |------|-------|
 | **Team URL** | [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net) |
 | **Health** | `GET https://bidintelligence.cagteam.net/api/health` → `200` |
+| **Auth** | Clerk (`AUTH_ENABLED=true`) |
 | **Smoke command** | `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` |
 | **Expected output** | `SMOKE PASS` or `SMOKE FAIL` (password never logged) |
-| **Smoke users** | `carmen@ccacontact.com`, `rose@ccacontact.com` — seed: `node scripts/seed-smoke-users.mjs` |
 | **Post-deploy** | With `BIOS_SMOKE_PASSWORD` in server `.env`, `./deploy/deploy.sh` runs smoke after health curl and **fails deploy** on `SMOKE FAIL` |
 
 Module-by-module checklist: [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md). Click-by-click setup: [`CARMEN_SETUP.md`](./CARMEN_SETUP.md).
 
 ---
 
-## Human steps — Clerk & Audit
+## Human steps — Audit
 
 ### Clerk shared-auth cutover — **complete**
 
 Production on the team URL uses **Clerk** (`AUTH_ENABLED=true`). Sign in/up at `/login`; legacy email/password login is disabled when Clerk is enabled.
 
-Key rotation or new env: [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Clerk cutover checklist — `bidintelligence.cagteam.net`**; preflight: `node scripts/clerk-cutover-preflight.mjs --check-only`.
+Key rotation or new env: [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Clerk cutover checklist — `bidintelligence.cagteam.net`**.
 
 ### Audit-Risk-Model PR #2 — **OPEN, awaiting Rose sign-off**
 
@@ -83,9 +86,9 @@ Details: [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md) § A
 | # | Action |
 |---|--------|
 | 1 | Run smoke: `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` |
-| 2 | Export gate: on `/package-builder`, confirm PDF/DOCX blocked until **Approve for use** on bid score |
-| 3 | Clerk `/login` — Sign in/up on team URL (cutover complete) |
-| 4 | PM2: `pm2 describe bid-intelligence-os` — expect **fork_mode** + `tsx` (see runbook if restart loop) |
+| 2 | Export: on `/package-builder`, confirm PDF/DOCX available after **Approve for use** on bid score |
+| 3 | Clerk `/login` — Sign in/up on team URL |
+| 4 | PM2: `pm2 describe bid-intelligence-os` — expect **fork_mode** + `tsx` |
 
 Expanded table: [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md) § **Carmen — condensed action checklist**.
 
@@ -109,10 +112,8 @@ Expanded table: [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.m
 
 Summary pointer for Slack/email:
 
-> GitHub unrelated histories resolved — old promo `main` on `archive/main-promo-video-pre-bidos-2026-07`; production line is now `main` (Tier 1 + Phase 4 live at https://bidintelligence.cagteam.net; auth: Clerk). Pending: Audit-Risk-Model [PR #2](https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model/pull/2) awaiting your sign-off. Plan completion summary: `docs/PLAN_COMPLETION_2026-07.md`.
+> GitHub unrelated histories resolved — production line is `main` (Tier 1 + Phase 4 + Phase 5 slices live at https://bidintelligence.cagteam.net; auth: Clerk). Pending: Audit-Risk-Model [PR #2](https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model/pull/2) awaiting your sign-off. Plan completion: `docs/PLAN_COMPLETION_2026-07.md`.
 
 ---
 
-*Last updated: 2026-07-08 · Baseline `afe436e`+ · Doc commit on production branch line.*
-
-*Last verified: 2026-07-09 @ `badb5c1` — health `200` OK (postgres/rls); local typecheck + check:security + smoke:dry-run PASS; GitHub CI FAIL (Audit-Risk-Model sibling checkout, run [29017830988](https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/actions/runs/29017830988)).*
+*Last updated: 2026-07-09 · Baseline `7566d3c`+.*

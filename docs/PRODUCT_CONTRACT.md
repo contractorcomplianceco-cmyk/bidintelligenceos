@@ -5,7 +5,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 **Last verified:** 2026-07-09  
 **Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)  
 **Auth:** Clerk (`AUTH_ENABLED=true` on team URL)  
-**Verified at:** `afe436e`+ (VoiceConnect Phase 5 status stub; PDF export gate at `7dcfc57`; post-deploy smoke + dry-run; Phase 5 roadmap in `docs/PHASE_5_ROADMAP.md`)
+**Verified at:** `7566d3c`+ (Clerk live; PDF/DOCX export; RBAC invites; VoiceConnect + VideoConnect bridges; white-label sidebar; Phase 5 roadmap in `docs/PHASE_5_ROADMAP.md`)
 
 **Legend:** `live` = persisted API data when signed in · `partial live` = mix of live API + demo fixtures or honest empty · `demo` = seed fixtures / marketing showcase only · `planned` = not built
 
@@ -33,7 +33,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
 | Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs + live ROSEOS brief and insight cards when signed in; ops tiles from `/api/v1/ops/*` when jobs exist; VoiceConnect / MarketWatch add-on cards hidden for authed users; CompetitorWatch coming-soon card remains |
-| Daily Briefings | `/briefings` | **partial live** | Live brief from pipeline tasks, ROSEOS, and compliance counts when signed in; demo fixtures otherwise; briefing archive is demo for anonymous sessions, empty for authed (no archive API) |
+| Daily Briefings | `/briefings` | **partial live** | Live brief from pipeline tasks, ROSEOS, and compliance counts when signed in; demo fixtures otherwise; briefing archive API live for authed users |
 | Alerts | `/alerts` | **partial live** | Overdue follow-ups, compliance gaps, ROSEOS insights, and ops alerts (`/api/v1/ops/alerts`) when signed in; demo fixtures otherwise |
 
 ## Bid lifecycle
@@ -43,7 +43,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | Bid Intelligence | `/bids`, `/bids/:id` | **live** | API CRUD, Go/No-Go score workflow, outcome recording when authenticated; package-builder CTA disabled until bid score is human-reviewed (live authed only) |
 | Bid Fit | `/bid-fit` | **partial live** | Live 12-category score when `?bidId=` + signed in; demo otherwise |
 | New bid intake | `/new-bid` | **live** | Draft + document upload + ROSEOS scope analysis (requires sign-in to persist) |
-| Package Builder | `/package-builder` | **live** | Section preview from uploaded bid documents + compliance gates via `/api/v1/ops/package-builder`; PDF/DOCX export disabled until bid score is human-reviewed (live authed only); demo templates for anonymous sessions |
+| Package Builder | `/package-builder` | **live** | Section preview from uploaded bid documents + compliance gates via `/api/v1/ops/package-builder`; PDF/DOCX server-side export after human review (`POST /api/v1/bids/:id/export`); demo templates for anonymous sessions |
 | Won Jobs | `/won-jobs` | **live** | Jobs from `/api/v1/jobs`; convert won bids via `POST /api/v1/jobs/from-bid/:bidId` |
 | Government Contracting | `/government` | **partial live** | Demo fixtures for anonymous/demo sessions; live pipeline from Public/GC bids + jurisdiction compliance when signed in; `OpsModuleEmpty` when authed with no qualifying bids or jurisdiction data |
 | Bid Library | `/bid-library` | **partial live** | Orphan route (not in nav). Live bids list from `/api/v1/bids` when signed in; demo fixtures otherwise; `OpsModuleEmpty` when authed with no bids |
@@ -88,7 +88,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
 | Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses, certifications, primary contact, leadership, and white-label header (`brandName`, `logoUrl`, `brandColor`, optional `productName`) from org profile JSON when signed in; demo fixtures for anonymous sessions only |
-| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile`; enterprise tab persists licenses, certifications, contact, leadership, and white-label fields (`brandName`, `productName`, `logoUrl`, `brandColor`); Team tab for org invites (owner/admin); multi-location rollups remain Phase 5; custom domain deferred |
+| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile`; enterprise tab persists licenses, certifications, contact, leadership, white-label fields (`brandName`, `productName`, `logoUrl`, `brandColor`), and `locations[]`; Team tab for org invites (owner/admin); franchise rollups and custom domain deferred |
 
 ## Orphan routes (not in nav)
 
@@ -132,6 +132,9 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | Surface | Status | Notes |
 |---------|--------|-------|
 | Settings enterprise — white label | **partial live** | `brandName`, `productName`, `logoUrl`, `brandColor` persist and apply to sidebar + business profile; custom domain DNS/TLS deferred |
-| Settings enterprise — multi-location | planned | Franchise rollups, regional segmentation, location KPIs |
+| Settings enterprise — multi-location | **partial live** | `locations[]` (name, region, address) in `profile_json` + settings UI; franchise rollups and regional KPIs deferred |
 | Settings enterprise — RBAC | **partial live** | Org invites + member list live; role templates and permission matrix UI remain demo |
-| `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses`, `certifications`, `phone`, `contactEmail`, `leadership`, and white-label fields persist in `organizations.profile_json` |
+| `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses`, `certifications`, `phone`, `contactEmail`, `leadership`, white-label fields, and `locations` persist in `organizations.profile_json` |
+| Clerk production cutover | **live** | `AUTH_ENABLED=true` on team URL; legacy login disabled when Clerk enabled |
+| Full client export PDF/DOCX | **live** | Server-side generation after `humanReviewApproved` on bid score |
+| VideoConnect capture upload | planned | Metadata stub (`POST /api/walkthroughs`); full video pipeline deferred |

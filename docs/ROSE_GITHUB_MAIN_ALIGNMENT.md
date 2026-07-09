@@ -25,10 +25,9 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
    git push origin origin/feat/bidos-production-2026-07:main --force-with-lease
    ```
    - Production baseline from feature branch: **`6ff2c75`** — `feat: enrich closeout stats and package scope from bid summary`
-   - Current `main` tip: **`badb5c1`** — org white-label brand fields stub (`badb5c1`); plan completion doc at `13e0e15`; team-review tag at `7d4e6af`
-   - No PR was opened (histories were unrelated); this doc serves as the merge record.
+   - Current `main` tip: **`7566d3c`** — white-label sidebar; VoiceConnect + VideoConnect bridges; RBAC invites; PDF/DOCX export; Clerk live
 
-3. **Clerk cutover** remains **pending** — see `deploy/RUNBOOK.md` § Clerk cutover checklist. Production still uses legacy smoke-test auth until redirect URLs and deploy are completed.
+3. **Clerk cutover** — **complete** (2026-07-09). Production uses Clerk (`AUTH_ENABLED=true`) on https://bidintelligence.cagteam.net. See `deploy/RUNBOOK.md` § Clerk cutover checklist.
 
    **Preflight (read-only, run before cutover):**
    ```bash
@@ -46,12 +45,10 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
 > **What we did:**
 > - **Preserved** the old promo-video `main` on archive branch **`archive/main-promo-video-pre-bidos-2026-07`** (tip `58352bc`) — nothing was deleted:  
 >   https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/tree/archive/main-promo-video-pre-bidos-2026-07
-> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`badb5c1`**). **`main` is now the production branch.**
-> - **Production app** remains at **https://bidintelligence.cagteam.net** (unchanged by this git operation).
+> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`7566d3c`**). **`main` is now the production branch.**
+> - **Production app** remains at **https://bidintelligence.cagteam.net** (Clerk auth live; PDF/DOCX export; RBAC invites; VoiceConnect + VideoConnect bridges).
 >
-> **Still pending (unchanged):** Clerk shared-auth cutover per `deploy/RUNBOOK.md` — do not enable `AUTH_ENABLED=true` until Clerk redirect URLs for `bidintelligence.cagteam.net` are configured and we run `./deploy/deploy.sh`. Preflight: `node scripts/clerk-cutover-preflight.mjs --check-only`.
->
-> **Audit-Risk-Model PR #2** — [feat: safe scoring-engine alignment (phase 1)](https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model/pull/2) is **OPEN** on remote (CI green, mergeable). Awaiting your sign-off before merge to `main`.
+> **Still pending (unchanged):** Audit-Risk-Model [PR #2](https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model/pull/2) — **OPEN**, CI green, mergeable. **Awaiting your sign-off before merge to `main`. Do not merge without Rose approval.**
 >
 > **For Carmen smoke test:** `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` against https://bidintelligence.cagteam.net. Module checklist: `docs/PRODUCT_CONTRACT.md`. Setup: `docs/CARMEN_SETUP.md`. Phase 5 deferred work: `docs/PHASE_5_ROADMAP.md`.
 >
@@ -63,16 +60,16 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
 
 | # | Action | Command / link |
 |---|--------|----------------|
-| 1 | Automated smoke (legacy auth) | `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` — health, login, bids/jobs/ops/command-center; prints `SMOKE PASS` or `SMOKE FAIL` (no secrets logged) |
+| 1 | Automated smoke (Clerk) | `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` — health, Clerk session, bids/jobs/ops; prints `SMOKE PASS` or `SMOKE FAIL` |
 | 2 | **Post-deploy smoke** | With `BIOS_SMOKE_PASSWORD` in server `.env`, `./deploy/deploy.sh` runs `scripts/smoke-team-url.mjs` after health curl → expect `SMOKE PASS` (deploy fails on `SMOKE FAIL`). Manual rerun: `BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs` |
 | 3 | Health check | `GET https://bidintelligence.cagteam.net/api/health` → `200` |
 | 4 | **Export gate (client-facing)** | On `/package-builder` or bid detail: DOCX/PDF export stays blocked (`clientExportBlocked`) until bid score is human-reviewed. Open bid → **Bid Intelligence** → **Approve for use** clears lock (API: `PATCH /api/v1/bids/:id/score/approve` or bid detail approve UX) |
 | 5 | Human review approve UX | **Bid Intelligence** panel shows **Pending human review** until approved; verify export buttons enable only after approval |
-| 6 | Phase 5 deferred work | `docs/PHASE_5_ROADMAP.md` — Clerk cutover, full PDF export, enterprise RBAC, VideoConnect live, Audit-Risk-Model PR #2 |
+| 6 | Phase 5 deferred work | `docs/PHASE_5_ROADMAP.md` — multi-location rollups, VideoConnect capture upload, custom domain, Audit-Risk-Model PR #2 |
 | 7 | PM2 fork fix (restart loop) | Confirm `pm2 describe bid-intelligence-os` shows **fork_mode** + `tsx` (not `cluster` + `npm`). If restarts spike, redeploy: `./deploy/deploy.sh` — see `deploy/RUNBOOK.md` § Troubleshooting (PM2 restarts) |
-| 8 | What is live vs demo | `docs/PRODUCT_CONTRACT.md` (verified at **`afe436e`**+) |
+| 8 | What is live vs demo | `docs/PRODUCT_CONTRACT.md` (verified at **`7566d3c`**+) |
 | 9 | Click-by-click setup | `docs/CARMEN_SETUP.md` |
-| 10 | Clerk cutover (not enabled) | `node scripts/clerk-cutover-preflight.mjs --check-only` then `deploy/RUNBOOK.md` § Clerk cutover |
+| 10 | Clerk cutover | **Complete** — `AUTH_ENABLED=true` on team URL; preflight: `node scripts/clerk-cutover-preflight.mjs --check-only` |
 
 Smoke users: `carmen@ccacontact.com`, `rose@ccacontact.com` (`node scripts/seed-smoke-users.mjs`).
 
@@ -80,8 +77,8 @@ Smoke users: `carmen@ccacontact.com`, `rose@ccacontact.com` (`node scripts/seed-
 
 ```
 archive/main-promo-video-pre-bidos-2026-07  → 58352bc  (promo video era — preserved)
-main                                        → badb5c1  (BidOS production line)  tag: team-review-2026-07-08 @ 7d4e6af
-feat/bidos-production-2026-07               → badb5c1  (aligned with main)      tag: team-review-2026-07-08 @ 7d4e6af
+main                                        → 7566d3c  (BidOS production line)  tag: team-review-2026-07-08 @ 7d4e6af
+feat/bidos-production-2026-07               → 7566d3c  (aligned with main)
 ```
 
 ## Merge / PR record
@@ -129,4 +126,4 @@ Additional **uncommitted WIP** on this server (jurisdiction rules / RF library s
 
 1. **PR #2 not merged** — safe-alignment phase 1 (CI, auth flag, model versioning, additive DB tables, shared BidOS score engine, PM2 deploy stack) is ready on remote but needs explicit approval before merge to `main`. **Do not merge without Rose sign-off.**
 2. **WIP jurisdiction/RF library work** — uncommitted on server; separate from PR #2; decide whether to include in phase 1 or a follow-up PR.
-3. **Clerk cutover** — unchanged pending item; preflight: `node scripts/clerk-cutover-preflight.mjs --check-only`.
+3. **Clerk cutover** — **complete** (2026-07-09). Production uses Clerk on team URL.

@@ -2,8 +2,8 @@
 
 Deferred work extracted from [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) and production alignment notes. Phase 4 (ops APIs, org profile partial enterprise fields, human-review export gates) is live on the team URL; this doc tracks what remains.
 
-**Last updated:** 2026-07-08  
-**Baseline:** `main` at **`afe436e`**+ (VoiceConnect Phase 5 status stub; RBAC invites stub at `ce1ab86`; PDF export gate at `7dcfc57`; post-deploy smoke hook; Carmen checklist in alignment doc)  
+**Last updated:** 2026-07-09  
+**Baseline:** `main` at **`7566d3c`**+ (white-label sidebar; VoiceConnect live bridge; RBAC invites; PDF/DOCX export; VideoConnect status bridge; Clerk cutover live)  
 **Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)
 
 ## Related docs
@@ -11,75 +11,54 @@ Deferred work extracted from [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) and 
 | Doc | Purpose |
 |-----|---------|
 | [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) | Live vs demo module map; Phase 5 (deferred) table |
-| [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md) | GitHub `main` alignment record (tip **`afe436e`**+); Audit-Risk-Model PR #2 status; Carmen checklist (post-deploy smoke, export gate, this roadmap) |
+| [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md) | GitHub `main` alignment record; Audit-Risk-Model PR #2 status; Carmen checklist |
 | [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Post-deploy smoke** | `./deploy/deploy.sh` runs `scripts/smoke-team-url.mjs` when `BIOS_SMOKE_PASSWORD` is set |
-| [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Clerk cutover checklist** | Step-by-step Clerk production cutover for `bidintelligence.cagteam.net` |
+| [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Clerk cutover checklist** | Clerk production cutover for `bidintelligence.cagteam.net` (**complete**) |
+
+---
+
+## Shipped in Phase 5 (2026-07)
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Clerk production cutover | **live** | `AUTH_ENABLED=true` on team URL; Sign in/up at `/login` |
+| Full client export PDF/DOCX | **live** | Server-side generation after human review (`POST /api/v1/bids/:id/export`) |
+| RBAC & invites | **partial live** | `POST/GET/DELETE /api/v1/org/invites`, accept flow, `GET /api/v1/org/members` join |
+| White label | **partial live** | `brandName`, `productName`, `logoUrl`, `brandColor` persist; sidebar + business profile |
+| VoiceConnect | **partial live** | Status + capture list via `VOICE_CONNECT_API_URL` |
+| VideoConnect | **partial live** | Status + walkthrough list via `VIDEO_CONNECT_API_URL`; capture upload deferred |
+| Briefing archive | **live** | `GET/POST /api/v1/briefings/archive` for authed users |
+| Post-deploy smoke | **live** | Clerk-aware checks in `scripts/smoke-team-url.mjs` |
 
 ---
 
 ## Deferred items
 
-### 1. Enterprise — white-label, multi-location, RBAC & invites
+### 1. Enterprise — multi-location, custom domain, permission matrix
 
 **Source:** [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) § Phase 5 (deferred); Settings `/settings` enterprise tab.
 
 | Surface | Current | Phase 5 target |
 |---------|---------|----------------|
-| White label | Prototype UI only | Brand color, product name override, custom domain, logo upload — persisted and applied across workspace + client exports |
-| Multi-location | Prototype UI only | Franchise rollups, regional segmentation, location KPIs |
-| RBAC & invites | **stub** | Role templates, permission grants, user invites; `GET /api/v1/org/members` returns session user only (honest single-member list until multi-user) |
-| `GET/PATCH /api/v1/org/profile` | **partial live** | Extend `organizations.profile_json` beyond `licenses`, `certifications`, `phone`, `contactEmail`, `leadership` |
+| White label | **partial live** | `brandName`, `productName`, `logoUrl`, `brandColor` applied in sidebar + business profile; custom domain DNS/TLS deferred |
+| Multi-location | planned → **in progress** | Franchise rollups, regional segmentation, location KPIs; minimal `locations[]` in `profile_json` shipping |
+| RBAC & invites | **partial live** | Org invites + member list live; role templates and permission matrix UI remain demo |
+| `GET/PATCH /api/v1/org/profile` | **partial live** | Enterprise fields + white-label + `locations` array |
 
 **Routes:** `/settings` (Enterprise & White Label tab), `/business-profile` (reads persisted org fields).
 
 **Acceptance:** Authed owners can configure branding and locations; invite users with scoped roles; business profile reflects saved enterprise data without demo fixtures.
 
-#### RBAC stub — `org_invites` (planned schema, no migration yet)
-
-Pending Clerk cutover and multi-user membership work. Drizzle/Postgres shape aligned with existing `organization_members` conventions (`TEXT` ids, ISO `created_at`/`updated_at`, `org_id` RLS).
-
-| Column | Type | Notes |
-|--------|------|-------|
-| `id` | `TEXT` PK | e.g. `CCA-INV-…` via `nextId` |
-| `org_id` | `TEXT` NOT NULL FK → `organizations(id)` | Tenant scope; RLS via `app.org_id` |
-| `email` | `TEXT` NOT NULL | Invitee email (lowercased on insert) |
-| `role` | `TEXT` NOT NULL DEFAULT `'member'` | Target role on accept — `owner`, `admin`, `member`, `viewer` (final enum TBD) |
-| `invited_by_user_id` | `TEXT` NOT NULL FK → `users(id)` | Creator of the invite |
-| `token_hash` | `TEXT` NOT NULL UNIQUE | SHA-256 of single-use accept token (raw token never stored) |
-| `status` | `TEXT` NOT NULL DEFAULT `'pending'` | `pending` \| `accepted` \| `revoked` \| `expired` |
-| `expires_at` | `TEXT` NOT NULL | ISO timestamp; default 7 days from create |
-| `accepted_at` | `TEXT` | Set when invitee joins |
-| `accepted_by_user_id` | `TEXT` FK → `users(id)` | User who accepted (may differ from invite email if Clerk links accounts) |
-| `created_at` | `TEXT` NOT NULL | |
-| `updated_at` | `TEXT` NOT NULL | |
-
-**Indexes (planned):** `org_invites_org_idx` on `org_id`; unique partial on `(org_id, email)` where `status = 'pending'` to block duplicate open invites.
-
-**Planned routes (not built):**
-
-| Method | Path | Purpose |
-|--------|------|---------|
-| `POST` | `/api/v1/org/invites` | Owner/admin creates invite; returns one-time accept URL |
-| `GET` | `/api/v1/org/invites` | List pending invites for org |
-| `DELETE` | `/api/v1/org/invites/:id` | Revoke pending invite |
-| `POST` | `/api/v1/org/invites/accept` | Accept token → insert `organization_members`, mark invite accepted |
-
-**Live stub today:**
-
-| Method | Path | Behavior |
-|--------|------|----------|
-| `GET` | `/api/v1/org/members` | Returns `[{ userId, email, role, orgId }]` for the authenticated session user only — no join to `organization_members` yet; honest single-user list until multi-member queries ship |
-
 ---
 
-### 2. VideoConnect live integration
+### 2. VideoConnect full capture pipeline
 
-**Source:** [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) — Add-ons; `/video-connect` is **demo** (static marketing showcase, no live API).
+**Source:** [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) — Add-ons; `/video-connect` is **partial live**.
 
 | Current | Phase 5 target |
 |---------|----------------|
-| **partial live** — status bridge + walkthrough proxy when `VIDEO_CONNECT_API_URL` set; demo fixtures for anonymous | Full capture/upload pipeline, visual intelligence, walkthrough-to-bid draft linked to bid intake and Package Builder |
-| Add-on marketplace entry only | Ops integration parallel to VoiceConnect pattern (honest empty / live data when signed in) |
+| **partial live** — status bridge + walkthrough proxy when `VIDEO_CONNECT_API_URL` set; `POST /api/walkthroughs` metadata stub on VideoConnect API | Full capture/upload pipeline, visual intelligence, walkthrough-to-bid draft linked to bid intake and Package Builder |
+| Demo fixtures for anonymous | Ops integration parallel to VoiceConnect pattern (honest empty / live data when signed in) |
 
 **Route:** `/video-connect`
 
@@ -87,45 +66,7 @@ Pending Clerk cutover and multi-user membership work. Drizzle/Postgres shape ali
 
 ---
 
-### 3. Full client export PDF pipeline
-
-**Source:** [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) — Package Builder; guardrails (`humanReviewed` required before client-facing use).
-
-| Current | Phase 5 target |
-|---------|----------------|
-| Live section preview + compliance gates via `/api/v1/ops/package-builder` | Server-side PDF and DOCX generation from enabled package sections |
-| Export buttons gated by `clientExportBlocked` (human review) but `handleExport` is toast-only | Downloadable client-facing artifacts; internal strategy/margin excluded per Package Builder copy |
-| DOCX/PDF disabled until bid score human-reviewed (live authed) | Export unlocks after `humanReviewApproved` on bid detail (`PATCH /api/v1/bids/:id`) |
-
-**Routes:** `/package-builder`, bid detail approve UX
-
-**Acceptance:** After human review, authed users receive real PDF/DOCX files compiled from uploaded bid documents and compliance gates — not placeholder toasts.
-
----
-
-### 4. Clerk production cutover
-
-**Source:** [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md); [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § **Clerk cutover checklist — `bidintelligence.cagteam.net`**.
-
-| Current | Phase 5 target |
-|---------|----------------|
-| Legacy smoke-test auth (`AUTH_ENABLED=false`) | `AUTH_ENABLED=true` with Clerk shared CCA auth |
-| Email/password at `/login` | Clerk Sign in/up; legacy `POST /api/v1/auth/login` returns `400` when enabled |
-
-**Checklist (summary — full steps in runbook):**
-
-1. Preflight: `node scripts/clerk-cutover-preflight.mjs --check-only`
-2. Server `.env` — Clerk keys, `VITE_CLERK_*`, `ADMIN_EMAILS` (never commit secrets)
-3. Clerk Dashboard — allowed origins & redirect URLs for `bidintelligence.cagteam.net`
-4. Deploy: `./deploy/deploy.sh` (rebuild required for `VITE_*`)
-5. Verify health, Clerk UI at `/login`, user sync to local `users` / `organizations`
-6. Decommission smoke-test users; rollback procedure documented in runbook if needed
-
-**Do not** enable `AUTH_ENABLED=true` until redirect URLs are configured and deploy completes. See [`deploy/RUNBOOK.md`](../deploy/RUNBOOK.md) § Clerk cutover checklist.
-
----
-
-### 5. Audit-Risk-Model PR #2 merge
+### 3. Audit-Risk-Model PR #2 merge
 
 **Source:** [`ROSE_GITHUB_MAIN_ALIGNMENT.md`](./ROSE_GITHUB_MAIN_ALIGNMENT.md) § Appendix — Audit-Risk-Model integration & merge status.
 
@@ -150,26 +91,23 @@ Pending Clerk cutover and multi-user membership work. Drizzle/Postgres shape ali
 
 ```mermaid
 flowchart LR
-  A[Clerk cutover] --> B[PR #2 merge]
-  B --> C[Full PDF export]
-  C --> D[Enterprise RBAC]
-  D --> E[VideoConnect live]
+  A[Clerk cutover ✓] --> B[PR #2 merge]
+  B --> C[Multi-location MVP]
+  C --> D[VideoConnect capture]
+  D --> E[Custom domain + RBAC matrix]
 ```
 
-1. **Clerk cutover** — unblocks shared CCA identity for invites/RBAC work.
-2. **Audit-Risk-Model PR #2** — locks scoring/compliance alignment before expanding client exports.
-3. **Full client export PDF pipeline** — builds on existing human-review gates.
-4. **Enterprise white-label / multi-location / RBAC** — depends on stable auth and org model.
-5. **VideoConnect live** — add-on integration after core export and enterprise foundations.
-
-Order may shift per product priority; items are independent enough to parallelize after Clerk + PR #2.
+1. **Clerk cutover** — **complete** (2026-07).
+2. **Audit-Risk-Model PR #2** — locks scoring/compliance alignment; awaiting Rose.
+3. **Multi-location MVP** — `locations[]` in org profile + settings UI.
+4. **VideoConnect full capture** — upload pipeline after metadata stub.
+5. **Custom domain + permission matrix** — enterprise polish.
 
 ---
 
 ## Out of scope (Phase 5)
 
-- VoiceConnect, BuildConnect, ComplianceConnect, CompetitorWatchOS live APIs (remain demo per contract)
-- Orphan route promotion to nav (`/bid-library`, `/monitoring`, etc.)
-- Briefing archive API
+- BuildConnect, ComplianceConnect, CompetitorWatchOS live APIs (remain demo per contract)
+- Orphan route promotion to nav (`/bid-library`, `/monitoring`, etc.) — bid-library and monitoring now in team nav
 
 Update [`PRODUCT_CONTRACT.md`](./PRODUCT_CONTRACT.md) when any Phase 5 item ships.
