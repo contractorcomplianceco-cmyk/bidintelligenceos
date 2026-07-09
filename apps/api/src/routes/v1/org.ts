@@ -28,6 +28,13 @@ const leadershipEntrySchema = z.object({
   email: z.string().optional(),
 });
 
+const locationEntrySchema = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  region: z.string().optional(),
+  address: z.string().optional(),
+});
+
 /** Optional enterprise fields live in organizations.profile_json alongside company prefs. */
 const orgProfileSchema = z
   .object({
@@ -36,6 +43,7 @@ const orgProfileSchema = z
     phone: z.string().optional(),
     contactEmail: z.string().optional(),
     leadership: z.array(leadershipEntrySchema).optional(),
+    locations: z.array(locationEntrySchema).optional(),
     brandName: z.string().optional(),
     logoUrl: z.union([z.string().url(), z.literal("")]).optional(),
     brandColor: z.union([z.string().regex(/^#[0-9A-Fa-f]{6}$/), z.literal("")]).optional(),

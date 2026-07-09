@@ -31,7 +31,7 @@ import {
   ENTERPRISE_PERMISSIONS,
   ENTERPRISE_ROLES,
 } from "@core/enterprise";
-import { parseBrandColor, parseCertifications, parseLeadershipEntries, parseLicenseEntries, parseStringField, parseUrlField, type LeadershipEntry, type LicenseEntry } from "@/lib/org-profile";
+import { parseBrandColor, parseCertifications, parseLeadershipEntries, parseLicenseEntries, parseLocationEntries, parseStringField, parseUrlField, type LeadershipEntry, type LicenseEntry, type LocationEntry } from "@/lib/org-profile";
 
 export default function Settings() {
   const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
@@ -97,6 +97,7 @@ export default function Settings() {
   const [brandName, setBrandName] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [productName, setProductName] = useState("");
+  const [locations, setLocations] = useState<LocationEntry[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("member");
 
@@ -111,6 +112,7 @@ export default function Settings() {
     setLogoUrl(parseUrlField(org.profile?.logoUrl));
     setProductName(parseStringField(org.profile?.productName));
     setBrandColor(parseBrandColor(org.profile?.brandColor, BRAND_COLORS[0].hex));
+    setLocations(parseLocationEntries(org.profile?.locations));
   }, [live, org?.id, org?.profile]);
 
   useEffect(() => {
@@ -161,6 +163,14 @@ export default function Settings() {
         ...(entry.email?.trim() ? { email: entry.email.trim() } : {}),
       }))
       .filter((entry) => entry.name.length > 0);
+    const nextLocations = locations
+      .map((entry, index) => ({
+        id: entry.id?.trim() || `loc-${index}`,
+        name: entry.name.trim(),
+        ...(entry.region?.trim() ? { region: entry.region.trim() } : {}),
+        ...(entry.address?.trim() ? { address: entry.address.trim() } : {}),
+      }))
+      .filter((entry) => entry.name.length > 0);
     const trimmedLogoUrl = logoUrl.trim();
     if (trimmedLogoUrl && !parseUrlField(trimmedLogoUrl)) {
       toast({
@@ -178,6 +188,7 @@ export default function Settings() {
         phone: phone.trim(),
         contactEmail: contactEmail.trim(),
         leadership: nextLeadership,
+        locations: nextLocations,
         brandName: brandName.trim(),
         productName: productName.trim(),
         ...(trimmedLogoUrl ? { logoUrl: trimmedLogoUrl } : { logoUrl: "" }),
@@ -186,7 +197,7 @@ export default function Settings() {
     });
     toast({
       title: "Enterprise credentials saved",
-      description: "White-label branding, licenses, certifications, contact, and leadership stored on your organization profile.",
+      description: "White-label branding, locations, licenses, certifications, contact, and leadership stored on your organization profile.",
     });
   };
 
@@ -580,8 +591,8 @@ export default function Settings() {
                   Enterprise Credentials
                 </h3>
                 <p className="text-slate-500 mt-1">
-                  Licenses, certifications, contacts, leadership, and white-label branding persist on your organization profile.
-                  Team invites are on the Team tab; multi-location rollups remain Phase 5.
+                  Licenses, certifications, contacts, leadership, locations, and white-label branding persist on your organization profile.
+                  Team invites are on the Team tab; franchise rollups and regional KPIs remain Phase 5.
                 </p>
               </div>
             </div>
@@ -885,6 +896,89 @@ export default function Settings() {
                   onClick={() => setLeadership((rows) => [...rows, { name: "" }])}
                 >
                   Add leadership contact
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                  <Building2 className="h-5 w-5 text-[#0284C7]" />
+                  Locations
+                </CardTitle>
+                <CardDescription className="text-slate-500">
+                  Offices, branches, or franchise sites. Name and region are required; address is optional.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                {locations.length === 0 ? (
+                  <p className="text-sm text-slate-500">No locations on file. Add your first site below.</p>
+                ) : (
+                  locations.map((entry, index) => (
+                    <div key={entry.id ?? index} className="grid gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</Label>
+                        <Input
+                          value={entry.name}
+                          onChange={(e) =>
+                            setLocations((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, name: e.target.value } : row)),
+                            )
+                          }
+                          placeholder="Austin HQ"
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Region</Label>
+                        <Input
+                          value={entry.region ?? ""}
+                          onChange={(e) =>
+                            setLocations((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, region: e.target.value } : row)),
+                            )
+                          }
+                          placeholder="Southwest"
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="space-y-2 md:col-span-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Address (optional)</Label>
+                        <Input
+                          value={entry.address ?? ""}
+                          onChange={(e) =>
+                            setLocations((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, address: e.target.value } : row)),
+                            )
+                          }
+                          placeholder="123 Main St, Austin, TX"
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-[#CBD5E1] bg-white text-slate-700"
+                          onClick={() => setLocations((rows) => rows.filter((_, i) => i !== index))}
+                        >
+                          Remove location
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <Button
+                  variant="outline"
+                  className="border-[#CBD5E1] bg-white text-slate-700"
+                  onClick={() =>
+                    setLocations((rows) => [
+                      ...rows,
+                      { id: `loc-${Date.now()}`, name: "", region: "" },
+                    ])
+                  }
+                >
+                  Add location
                 </Button>
               </CardContent>
             </Card>

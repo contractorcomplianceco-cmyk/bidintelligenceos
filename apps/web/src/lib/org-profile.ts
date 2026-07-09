@@ -8,6 +8,13 @@ export type LeadershipEntry = {
   email?: string;
 };
 
+export type LocationEntry = {
+  id?: string;
+  name: string;
+  region?: string;
+  address?: string;
+};
+
 export function initialsFromName(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "?";
@@ -84,4 +91,17 @@ export function parseLicenseEntries(value: unknown): LicenseEntry[] {
 export function parseCertifications(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((entry): entry is string => typeof entry === "string" && entry.trim().length > 0);
+}
+
+export function parseLocationEntries(value: unknown): LocationEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter((entry): entry is Record<string, unknown> => typeof entry === "object" && entry !== null)
+    .map((entry, index) => ({
+      id: typeof entry.id === "string" ? entry.id : `loc-${index}`,
+      name: typeof entry.name === "string" ? entry.name : "",
+      region: typeof entry.region === "string" ? entry.region : undefined,
+      address: typeof entry.address === "string" ? entry.address : undefined,
+    }))
+    .filter((entry) => entry.name.trim().length > 0);
 }

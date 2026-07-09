@@ -18,6 +18,7 @@ import {
   parseCertifications,
   parseLeadershipEntries,
   parseLicenseEntries,
+  parseLocationEntries,
   parseBrandColor,
   parseServiceAreas,
   parseStringField,
@@ -159,6 +160,7 @@ export default function BusinessProfile() {
     "Waco Corridor",
   ];
   const serviceAreas = live ? parseServiceAreas(org?.profile?.serviceAreas) : demoServiceAreas;
+  const locations = live ? parseLocationEntries(org?.profile?.locations) : [];
 
   const differentiators = live
     ? []
@@ -538,6 +540,45 @@ export default function BusinessProfile() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Enterprise locations */}
+            {live && (
+            <Card className="bg-white border-[#E2E8F0]">
+              <CardHeader className="p-5 border-b border-[#E2E8F0] flex flex-row items-center gap-2">
+                <Building2 className="w-4 h-4 text-[#0284C7]" />
+                <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">
+                  LOCATIONS {locations.length > 0 ? `(${locations.length})` : ""}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-5">
+                {locations.length === 0 ? (
+                  <p className="text-sm text-slate-500">
+                    No locations on file. Add offices or branches in Settings → Enterprise & White Label.
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {locations.map((loc) => (
+                      <div
+                        key={loc.id ?? loc.name}
+                        className="flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3"
+                      >
+                        <MapPin className="w-4 h-4 text-[#0284C7] shrink-0 mt-0.5" />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-900">{loc.name}</p>
+                          {loc.region ? (
+                            <p className="text-xs text-slate-500">{loc.region}</p>
+                          ) : null}
+                          {loc.address ? (
+                            <p className="text-xs text-slate-500 mt-0.5">{loc.address}</p>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            )}
 
             {/* Primary contact */}
             <Card className="bg-white border-[#E2E8F0]">
