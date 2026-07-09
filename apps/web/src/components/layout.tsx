@@ -44,6 +44,8 @@ import { useToast } from "@/hooks/use-toast";
 import { VERTICALS } from "@core/verticals";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
+import { useOrgProfile } from "@/hooks/use-org";
+import { parseBrandColor, parseStringField, parseUrlField } from "@/lib/org-profile";
 import { VoiceConnectCommandBar } from "@/components/voice-connect/command-bar";
 import logo from "@/assets/bidintelligence-logo.png";
 
@@ -196,6 +198,12 @@ export function Layout({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
+  const { data: org } = useOrgProfile();
+  const brandName = live ? parseStringField(org?.profile?.brandName) : "";
+  const productName = live ? parseStringField(org?.profile?.productName) : "";
+  const logoUrl = live ? parseUrlField(org?.profile?.logoUrl) : "";
+  const brandColor = live ? parseBrandColor(org?.profile?.brandColor, "#38BDF8") : "#38BDF8";
+  const workspaceTitle = productName || brandName || "BidIntelligenceOS";
 
   useEffect(() => {
     document.documentElement.classList.remove("dark");
@@ -204,8 +212,15 @@ export function Layout({ children }: { children: ReactNode }) {
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-[#0B1220] border-r border-[#1E293B]">
       <div className="px-5 py-5 border-b border-[#1E293B]">
-        <img src={logo} alt="BidIntelligenceOS" className="h-14 w-auto object-contain" />
-        <p className="text-[10px] text-[#8A96B0] tracking-wider mt-2 pl-0.5">
+        {logoUrl ? (
+          <img src={logoUrl} alt={workspaceTitle} className="h-14 w-auto max-w-full object-contain" />
+        ) : (
+          <img src={logo} alt="BidIntelligenceOS" className="h-14 w-auto object-contain" />
+        )}
+        <p className="text-sm font-semibold text-white mt-2 tracking-tight" style={{ color: live && (brandName || productName) ? brandColor : undefined }}>
+          {workspaceTitle}
+        </p>
+        <p className="text-[10px] text-[#8A96B0] tracking-wider mt-1 pl-0.5">
           A product of Contractor Connect
         </p>
       </div>

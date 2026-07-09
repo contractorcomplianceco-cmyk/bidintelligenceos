@@ -104,6 +104,35 @@ VIDEO_CONNECT_APP_URL=https://ccavideoconnect.com   # optional capture UI URL (d
 - `GET /api/health` → `videoConnect: true` when `VIDEO_CONNECT_API_URL` is set
 - Authed users without env see honest empty state on `/video-connect`; anonymous sessions keep demo fixtures
 
+## VoiceConnect add-on bridge
+
+Live field capture status when the external VoiceConnect API is configured:
+
+```env
+VOICE_CONNECT_API_URL=https://demo.ccavoiceconnect.com
+VOICE_CONNECT_API_TOKEN=   # optional Bearer for protected VoiceConnect API
+VOICE_CONNECT_APP_URL=https://demo.ccavoiceconnect.com   # optional capture UI URL (defaults to VOICE_CONNECT_API_URL)
+```
+
+- `GET /api/v1/integrations/voice-connect/status` — configured / connected / available for authed team users
+- `GET /api/v1/integrations/voice-connect/captures` — proxies capture list when connected (probes `/api/summary` POST when no `/api/health`)
+- `GET /api/health` → `voiceConnect: true` when `VOICE_CONNECT_API_URL` is set
+- Authed users without env see honest empty state on `/voice-connect`; anonymous sessions keep demo fixtures
+
+## Org invites & RBAC (Phase 5)
+
+Postgres: apply `deploy/postgres/002_org_invites.sql` via `node scripts/setup-postgres.mjs` (runs all migrations in order).
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `POST` | `/api/v1/org/invites` | Owner/admin creates invite |
+| `GET` | `/api/v1/org/invites` | List pending invites |
+| `DELETE` | `/api/v1/org/invites/:id` | Revoke pending invite |
+| `POST` | `/api/v1/org/invites/accept` | Accept token → `organization_members` row |
+| `GET` | `/api/v1/org/members` | Real join on `organization_members` + `users` |
+
+Invite accept links use `APP_PUBLIC_URL` (or `CORS_ORIGIN`) + `/settings?invite=TOKEN`.
+
 ## Shared CCA auth (Clerk)
 
 Optional — when unset, legacy email/password JWT cookies continue to work.
@@ -307,7 +336,7 @@ Raw research notes, statute text, credentials, service role keys, and Supabase U
 
 ## Postgres migration
 
-Dual-driver support: set `DATABASE_URL` for Postgres + RLS; omit for SQLite dev. Schema lives in `deploy/postgres/001_init.sql` and Drizzle `schema-pg.ts`.
+Dual-driver support: set `DATABASE_URL` for Postgres + RLS; omit for SQLite dev. Schema lives in `deploy/postgres/` (`001_init.sql`, `002_org_invites.sql`) and Drizzle `schema-pg.ts`. Apply with `node scripts/setup-postgres.mjs`.
 
 ## Troubleshooting (PM2 restarts)
 

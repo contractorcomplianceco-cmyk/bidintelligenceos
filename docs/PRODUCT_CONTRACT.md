@@ -77,7 +77,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
 | Add-On Marketplace | `/add-ons` | demo | Catalog of connected and coming-soon add-ons; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
-| VoiceConnect | `/voice-connect` | **demo** | Demo fixtures for anonymous/demo sessions; `OpsModuleEmpty` for authed team users; command bar and command-center feed hidden when signed in |
+| VoiceConnect | `/voice-connect` | **partial live** | Demo fixtures for anonymous/demo sessions; live status + capture UI link from `VOICE_CONNECT_API_URL` when configured and healthy; `OpsModuleEmpty` for authed team users when not configured or unreachable; command bar hidden when signed in |
 | VideoConnect | `/video-connect` | **partial live** | Demo fixtures for anonymous/demo sessions; live status + walkthroughs from `VIDEO_CONNECT_API_URL` when configured and healthy; `OpsModuleEmpty` for authed team users when not configured or unreachable |
 | BuildConnect | `/build-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | ComplianceConnect | `/compliance-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
@@ -87,8 +87,8 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses, certifications, primary contact (phone/email), and leadership read from org profile JSON when signed in (honest empty when none saved); demo fixtures for anonymous sessions only; edit in Settings → Enterprise & White Label; identity and service-area fields empty until org profile is populated |
-| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; enterprise tab persists `licenses`, `certifications`, `phone`, `contactEmail`, and `leadership` JSON fields; white-label, multi-location, and RBAC deferred Phase 5 |
+| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses, certifications, primary contact, leadership, and white-label header (`brandName`, `logoUrl`, `brandColor`, optional `productName`) from org profile JSON when signed in; demo fixtures for anonymous sessions only |
+| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile`; enterprise tab persists licenses, certifications, contact, leadership, and white-label fields (`brandName`, `productName`, `logoUrl`, `brandColor`); Team tab for org invites (owner/admin); multi-location rollups remain Phase 5; custom domain deferred |
 
 ## Orphan routes (not in nav)
 
@@ -121,12 +121,17 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | `GET /api/v1/ops/package-builder` | Active bid packages + documents + compliance |
 | `GET /api/v1/ops/alerts` | Ops alerts for briefings/alerts merge |
 | `POST /api/v1/jobs/from-bid/:bidId` | Convert won bid to job deployment with seeded schedule |
+| `POST/GET/DELETE /api/v1/org/invites` | Org invite create, list pending, revoke (owner/admin) |
+| `POST /api/v1/org/invites/accept` | Accept invite token → `organization_members` |
+| `GET /api/v1/org/members` | Organization members join |
+| `GET /api/v1/integrations/voice-connect/status` | VoiceConnect bridge status |
+| `GET /api/v1/integrations/voice-connect/captures` | VoiceConnect capture list proxy |
 
 ## Phase 5 (deferred)
 
 | Surface | Status | Notes |
 |---------|--------|-------|
-| Settings enterprise — white label | planned | Brand color, product name override, custom domain, logo upload |
+| Settings enterprise — white label | **partial live** | `brandName`, `productName`, `logoUrl`, `brandColor` persist and apply to sidebar + business profile; custom domain DNS/TLS deferred |
 | Settings enterprise — multi-location | planned | Franchise rollups, regional segmentation, location KPIs |
-| Settings enterprise — RBAC | planned | Role templates, permission grants, user invites |
-| `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses` (object array), `certifications` (string array), `phone`, `contactEmail`, and `leadership` (object array) persist in `organizations.profile_json`; other enterprise fields not yet modeled |
+| Settings enterprise — RBAC | **partial live** | Org invites + member list live; role templates and permission matrix UI remain demo |
+| `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses`, `certifications`, `phone`, `contactEmail`, `leadership`, and white-label fields persist in `organizations.profile_json` |
