@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout";
 import { OpsModuleGate } from "@/components/ops-module-gate";
+import { DemoDataBadge } from "@/components/demo-data-badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   REGISTRATION_ITEMS,
@@ -144,6 +145,7 @@ export default function Government() {
     >
     <Layout>
       <div className="space-y-6 max-w-[1600px] mx-auto">
+        <DemoDataBadge />
         {/* Header */}
         <Card className="bg-white shadow-sm border-[#E2E8F0] overflow-hidden relative rounded-xl">
           <div className="absolute top-0 right-0 p-6 opacity-[0.06] pointer-events-none">
