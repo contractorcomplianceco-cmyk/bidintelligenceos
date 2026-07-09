@@ -60,25 +60,36 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Add-On Marketplace | `/add-ons` | demo | Catalog of connected and coming-soon add-ons; fixtures for all sessions |
+| Add-On Marketplace | `/add-ons` | demo | Catalog of connected and coming-soon add-ons; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | VoiceConnect | `/voice-connect` | **demo** | Demo fixtures for anonymous/demo sessions; `OpsModuleEmpty` for authed team users; command bar and command-center feed hidden when signed in |
 | VideoConnect | `/video-connect` | demo | Marketing showcase; no live API |
-| BuildConnect | `/build-connect` | demo | Marketing showcase; no live API |
-| ComplianceConnect | `/compliance-connect` | demo | Marketing showcase; no live API |
-| CompetitorWatchOS | `/competitor-watch` | demo | Seed fixtures; coming soon |
+| BuildConnect | `/build-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
+| ComplianceConnect | `/compliance-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
+| CompetitorWatchOS | `/competitor-watch` | demo | Seed fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users; coming soon |
 
 ## Account
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
 | Business profile | `/business-profile` | live | |
-| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; empty fields for missing data; enterprise tab shows `OpsModuleEmpty` for authed users |
+| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; empty fields for missing data; enterprise tab shows `OpsModuleEmpty` for authed users (verified) |
+
+## Orphan routes (not in nav)
+
+| Module | Route | Status | Notes |
+|--------|-------|--------|-------|
+| Legacy cockpit | `/cockpit` | demo | Superseded by Command Center; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
+| Insights | `/insights` | demo | Orphan win/loss chart; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
+| Documents hub | `/documents` | demo | Orphan compliance docs view; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
+| Competitors | `/competitors` | demo | Orphan competitor signals; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
+| Industry use cases | `/industry-use-cases` | demo | Marketing vertical walkthrough; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 
 ## Guardrails
 
 - Decision-support only; no guaranteed outcomes.
 - **Powered by AI. Reviewed by humans** — `humanReviewed` required before client-facing use.
 - Demo sessions never mix silent live data — fixtures only.
+- Authenticated team users never see silent demo seed on gated modules — `useLiveData` or `OpsModuleGate` required on any `@core/` fixture page.
 
 ## Phase 4 API routes (authed team users)
 

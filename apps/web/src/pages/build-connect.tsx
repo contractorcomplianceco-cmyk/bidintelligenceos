@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   networkSubs,
@@ -128,6 +129,12 @@ export default function BuildConnect() {
   }, []);
 
   return (
+    <OpsModuleGate
+      title="BuildConnect"
+      subtitle="Subcontractor network and trade capacity marketplace."
+      module="BuildConnect marketplace"
+      icon={<Network className="h-7 w-7 text-[#F97316]" />}
+    >
     <Layout>
       <div className="space-y-6 max-w-[1600px] mx-auto">
         {/* Header */}
@@ -524,5 +531,6 @@ export default function BuildConnect() {
         </div>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }

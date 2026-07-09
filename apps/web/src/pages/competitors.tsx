@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, ShieldCheck } from "lucide-react";
 import { competitorSignals } from "@core/data";
@@ -6,6 +7,12 @@ import { Badge } from "@/components/ui/badge";
 
 export default function Competitors() {
   return (
+    <OpsModuleGate
+      title="Competitor Intelligence"
+      subtitle="Market signals derived from lawful public and contractor-provided data."
+      module="Competitor intelligence"
+      icon={<Users className="h-7 w-7 text-teal-600" />}
+    >
     <Layout>
       <div className="space-y-8 max-w-5xl mx-auto">
         <div>
@@ -46,5 +53,6 @@ export default function Competitors() {
         </div>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }

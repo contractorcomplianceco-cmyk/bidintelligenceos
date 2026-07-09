@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   COMPLIANCE_ITEMS,
@@ -70,6 +71,12 @@ export default function ComplianceConnect() {
   const ringDeg = (OVERALL_READINESS / 100) * 360;
 
   return (
+    <OpsModuleGate
+      title="ComplianceConnect"
+      subtitle="Compliance readiness and audit tracking for contractors."
+      module="ComplianceConnect"
+      icon={<ShieldCheck className="h-7 w-7 text-[#059669]" />}
+    >
     <Layout>
       <div className="space-y-6 max-w-[1600px] mx-auto">
         {/* Header */}
@@ -387,5 +394,6 @@ export default function ComplianceConnect() {
         </Card>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }

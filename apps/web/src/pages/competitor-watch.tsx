@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { COMPETITORWATCH } from "@core/competitorwatch";
@@ -36,6 +37,12 @@ export default function CompetitorWatch() {
   };
 
   return (
+    <OpsModuleGate
+      title="CompetitorWatchOS"
+      subtitle="Competitive intelligence add-on — coming soon."
+      module="CompetitorWatchOS"
+      icon={<Crosshair className="h-7 w-7 text-[#A855F7]" />}
+    >
     <Layout>
       <div className="space-y-6 max-w-[1600px] mx-auto">
         {/* Hero */}
@@ -231,5 +238,6 @@ export default function CompetitorWatch() {
         </p>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }

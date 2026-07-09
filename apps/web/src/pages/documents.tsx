@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Files, Package, CheckCircle2, ShieldAlert } from "lucide-react";
@@ -7,6 +8,12 @@ import { Link } from "wouter";
 
 export default function Documents() {
   return (
+    <OpsModuleGate
+      title="Documents & Packages"
+      subtitle="Central hub for compliance docs and proposal generation."
+      module="Documents hub"
+      icon={<Files className="h-7 w-7 text-teal-600" />}
+    >
     <Layout>
       <div className="space-y-8 max-w-5xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -62,5 +69,6 @@ export default function Documents() {
         </div>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }

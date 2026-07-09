@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Link } from "wouter";
 import { ADD_ONS, type AddOn } from "@core/add-ons";
 import {
@@ -44,6 +45,12 @@ function StatusChip({ status }: { status: AddOn["status"] }) {
 
 export default function AddOns() {
   return (
+    <OpsModuleGate
+      title="Add-On Marketplace"
+      subtitle="Connected and coming-soon add-ons for BidIntelligenceOS."
+      module="Add-on marketplace"
+      icon={<Blocks className="h-7 w-7 text-[#2563EB]" />}
+    >
     <Layout>
       <div className="space-y-6 max-w-[1600px] mx-auto">
         {/* Hero */}
@@ -201,5 +208,6 @@ export default function AddOns() {
         </div>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }

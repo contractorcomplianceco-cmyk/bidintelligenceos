@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
 import { activateOnKey } from "@shared/a11y";
@@ -56,6 +57,12 @@ export default function IndustryUseCases() {
     INDUSTRY_USE_CASES.find((i) => i.id === activeId) ?? INDUSTRY_USE_CASES[0];
 
   return (
+    <OpsModuleGate
+      title="Industry Use Cases"
+      subtitle="How BidIntelligenceOS adapts to your trade."
+      module="Industry use cases"
+      icon={<Factory className="h-7 w-7 text-[#0284C7]" />}
+    >
     <Layout>
       <div className="space-y-6 max-w-[1600px] mx-auto">
         {/* Header */}
@@ -168,6 +175,7 @@ export default function IndustryUseCases() {
         </p>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }
 

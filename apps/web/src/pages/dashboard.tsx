@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { seedBids, followUpQueue, competitorSignals, documentReadiness, analyticsData } from "@core/data";
 import { activateOnKey } from "@shared/a11y";
@@ -26,6 +27,12 @@ export default function Dashboard() {
   const activeBids = seedBids.filter(b => b.status === "In Progress" || b.status === "Review");
 
   return (
+    <OpsModuleGate
+      title="Legacy Cockpit"
+      subtitle="Older pipeline dashboard — superseded by Command Center."
+      module="Legacy cockpit dashboard"
+      icon={<FolderKanban className="h-7 w-7 text-teal-600" />}
+    >
     <Layout>
       <div className="space-y-6">
         {/* KPI Row */}
@@ -412,5 +419,6 @@ export default function Dashboard() {
         </div>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }

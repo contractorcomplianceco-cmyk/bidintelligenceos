@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout";
+import { OpsModuleGate } from "@/components/ops-module-gate";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { analyticsData } from "@core/data";
 import { 
@@ -8,6 +9,12 @@ import { LineChart as LineChartIcon } from "lucide-react";
 
 export default function Insights() {
   return (
+    <OpsModuleGate
+      title="Win/Loss Analytics"
+      subtitle="Historical performance insights to refine future bid strategy."
+      module="Win/loss analytics"
+      icon={<LineChartIcon className="h-7 w-7 text-teal-600" />}
+    >
     <Layout>
       <div className="space-y-8 max-w-[1600px] mx-auto">
         <div>
@@ -49,5 +56,6 @@ export default function Insights() {
         </Card>
       </div>
     </Layout>
+    </OpsModuleGate>
   );
 }
