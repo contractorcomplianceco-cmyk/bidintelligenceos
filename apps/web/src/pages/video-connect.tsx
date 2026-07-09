@@ -187,6 +187,7 @@ function VideoConnectHeader({
             </div>
           </div>
           {connected && appUrl && (
+            <>
             <a
               href={appUrl}
               target="_blank"
@@ -196,6 +197,17 @@ function VideoConnectHeader({
               Open VideoConnect capture
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
+            <a
+              href={`${appUrl.replace(/\/$/, "")}/capture?source=bidos`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold text-white transition-colors"
+              style={{ background: VIOLET }}
+            >
+              Request walkthrough
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+            </>
           )}
         </div>
       </div>

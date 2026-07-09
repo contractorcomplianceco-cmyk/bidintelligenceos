@@ -89,7 +89,26 @@ feat/bidos-production-2026-07               → 7566d3c  (aligned with main)
 
 ---
 
-## Appendix — Audit-Risk-Model integration & merge status (2026-07-08)
+## Pending Rose — 2026-07-09
+
+**Audit-Risk-Model PR #2** remains **OPEN**. CI green, mergeable. **Do not merge without Rose sign-off.**
+
+Production BidOS at https://bidintelligence.cagteam.net is on `main` (`adb39ec`+): Clerk live, PDF/DOCX export, RBAC invites, VoiceConnect + VideoConnect bridges, white-label sidebar, multi-location MVP in progress.
+
+**Action for Rose:** Review and merge [PR #2](https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model/pull/2) when ready, or reply with changes requested.
+
+### Slack copy-paste (2026-07-09)
+
+> Hi Rose — quick BidOS + Audit update:
+>
+> **BidOS `main`** is live at https://bidintelligence.cagteam.net (Clerk auth, PDF/DOCX export after human review, org invites/RBAC, VoiceConnect + VideoConnect bridges, white-label in sidebar). Phase 5 doc sync: `docs/PHASE_5_ROADMAP.md`.
+>
+> **Still pending your sign-off:** Audit-Risk-Model [PR #2](https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model/pull/2) (safe-alignment phase 1). CI is green and mergeable — we have **not** merged. Compliance pull on prod still returns `CCA-2026-BIOS-FL` as expected.
+>
+> Full alignment record: `docs/ROSE_GITHUB_MAIN_ALIGNMENT.md` · Plan summary: `docs/PLAN_COMPLETION_2026-07.md`
+>
+> Let me know when you want PR #2 merged or if you need a walkthrough on the diff.
+
 
 ### BidOS ↔ Audit stack (live on this server)
 
