@@ -815,6 +815,103 @@ export async function buildRiskProjection(orgId: string) {
   };
 }
 
+function buildLivePackageSections(
+  bid: { name: string; recipient: string | null; amount: number | null; type: string | null },
+  bidDocs: { fileName: string; extractionStatus: string; extractedText: string | null }[],
+  complianceItems: { label: string; status: string }[],
+  humanReviewed: boolean,
+) {
+  const docExcerpts = bidDocs
+    .filter((d) => d.extractedText && d.extractedText.length > 20)
+    .map((d) => ({
+      fileName: d.fileName,
+      excerpt:
+        d.extractedText!.slice(0, 600).trim() +
+        (d.extractedText!.length > 600 ? "…" : ""),
+    }));
+
+  const scopeBullets =
+    docExcerpts.length > 0
+      ? docExcerpts.flatMap((d) => [`Source: ${d.fileName}`, d.excerpt])
+      : bidDocs.length > 0
+        ? bidDocs.map(
+            (d) =>
+              `${d.fileName} — ${d.extractionStatus === "done" ? "extracted, pending review" : "processing"}`,
+          )
+        : ["Upload bid documents to populate scope sections from live extraction."];
+
+  const complianceContent =
+    complianceItems.length > 0
+      ? complianceItems.map(
+          (c) => `${c.label} — ${c.status === "pass" ? "Pass" : "Gap identified"}`,
+        )
+      : ["Run Go/No-Go scoring to populate compliance checklist."];
+
+  const sections: {
+    id: string;
+    type: string;
+    title: string;
+    required: boolean;
+    enabled: boolean;
+    content: unknown;
+  }[] = [
+    {
+      id: "cover",
+      type: "Cover",
+      title: "Proposal Cover",
+      required: true,
+      enabled: true,
+      content: {
+        title: bid.name,
+        subtitle: `Prepared for ${bid.recipient || "Client"}`,
+      },
+    },
+    {
+      id: "scope",
+      type: "Scope of Work",
+      title: "Scope of Work",
+      required: true,
+      enabled: true,
+      content: scopeBullets,
+    },
+    {
+      id: "documents",
+      type: "Attachments",
+      title: "Bid Documents",
+      required: false,
+      enabled: bidDocs.length > 0,
+      content: bidDocs.map((d) => ({
+        phase: d.fileName,
+        duration: d.extractionStatus,
+      })),
+    },
+    {
+      id: "compliance",
+      type: "Qualifications",
+      title: "Compliance Checklist",
+      required: true,
+      enabled: complianceItems.length > 0,
+      content: complianceContent,
+    },
+  ];
+
+  if (bid.amount && bid.amount > 0) {
+    sections.push({
+      id: "pricing",
+      type: "Pricing Summary",
+      title: "Pricing Summary",
+      required: true,
+      enabled: humanReviewed,
+      content: {
+        items: [{ description: `${bid.type || "Base"} bid amount`, amount: `$${bid.amount.toLocaleString()}` }],
+        total: `$${bid.amount.toLocaleString()}`,
+      },
+    });
+  }
+
+  return sections;
+}
+
 export async function buildPackageBuilderProjection(orgId: string) {
   const db = getDb();
   const bidRows = await db
@@ -905,7 +1002,8 @@ export async function buildPackageBuilderProjection(orgId: string) {
           }
         }
 
-        const bidDocs = (docsByBid.get(bid.id) ?? []).map((d) => ({
+        const rawDocs = docsByBid.get(bid.id) ?? [];
+        const bidDocs = rawDocs.map((d) => ({
           id: d.id,
           fileName: d.fileName,
           mimeType: d.mimeType,
@@ -914,6 +1012,17 @@ export async function buildPackageBuilderProjection(orgId: string) {
           humanReviewed: Boolean(d.humanReviewed),
           createdAt: d.createdAt,
         }));
+
+        const sections = buildLivePackageSections(
+          bid,
+          rawDocs.map((d) => ({
+            fileName: d.fileName,
+            extractionStatus: d.extractionStatus,
+            extractedText: d.extractedText,
+          })),
+          complianceItems,
+          humanReviewed,
+        );
 
         return {
           id: `pkg-${bid.id}`,
@@ -930,24 +1039,7 @@ export async function buildPackageBuilderProjection(orgId: string) {
           humanReviewed,
           verdict,
           complianceItems,
-          sections: [
-            { id: "cover", type: "Cover", title: "Proposal Cover", required: true, enabled: true },
-            { id: "scope", type: "Scope of Work", title: "Scope of Work", required: true, enabled: true },
-            {
-              id: "pricing",
-              type: "Pricing Summary",
-              title: "Pricing Summary",
-              required: true,
-              enabled: humanReviewed,
-            },
-            {
-              id: "compliance",
-              type: "Qualifications",
-              title: "Compliance Checklist",
-              required: true,
-              enabled: complianceItems.length > 0,
-            },
-          ],
+          sections,
         };
       }),
   );
