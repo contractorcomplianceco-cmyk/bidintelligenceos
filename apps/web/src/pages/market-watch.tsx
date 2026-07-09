@@ -167,8 +167,8 @@ export default function MarketWatch() {
             module="Opportunity Radar"
             description={
               researchPreview?.configured
-                ? "Research Hub is configured but no export-ready rows are available yet. Check back after jurisdiction research is validated."
-                : "Configure the server-side Research Hub bridge to populate live market signals. Demo fixtures are available in interactive demo sessions."
+                ? "Research Hub bridge is connected but no export-ready jurisdiction rows are available yet. Validate research in Research Hub, then refresh — demo fixtures remain available in interactive demo sessions only."
+                : "Set RESEARCH_HUB_API_URL on the server to enable the Research Hub bridge. Until then, live market signals stay empty for team users; demo fixtures are available in interactive demo sessions only."
             }
           />
         </div>

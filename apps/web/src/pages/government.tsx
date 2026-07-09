@@ -230,7 +230,11 @@ export default function Government() {
           </div>
           <OpsModuleEmpty
             module="Government contracting pipeline"
-            description="Record Public or GC bids with state locations in Bid Intelligence, or connect jurisdiction compliance research, to populate this module."
+            description={
+              allBids.length > 0
+                ? `You have ${allBids.length} bid${allBids.length === 1 ? "" : "s"} on file, but none qualify as Public/GC government work with a state location. Tag bids as Public or GC and include a state in the location field, or connect jurisdiction compliance research.`
+                : "Record Public or GC bids with state locations in Bid Intelligence, or connect jurisdiction compliance research, to populate this module."
+            }
           />
         </div>
       </Layout>

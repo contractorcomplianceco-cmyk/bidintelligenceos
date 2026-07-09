@@ -336,9 +336,31 @@ export async function fetchLiveWeatherForJobsite(
   location: string | null | undefined,
   payload: Record<string, unknown>
 ): Promise<LiveWeatherSnapshot | null> {
-  const query = resolveGeoQuery(location, payload);
-  if (!query) return null;
-  const coords = await geocodeQuery(query);
-  if (!coords) return null;
-  return fetchForecast(coords.lat, coords.lon);
+  const queries: string[] = [];
+  const seen = new Set<string>();
+  const addQuery = (q: string | null | undefined) => {
+    const trimmed = q?.trim();
+    if (!trimmed || seen.has(trimmed.toLowerCase())) return;
+    seen.add(trimmed.toLowerCase());
+    queries.push(trimmed);
+  };
+
+  addQuery(resolveGeoQuery(location, payload));
+
+  const parsed = location ? parseCityStateFromLocation(location) : null;
+  const state = String(
+    payload.state ?? payload.siteState ?? payload.stateCode ?? parsed?.state ?? ""
+  )
+    .trim()
+    .toUpperCase();
+  if (parsed?.city && state) addQuery(`${parsed.city}, ${state}`);
+  if (state && US_STATE_NAMES[state]) addQuery(US_STATE_NAMES[state]);
+  if (state) addQuery(state);
+  if (parsed?.city && !state) addQuery(parsed.city);
+
+  for (const query of queries) {
+    const coords = await geocodeQuery(query);
+    if (coords) return fetchForecast(coords.lat, coords.lon);
+  }
+  return null;
 }

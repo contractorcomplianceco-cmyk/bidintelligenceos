@@ -98,31 +98,47 @@ export default function Analytics() {
   );
 
   const winRateSeries = useMemo(() => {
-    if (live && liveWinRateSeries.length > 0) {
-      return range === "6M" ? liveWinRateSeries.slice(-6) : liveWinRateSeries;
+    if (live) {
+      if (liveWinRateSeries.length > 0) {
+        return range === "6M" ? liveWinRateSeries.slice(-6) : liveWinRateSeries;
+      }
+      return [];
     }
     return range === "6M" ? analyticsData.winRateOverTime.slice(-6) : analyticsData.winRateOverTime;
   }, [live, liveWinRateSeries, range]);
 
-  const currentWinRate = live && winLoss?.summary.winRate != null
-    ? winLoss.summary.winRate
+  const liveDecidedCount = live ? (winLoss?.summary.decided ?? 0) : null;
+
+  const currentWinRate = live
+    ? winLoss?.summary.winRate != null
+      ? winLoss.summary.winRate
+      : null
     : analyticsData.winRateOverTime[analyticsData.winRateOverTime.length - 1].rate;
   const priorWinRate = live && liveWinRateSeries.length >= 2
     ? liveWinRateSeries[liveWinRateSeries.length - 2].rate
+    : live
+    ? null
     : analyticsData.winRateOverTime[analyticsData.winRateOverTime.length - 2].rate;
-  const winRateDelta = live && winLoss?.summary.winRate != null
-    ? liveWinRateSeries.length >= 2
+  const winRateDelta = live
+    ? liveWinRateSeries.length >= 2 && currentWinRate != null && priorWinRate != null
       ? currentWinRate - priorWinRate
       : 0
-    : currentWinRate - priorWinRate;
+    : currentWinRate != null && priorWinRate != null
+    ? currentWinRate - priorWinRate
+    : 0;
 
-  const currentMargin = live && costData?.summary?.avgMargin != null
-    ? costData.summary.avgMargin
+  const currentMargin = live
+    ? costData?.summary?.avgMargin != null
+      ? costData.summary.avgMargin
+      : null
     : analyticsData.marginTrend[analyticsData.marginTrend.length - 1].margin;
   const firstMargin = live && costData?.records?.length
     ? costData.records.reduce((s, r) => s + r.grossMargin, 0) / costData.records.length
+    : live
+    ? null
     : analyticsData.marginTrend[0].margin;
-  const marginDelta = +(currentMargin - firstMargin).toFixed(1);
+  const marginDelta =
+    currentMargin != null && firstMargin != null ? +(currentMargin - firstMargin).toFixed(1) : 0;
 
   const totalWon = live && winLoss
     ? (winLoss.byOutcome.find((b) => b.outcome === "won")?.count ?? 0)
@@ -245,13 +261,29 @@ export default function Analytics() {
   const kpis = [
     {
       label: "Win Rate",
-      value: live && liveWinRate != null ? `${liveWinRate}%` : `${currentWinRate}%`,
-      delta: live && winLoss ? `${winLoss.summary.decided} decided bids` : `${winRateDelta >= 0 ? "+" : ""}${winRateDelta}pp MoM`,
-      positive: live && liveWinRate != null ? liveWinRate >= 50 : winRateDelta >= 0,
+      value: live ? (currentWinRate != null ? `${currentWinRate}%` : "—") : `${currentWinRate}%`,
+      delta: live
+        ? liveDecidedCount != null && liveDecidedCount > 0
+          ? `${liveDecidedCount} decided bids`
+          : "Record bid outcomes to populate"
+        : `${winRateDelta >= 0 ? "+" : ""}${winRateDelta}pp MoM`,
+      positive: live ? (currentWinRate != null ? currentWinRate >= 50 : true) : winRateDelta >= 0,
       icon: Target,
       color: "#38BDF8",
     },
-    { label: "Avg Gross Margin", value: `${currentMargin}%`, delta: live && costData?.records?.length ? `Across ${costData.records.length} jobs` : `${marginDelta >= 0 ? "+" : ""}${marginDelta}pp YTD`, positive: marginDelta >= 0, icon: Percent, color: "#22C55E" },
+    {
+      label: "Avg Gross Margin",
+      value: live ? (currentMargin != null ? `${currentMargin}%` : "—") : `${currentMargin}%`,
+      delta:
+        live && costData?.records?.length
+          ? `Across ${costData.records.length} jobs`
+          : live
+          ? "Add job cost data"
+          : `${marginDelta >= 0 ? "+" : ""}${marginDelta}pp YTD`,
+      positive: marginDelta >= 0,
+      icon: Percent,
+      color: "#22C55E",
+    },
     { label: "Avg Projected ROI", value: `${avgProjectedRoi}%`, delta: "Across active jobs", positive: true, icon: TrendingUp, color: "#0BA3A8" },
     { label: "Total Outcomes", value: `${totalOutcomes}`, delta: `${totalWon} won / ${totalLost} lost`, positive: true, icon: BarChart3, color: "#A855F7" },
   ];
@@ -270,7 +302,11 @@ export default function Analytics() {
               Win/loss and performance intelligence for {verticalConfig.name}. Decision-support guidance only.
             </p>
             {live && winLoss && (
-              <p className="text-[11px] text-teal-700 mt-1">Win/loss KPIs from live bid outcomes.</p>
+              <p className="text-[11px] text-teal-700 mt-1">
+                {liveDecidedCount && liveDecidedCount > 0
+                  ? "Win/loss KPIs from live bid outcomes."
+                  : "Live analytics — record bid outcomes and job costs to populate charts."}
+              </p>
             )}
           </div>
           <div className="flex items-center gap-2">
