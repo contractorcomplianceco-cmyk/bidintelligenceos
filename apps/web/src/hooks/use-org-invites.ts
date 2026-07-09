@@ -80,3 +80,20 @@ export function useAcceptOrgInvite() {
     },
   });
 }
+
+export function useUpdateOrgMemberRole() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: { userId: string; role: string }) =>
+      apiFetch<{ ok: boolean; userId: string; role: string }>(
+        `/api/v1/org/members/${encodeURIComponent(body.userId)}/role`,
+        {
+          method: "PATCH",
+          body: JSON.stringify({ role: body.role }),
+        },
+      ),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["org-members"] });
+    },
+  });
+}

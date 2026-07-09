@@ -1,9 +1,14 @@
 import { Router } from "express";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../../db/client.js";
 import { organizationMembers, organizations, users } from "../../db/schema.js";
 import { nowIso } from "../../lib/ids.js";
+import {
+  canChangeMemberRole,
+  normalizeMemberRole,
+  validateMemberRoleChange,
+} from "../../lib/rbac.js";
 import { requireAuth, type AuthedRequest } from "../../middleware/auth.js";
 import { orgScopeMiddleware } from "../../middleware/org-scope.js";
 import orgInvitesRoutes from "./org-invites.js";
@@ -28,10 +33,17 @@ const leadershipEntrySchema = z.object({
   email: z.string().optional(),
 });
 
+const hostnameSchema = z
+  .string()
+  .regex(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i, "Invalid hostname")
+  .or(z.literal(""));
+
 const locationEntrySchema = z.object({
   id: z.string().optional(),
   name: z.string(),
   region: z.string().optional(),
+  parentRegion: z.string().optional(),
+  isPrimary: z.boolean().optional(),
   address: z.string().optional(),
 });
 
@@ -48,8 +60,13 @@ const orgProfileSchema = z
     logoUrl: z.union([z.string().url(), z.literal("")]).optional(),
     brandColor: z.union([z.string().regex(/^#[0-9A-Fa-f]{6}$/), z.literal("")]).optional(),
     productName: z.string().optional(),
+    customDomain: hostnameSchema.optional(),
   })
   .passthrough();
+
+const updateMemberRoleSchema = z.object({
+  role: z.enum(["owner", "admin", "member", "viewer"]),
+});
 
 const profileSchema = z.object({
   name: z.string().min(1).optional(),
@@ -89,6 +106,57 @@ router.get("/members", async (req, res) => {
   });
 
   res.json({ members });
+});
+
+/** Change a member role — owner/admin only; blocks self-demote owner. */
+router.patch("/members/:userId/role", async (req, res) => {
+  const auth = (req as unknown as AuthedRequest).auth;
+  if (!canChangeMemberRole(auth.role, auth.email)) {
+    res.status(403).json({ error: "Only organization owners or admins can change member roles" });
+    return;
+  }
+
+  const parsed = updateMemberRoleSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
+    return;
+  }
+
+  const targetUserId = req.params.userId;
+  const db = getDb();
+  const memberRows = await db
+    .select()
+    .from(organizationMembers)
+    .where(eq(organizationMembers.orgId, auth.orgId));
+
+  const target = memberRows.find((m) => m.userId === targetUserId);
+  if (!target) {
+    res.status(404).json({ error: "Member not found in this organization" });
+    return;
+  }
+
+  const ownerCount = memberRows.filter((m) => m.role.toLowerCase() === "owner").length;
+  const validation = validateMemberRoleChange({
+    actorUserId: auth.userId,
+    actorRole: auth.role,
+    targetUserId,
+    targetCurrentRole: target.role,
+    newRole: parsed.data.role,
+    ownerCount,
+  });
+  if (!validation.ok) {
+    res.status(400).json({ error: validation.error });
+    return;
+  }
+
+  const role = normalizeMemberRole(parsed.data.role);
+  const ts = nowIso();
+  await db
+    .update(organizationMembers)
+    .set({ role })
+    .where(and(eq(organizationMembers.orgId, auth.orgId), eq(organizationMembers.userId, targetUserId)));
+
+  res.json({ ok: true, userId: targetUserId, role, updatedAt: ts });
 });
 
 router.get("/profile", async (req, res) => {

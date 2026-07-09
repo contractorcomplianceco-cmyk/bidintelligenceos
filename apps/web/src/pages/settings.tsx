@@ -21,6 +21,7 @@ import {
   useOrgInvites,
   useOrgMembers,
   useRevokeOrgInvite,
+  useUpdateOrgMemberRole,
 } from "@/hooks/use-org-invites";
 import { DemoDataBadge } from "@/components/demo-data-badge";
 import { useEffect, useRef, useState } from "react";
@@ -30,8 +31,11 @@ import {
   ENTERPRISE_LOCATIONS,
   ENTERPRISE_PERMISSIONS,
   ENTERPRISE_ROLES,
+  RBAC_PERMISSIONS,
+  RBAC_ROLE_TEMPLATES,
 } from "@core/enterprise";
-import { parseBrandColor, parseCertifications, parseLeadershipEntries, parseLicenseEntries, parseLocationEntries, parseStringField, parseUrlField, type LeadershipEntry, type LicenseEntry, type LocationEntry } from "@/lib/org-profile";
+import { parseBrandColor, parseCertifications, parseHostnameField, parseLeadershipEntries, parseLicenseEntries, parseLocationEntries, parseStringField, parseUrlField, type LeadershipEntry, type LicenseEntry, type LocationEntry } from "@/lib/org-profile";
+import { filterLocationsByRegion, groupLocationsByRegion, uniqueLocationRegions } from "@/lib/location-rollups";
 
 export default function Settings() {
   const { mode, setMode, vertical, setVertical, verticalConfig } = useAppContext();
@@ -47,6 +51,7 @@ export default function Settings() {
   const createInvite = useCreateOrgInvite();
   const revokeInvite = useRevokeOrgInvite();
   const acceptInvite = useAcceptOrgInvite();
+  const updateMemberRole = useUpdateOrgMemberRole();
   const [, setLocation] = useLocation();
   const inviteAcceptStarted = useRef(false);
 
@@ -100,6 +105,7 @@ export default function Settings() {
   const [locations, setLocations] = useState<LocationEntry[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("member");
+  const [locationRegionFilter, setLocationRegionFilter] = useState("all");
 
   useEffect(() => {
     if (!live || !org) return;
@@ -113,6 +119,7 @@ export default function Settings() {
     setProductName(parseStringField(org.profile?.productName));
     setBrandColor(parseBrandColor(org.profile?.brandColor, BRAND_COLORS[0].hex));
     setLocations(parseLocationEntries(org.profile?.locations));
+    setCustomDomain(parseHostnameField(org.profile?.customDomain));
   }, [live, org?.id, org?.profile]);
 
   useEffect(() => {
@@ -139,7 +146,7 @@ export default function Settings() {
   }, [live, acceptInvite, setLocation, toast]);
 
   const [brandColor, setBrandColor] = useState(BRAND_COLORS[0].hex);
-  const [customDomain, setCustomDomain] = useState("bids.yourcompany.com");
+  const [customDomain, setCustomDomain] = useState("");
   const [rollupEnabled, setRollupEnabled] = useState(true);
   const [regionalSegmentation, setRegionalSegmentation] = useState(false);
 
@@ -168,10 +175,21 @@ export default function Settings() {
         id: entry.id?.trim() || `loc-${index}`,
         name: entry.name.trim(),
         ...(entry.region?.trim() ? { region: entry.region.trim() } : {}),
+        ...(entry.parentRegion?.trim() ? { parentRegion: entry.parentRegion.trim() } : {}),
+        ...(entry.isPrimary ? { isPrimary: true } : {}),
         ...(entry.address?.trim() ? { address: entry.address.trim() } : {}),
       }))
       .filter((entry) => entry.name.length > 0);
     const trimmedLogoUrl = logoUrl.trim();
+    const trimmedCustomDomain = customDomain.trim().toLowerCase();
+    if (trimmedCustomDomain && !parseHostnameField(trimmedCustomDomain)) {
+      toast({
+        title: "Invalid custom domain",
+        description: "Enter a valid hostname such as bids.yourcompany.com.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (trimmedLogoUrl && !parseUrlField(trimmedLogoUrl)) {
       toast({
         title: "Invalid logo URL",
@@ -191,6 +209,7 @@ export default function Settings() {
         locations: nextLocations,
         brandName: brandName.trim(),
         productName: productName.trim(),
+        ...(trimmedCustomDomain ? { customDomain: trimmedCustomDomain } : { customDomain: "" }),
         ...(trimmedLogoUrl ? { logoUrl: trimmedLogoUrl } : { logoUrl: "" }),
         brandColor,
       },
@@ -636,8 +655,29 @@ export default function Settings() {
                 </div>
                 <p className="text-xs text-slate-500 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] px-3 py-2 flex items-start gap-2">
                   <Globe className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                  Custom domain (DNS verification and TLS) is deferred to a later Phase 5 slice — use logo URL for now; file upload is not required when a hosted logo link is available.
+                  Custom domain is saved on your org profile. DNS cutover and TLS provisioning are manual — see deploy RUNBOOK § Custom domain.
                 </p>
+                <div className="space-y-2">
+                  <Label htmlFor="customDomainLive" className="text-xs font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                    <Globe className="w-3.5 h-3.5" /> Custom domain
+                  </Label>
+                  <Input
+                    id="customDomainLive"
+                    value={customDomain}
+                    onChange={(e) => setCustomDomain(e.target.value)}
+                    placeholder="bids.yourcompany.com"
+                    className="bg-[#F1F5F9] border-[#E2E8F0] text-slate-700"
+                  />
+                  <div className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs text-sky-900 space-y-1">
+                    <p className="font-semibold">DNS instructions (no TLS automation yet)</p>
+                    <p>
+                      Add a <code className="bg-white/80 px-1 rounded">CNAME</code> record pointing{" "}
+                      <strong>{customDomain.trim() || "bids.yourcompany.com"}</strong> to{" "}
+                      <code className="bg-white/80 px-1 rounded">bidintelligence.cagteam.net</code>.
+                    </p>
+                    <p className="text-sky-700">TLS certificate cutover is deferred to Carmen — save the hostname here first.</p>
+                  </div>
+                </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="logoUrl" className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -907,14 +947,57 @@ export default function Settings() {
                   Locations
                 </CardTitle>
                 <CardDescription className="text-slate-500">
-                  Offices, branches, or franchise sites. Name and region are required; address is optional.
+                  Offices, branches, or franchise sites. Group by parent region for rollups; mark one primary HQ.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
+                {locations.length > 0 && uniqueLocationRegions(locations).length > 0 && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Filter by region</Label>
+                    <Select value={locationRegionFilter} onValueChange={setLocationRegionFilter}>
+                      <SelectTrigger className="w-[200px] bg-white border-[#E2E8F0]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All regions</SelectItem>
+                        {uniqueLocationRegions(locations).map((region) => (
+                          <SelectItem key={region} value={region}>
+                            {region}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <span className="text-xs text-slate-500">
+                      {filterLocationsByRegion(locations, locationRegionFilter).length} of {locations.length} locations
+                    </span>
+                  </div>
+                )}
+                {locations.length > 0 && (
+                  <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                    <div className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3">
+                      <p className="text-xs text-slate-500">Locations</p>
+                      <p className="text-xl font-bold text-slate-900">{locations.length}</p>
+                    </div>
+                    <div className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3">
+                      <p className="text-xs text-slate-500">Regions</p>
+                      <p className="text-xl font-bold text-slate-900">
+                        {uniqueLocationRegions(locations).length || "—"}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-3">
+                      <p className="text-xs text-slate-500">Primary HQ</p>
+                      <p className="text-sm font-semibold text-slate-900 truncate">
+                        {locations.find((l) => l.isPrimary)?.name || "Not set"}
+                      </p>
+                    </div>
+                  </div>
+                )}
                 {locations.length === 0 ? (
                   <p className="text-sm text-slate-500">No locations on file. Add your first site below.</p>
                 ) : (
-                  locations.map((entry, index) => (
+                  filterLocationsByRegion(locations, locationRegionFilter).map((entry) => {
+                    const index = locations.findIndex((row) => row.id === entry.id && row.name === entry.name);
+                    return (
                     <div key={entry.id ?? index} className="grid gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4 md:grid-cols-2">
                       <div className="space-y-2">
                         <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</Label>
@@ -942,6 +1025,42 @@ export default function Settings() {
                           className="bg-white border-[#E2E8F0] text-slate-700"
                         />
                       </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Parent region (rollup)</Label>
+                        <Input
+                          value={entry.parentRegion ?? ""}
+                          onChange={(e) =>
+                            setLocations((rows) =>
+                              rows.map((row, i) => (i === index ? { ...row, parentRegion: e.target.value } : row)),
+                            )
+                          }
+                          placeholder="Texas"
+                          className="bg-white border-[#E2E8F0] text-slate-700"
+                        />
+                      </div>
+                      <div className="flex items-end gap-3">
+                        <div className="flex items-center gap-2 pb-2">
+                          <Switch
+                            id={`primary-${entry.id}`}
+                            checked={Boolean(entry.isPrimary)}
+                            onCheckedChange={(checked) =>
+                              setLocations((rows) =>
+                                rows.map((row, i) =>
+                                  i === index
+                                    ? { ...row, isPrimary: checked }
+                                    : checked
+                                      ? { ...row, isPrimary: false }
+                                      : row,
+                                ),
+                              )
+                            }
+                            className="data-[state=checked]:bg-[#38BDF8]"
+                          />
+                          <Label htmlFor={`primary-${entry.id}`} className="text-sm text-slate-700">
+                            Primary HQ
+                          </Label>
+                        </div>
+                      </div>
                       <div className="space-y-2 md:col-span-2">
                         <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Address (optional)</Label>
                         <Input
@@ -966,7 +1085,8 @@ export default function Settings() {
                         </Button>
                       </div>
                     </div>
-                  ))
+                    );
+                  })
                 )}
                 <Button
                   variant="outline"
@@ -1361,33 +1481,118 @@ export default function Settings() {
                 Team & Invites
               </h3>
               <p className="text-slate-500 mt-1">
-                Organization members and pending invites. Owners and admins can invite teammates with scoped roles.
+                Organization members, role templates, and pending invites. Owners and admins can invite teammates and change roles.
               </p>
             </div>
 
             <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
               <CardHeader className="border-b border-[#E2E8F0] pb-4">
+                <CardTitle className="text-lg text-slate-900 flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-[#0284C7]" />
+                  Role templates & permissions
+                </CardTitle>
+                <CardDescription className="text-slate-500">
+                  Canonical RBAC matrix for owner, admin, member, and viewer roles. Enforced on invites and member role changes.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-3">
+                {RBAC_ROLE_TEMPLATES.map((role) => {
+                  const memberCount = members.filter((m) => m.role.toLowerCase() === role.id).length;
+                  return (
+                    <div key={role.id} className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-slate-500" />
+                          <p className="text-sm font-semibold text-slate-900">{role.name}</p>
+                          <span className="text-xs text-slate-500">· {memberCount} member{memberCount === 1 ? "" : "s"}</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-slate-500 mt-1">{role.description}</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {RBAC_PERMISSIONS.map((perm) => {
+                          const granted = role.permissions.includes(perm.id);
+                          return (
+                            <span
+                              key={perm.id}
+                              title={perm.description}
+                              className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+                                granted
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                                  : "bg-white text-slate-400 border-[#E2E8F0]"
+                              }`}
+                            >
+                              {granted && <Check className="h-3 w-3" />}
+                              {perm.label}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white border-[#E2E8F0] shadow-sm rounded-xl">
+              <CardHeader className="border-b border-[#E2E8F0] pb-4">
                 <CardTitle className="text-lg text-slate-900">Members</CardTitle>
                 <CardDescription className="text-slate-500">
-                  Active users in your organization from organization_members.
+                  Active users in your organization. Owners and admins can change roles (owners cannot demote themselves).
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-6 space-y-2">
                 {members.length === 0 ? (
                   <p className="text-sm text-slate-500">No members loaded.</p>
                 ) : (
-                  members.map((m) => (
-                    <div
-                      key={m.userId}
-                      className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] px-4 py-3"
-                    >
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{m.name || m.email}</p>
-                        <p className="text-xs text-slate-500">{m.email}</p>
+                  members.map((m) => {
+                    const isSelf = user?.id === m.userId;
+                    const canEditRole = teamAdmin && !isSelf;
+                    return (
+                      <div
+                        key={m.userId}
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] px-4 py-3"
+                      >
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">
+                            {m.name || m.email}
+                            {isSelf ? (
+                              <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">You</span>
+                            ) : null}
+                          </p>
+                          <p className="text-xs text-slate-500">{m.email}</p>
+                        </div>
+                        {canEditRole ? (
+                          <Select
+                            value={m.role.toLowerCase()}
+                            onValueChange={(role) =>
+                              updateMemberRole.mutate(
+                                { userId: m.userId, role },
+                                {
+                                  onSuccess: () => toast({ title: "Role updated", description: `${m.email} is now ${role}.` }),
+                                  onError: (err: Error) =>
+                                    toast({ title: "Role change failed", description: err.message, variant: "destructive" }),
+                                },
+                              )
+                            }
+                          >
+                            <SelectTrigger className="w-[140px] bg-white border-[#E2E8F0] text-xs font-semibold uppercase">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {user?.role?.toLowerCase() === "owner" ? (
+                                <SelectItem value="owner">Owner</SelectItem>
+                              ) : null}
+                              <SelectItem value="admin">Admin</SelectItem>
+                              <SelectItem value="member">Member</SelectItem>
+                              <SelectItem value="viewer">Viewer</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <span className="text-xs font-semibold uppercase tracking-wider text-[#0284C7]">{m.role}</span>
+                        )}
                       </div>
-                      <span className="text-xs font-semibold uppercase tracking-wider text-[#0284C7]">{m.role}</span>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </CardContent>
             </Card>

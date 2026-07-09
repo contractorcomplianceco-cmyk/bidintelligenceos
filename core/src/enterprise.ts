@@ -1,9 +1,9 @@
 /**
- * Seed data for the Enterprise & White-Label settings section.
+ * Enterprise settings seed data and RBAC role templates.
  *
- * Prototype-only. Nothing here is persisted — these structures back local UI
- * state for demonstrating Enterprise-plan capabilities (branding, multi-location
- * rollups, role-based access). All figures are illustrative sample data.
+ * RBAC_ROLE_TEMPLATES and RBAC_PERMISSIONS are the canonical permission matrix
+ * for live org invites and member role management. ENTERPRISE_* demo fixtures
+ * remain for anonymous / demo sessions only.
  */
 
 export interface BrandColor {
@@ -70,61 +70,107 @@ export const ENTERPRISE_LOCATIONS: EnterpriseLocation[] = [
   },
 ];
 
+/** Canonical RBAC permissions enforced via org member roles. */
+export interface RbacPermission {
+  id: string;
+  label: string;
+  description: string;
+}
+
+export const RBAC_PERMISSIONS: RbacPermission[] = [
+  { id: "view-bids", label: "View bids", description: "Read bid pipeline, documents, and scores" },
+  { id: "edit-bids", label: "Edit bids", description: "Create and update bids, intake, and package sections" },
+  { id: "manage-jobs", label: "Manage jobs", description: "Deploy won work, scheduling, labor, and closeout" },
+  { id: "manage-members", label: "Manage members", description: "Invite teammates and change member roles" },
+  { id: "manage-org", label: "Manage organization", description: "Update org profile, branding, and enterprise settings" },
+  { id: "export-packages", label: "Export packages", description: "Generate client-facing PDF/DOCX after human review" },
+];
+
+export interface RbacRoleTemplate {
+  id: "owner" | "admin" | "member" | "viewer";
+  name: string;
+  description: string;
+  /** ids from RBAC_PERMISSIONS granted to this role */
+  permissions: string[];
+}
+
+/** Live org role templates — owner/admin/member/viewer. */
+export const RBAC_ROLE_TEMPLATES: RbacRoleTemplate[] = [
+  {
+    id: "owner",
+    name: "Owner",
+    description: "Full workspace control, billing, and member administration.",
+    permissions: ["view-bids", "edit-bids", "manage-jobs", "manage-members", "manage-org", "export-packages"],
+  },
+  {
+    id: "admin",
+    name: "Admin",
+    description: "Manage team, org settings, and all bid/job workflows except ownership transfer.",
+    permissions: ["view-bids", "edit-bids", "manage-jobs", "manage-members", "manage-org", "export-packages"],
+  },
+  {
+    id: "member",
+    name: "Member",
+    description: "Build bids, run jobs, and export reviewed packages.",
+    permissions: ["view-bids", "edit-bids", "manage-jobs", "export-packages"],
+  },
+  {
+    id: "viewer",
+    name: "Viewer",
+    description: "Read-only access to bids and job status.",
+    permissions: ["view-bids"],
+  },
+];
+
+/** @deprecated Demo-only — use RBAC_ROLE_TEMPLATES for live team RBAC. */
 export interface EnterprisePermission {
   id: string;
   label: string;
 }
 
-export const ENTERPRISE_PERMISSIONS: EnterprisePermission[] = [
-  { id: "view-bids", label: "View bids" },
-  { id: "edit-pricing", label: "Edit pricing" },
-  { id: "approve-packages", label: "Approve packages" },
-  { id: "manage-jobs", label: "Manage jobs" },
-];
+/** @deprecated Demo-only — use RBAC_PERMISSIONS for live team RBAC. */
+export const ENTERPRISE_PERMISSIONS: EnterprisePermission[] = RBAC_PERMISSIONS.map(({ id, label }) => ({
+  id,
+  label,
+}));
 
+/** @deprecated Demo-only — use RBAC_ROLE_TEMPLATES for live team RBAC. */
 export interface EnterpriseRole {
   id: string;
   name: string;
   description: string;
   members: number;
-  /** ids from ENTERPRISE_PERMISSIONS granted to this role */
   permissions: string[];
 }
 
+/** @deprecated Demo-only fixture roles for anonymous enterprise tab. */
 export const ENTERPRISE_ROLES: EnterpriseRole[] = [
   {
     id: "owner",
     name: "Owner",
     description: "Full workspace control and billing.",
     members: 2,
-    permissions: ["view-bids", "edit-pricing", "approve-packages", "manage-jobs"],
+    permissions: ["view-bids", "edit-bids", "manage-jobs", "manage-members", "manage-org", "export-packages"],
   },
   {
-    id: "estimator",
-    name: "Estimator",
-    description: "Builds and prices bid packages.",
-    members: 6,
-    permissions: ["view-bids", "edit-pricing"],
-  },
-  {
-    id: "pm",
-    name: "Project Manager",
-    description: "Runs approvals and job handoff.",
-    members: 4,
-    permissions: ["view-bids", "approve-packages", "manage-jobs"],
-  },
-  {
-    id: "field",
-    name: "Field",
-    description: "Read-only field access to won work.",
-    members: 12,
-    permissions: ["view-bids", "manage-jobs"],
-  },
-  {
-    id: "finance",
-    name: "Finance",
-    description: "Reviews margins and reporting.",
+    id: "admin",
+    name: "Admin",
+    description: "Team and org administration.",
     members: 3,
-    permissions: ["view-bids", "edit-pricing"],
+    permissions: ["view-bids", "edit-bids", "manage-jobs", "manage-members", "manage-org", "export-packages"],
+  },
+  {
+    id: "member",
+    name: "Member",
+    description: "Builds and prices bid packages.",
+    members: 8,
+    permissions: ["view-bids", "edit-bids", "manage-jobs", "export-packages"],
+  },
+  {
+    id: "viewer",
+    name: "Viewer",
+    description: "Read-only field access.",
+    members: 5,
+    permissions: ["view-bids"],
   },
 ];
