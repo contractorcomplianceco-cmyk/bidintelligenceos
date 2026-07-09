@@ -78,7 +78,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 |--------|-------|--------|-------|
 | Add-On Marketplace | `/add-ons` | demo | Catalog of connected and coming-soon add-ons; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | VoiceConnect | `/voice-connect` | **partial live** | Demo fixtures for anonymous/demo sessions; live status + capture UI link from `VOICE_CONNECT_API_URL` when configured and healthy; `OpsModuleEmpty` for authed team users when not configured or unreachable; command bar hidden when signed in |
-| VideoConnect | `/video-connect` | **partial live** | Demo fixtures for anonymous/demo sessions; live status + walkthroughs from `VIDEO_CONNECT_API_URL` when configured and healthy; `OpsModuleEmpty` for authed team users when not configured or unreachable |
+| VideoConnect | `/video-connect` | **partial live** | Demo fixtures for anonymous/demo sessions; live status + walkthroughs from `VIDEO_CONNECT_API_URL` when configured; capture form + persisted walkthrough list on VideoConnect API; full video processing deferred |
 | BuildConnect | `/build-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | ComplianceConnect | `/compliance-connect` | demo | Marketing showcase; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | CompetitorWatchOS | `/competitor-watch` | demo | Seed fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users; coming soon |
@@ -87,8 +87,8 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses, certifications, primary contact, leadership, and white-label header (`brandName`, `logoUrl`, `brandColor`, optional `productName`) from org profile JSON when signed in; demo fixtures for anonymous sessions only |
-| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile`; enterprise tab persists licenses, certifications, contact, leadership, white-label fields (`brandName`, `productName`, `logoUrl`, `brandColor`), and `locations[]`; Team tab for org invites (owner/admin); franchise rollups and custom domain deferred |
+| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses, certifications, primary contact, leadership, locations grouped by region, and white-label header from org profile JSON when signed in; demo fixtures for anonymous sessions only |
+| Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile`; enterprise tab persists licenses, certifications, contact, leadership, white-label fields (`brandName`, `productName`, `logoUrl`, `brandColor`, `customDomain`), and `locations[]` (with `parentRegion`, `isPrimary`); Team tab: RBAC permission matrix, member role changes (`PATCH /api/v1/org/members/:userId/role`), org invites (owner/admin); TLS for custom domain deferred |
 
 ## Orphan routes (not in nav)
 
@@ -124,17 +124,23 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | `POST/GET/DELETE /api/v1/org/invites` | Org invite create, list pending, revoke (owner/admin) |
 | `POST /api/v1/org/invites/accept` | Accept invite token → `organization_members` |
 | `GET /api/v1/org/members` | Organization members join |
+| `PATCH /api/v1/org/members/:userId/role` | Change member role (owner/admin; blocks self-demote owner) |
 | `GET /api/v1/integrations/voice-connect/status` | VoiceConnect bridge status |
 | `GET /api/v1/integrations/voice-connect/captures` | VoiceConnect capture list proxy |
+| `GET /api/v1/integrations/sam-gov/status` | SAM.gov feed configured stub |
+| `GET /api/v1/integrations/bls/status` | BLS feed configured stub |
+| `GET /api/v1/integrations/zoho/status` | Zoho sync configured stub |
 
 ## Phase 5 (deferred)
 
 | Surface | Status | Notes |
 |---------|--------|-------|
-| Settings enterprise — white label | **partial live** | `brandName`, `productName`, `logoUrl`, `brandColor` persist and apply to sidebar + business profile; custom domain DNS/TLS deferred |
-| Settings enterprise — multi-location | **partial live** | `locations[]` (name, region, address) in `profile_json` + settings UI; franchise rollups and regional KPIs deferred |
-| Settings enterprise — RBAC | **partial live** | Org invites + member list live; role templates and permission matrix UI remain demo |
-| `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses`, `certifications`, `phone`, `contactEmail`, `leadership`, white-label fields, and `locations` persist in `organizations.profile_json` |
+| Settings enterprise — white label | **partial live** | `brandName`, `productName`, `logoUrl`, `brandColor`, `customDomain` persist; DNS instructions in UI; TLS cutover in RUNBOOK (manual — Carmen) |
+| Settings enterprise — multi-location | **partial live** | `locations[]` with `parentRegion`, `isPrimary`; regional grouping on business profile + analytics; region filter in settings |
+| Settings enterprise — RBAC | **partial live** | Role templates + permission matrix on Team tab; `PATCH /api/v1/org/members/:userId/role`; org invites live |
+| `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses`, `certifications`, `phone`, `contactEmail`, `leadership`, white-label fields, `customDomain`, and `locations` persist in `organizations.profile_json` |
 | Clerk production cutover | **live** | `AUTH_ENABLED=true` on team URL; legacy login disabled when Clerk enabled |
 | Full client export PDF/DOCX | **live** | Server-side generation after `humanReviewApproved` on bid score |
-| VideoConnect capture upload | planned | Metadata stub (`POST /api/walkthroughs`); full video pipeline deferred |
+| VideoConnect capture upload | **partial live** | VideoConnect API: JSON/multipart `POST /api/walkthroughs`, persisted list, `/capture` form; video processing + visual intelligence deferred |
+| Platform feeds (SAM.gov / BLS / Zoho) | **partial live** | Env-gated status routes + honest UI when keys missing; live feed wiring deferred |
+| Audit-Risk-Model PR #2 | **deferred** | Awaiting Rose sign-off — do not merge without approval |
