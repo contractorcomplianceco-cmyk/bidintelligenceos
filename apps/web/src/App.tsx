@@ -54,6 +54,10 @@ import CostInputs from "@/pages/cost-inputs";
 import BidFit from "@/pages/bid-fit";
 import StrategyMemo from "@/pages/strategy-memo";
 
+// Orphan ops pages (reachable by route, not in main nav)
+import Monitoring from "@/pages/monitoring";
+import BidLibrary from "@/pages/bid-library";
+
 // Legacy screens (kept reachable by route, folded out of the main nav)
 import Dashboard from "@/pages/dashboard";
 import Projects from "@/pages/projects";
@@ -148,6 +152,10 @@ function Router() {
       <Route path="/cost-inputs" component={CostInputs} />
       <Route path="/bid-fit" component={BidFit} />
       <Route path="/strategy-memo" component={StrategyMemo} />
+
+      {/* Orphan ops routes (not in main nav) */}
+      <Route path="/monitoring" component={Monitoring} />
+      <Route path="/bid-library" component={BidLibrary} />
 
       {/* Legacy routes (not in main nav) */}
       <Route path="/cockpit" component={Dashboard} />

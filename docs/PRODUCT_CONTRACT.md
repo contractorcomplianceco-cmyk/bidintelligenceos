@@ -27,9 +27,11 @@ Living map of marketing promises → routes → data status. Update when a modul
 | Bid Intelligence | `/bids`, `/bids/:id` | **live** | API CRUD, Go/No-Go score workflow, outcome recording when authenticated |
 | Bid Fit | `/bid-fit` | **partial live** | Live 12-category score when `?bidId=` + signed in; demo otherwise |
 | New bid intake | `/new-bid` | **live** | Draft + document upload + ROSEOS scope analysis |
-| Package Builder | `/package-builder` | **partial live** | Live bid packages + uploaded documents + jurisdiction/compliance from `/api/v1/ops/package-builder`; full preview demo |
+| Package Builder | `/package-builder` | **live** | Section preview from uploaded bid documents + compliance gates via `/api/v1/ops/package-builder`; demo templates for anonymous sessions |
 | Won Jobs | `/won-jobs` | **live** | Jobs from `/api/v1/jobs`; convert won bids via `POST /api/v1/jobs/from-bid/:bidId` |
 | Government Contracting | `/government` | demo | Seed |
+| Bid Library | `/bid-library` | **partial live** | Orphan route (not in nav). Live bids list from `/api/v1/bids` when signed in; demo fixtures otherwise; `OpsModuleEmpty` when authed with no bids |
+| Bid Monitoring | `/monitoring` | **partial live** | Orphan route (not in nav). Active pipeline from `/api/v1/bids` + jobs KPIs + `/api/health` when signed in; demo fixtures otherwise |
 
 ## Job execution
 
@@ -39,10 +41,10 @@ Living map of marketing promises → routes → data status. Update when a modul
 | Scheduling | `/scheduling` | **live** | Schedule events from `/api/v1/ops/scheduling` (job payload milestones) |
 | Labor & Subs | `/labor` | **live** | Crew/subs from job payload via `/api/v1/ops/labor` |
 | Permits | `/permits` | **partial live** | Job payload permits + jurisdiction/compliance-derived items via `/api/v1/ops/permits` |
-| Weather | `/weather` | **partial live** | Placeholder forecast per active job; external feed optional |
+| Weather | `/weather` | **partial live** | Open-Meteo 5-day forecast per active job (geocoded from site city/state); placeholder fallback when geocode fails |
 | Cost & ROI | `/cost-roi` | **partial live** | Job table + portfolio snapshot from `/api/v1/ops/cost-roi`; labor burn time-series demo |
 | Risk & Change Orders | `/risk` | **partial live** | Risks from jobs/bids/scores via `/api/v1/ops/risk`; profit-fade from live cost when available |
-| Job Closeout | `/closeout` | **partial live** | Won/completed jobs (completion ≥70% on won bids) via `/api/v1/ops/closeout`; punch list demo |
+| Job Closeout | `/closeout` | **live** | Won/completed jobs via `/api/v1/ops/closeout`; punch list, closeout docs, and completion chart from job payload when present; honest empty otherwise |
 
 ## Intelligence
 
@@ -74,7 +76,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 | `GET /api/v1/ops/scheduling` | Schedule events from job payload |
 | `GET /api/v1/ops/permits` | Permits from job payload + jurisdiction/compliance derivation |
 | `GET /api/v1/ops/labor` | Crew/subs from job payload |
-| `GET /api/v1/ops/weather` | Weather placeholder per active job |
+| `GET /api/v1/ops/weather` | Open-Meteo forecast per active job (geocode from location); placeholder fallback |
 | `GET /api/v1/ops/closeout` | Closeout pipeline from won/completed jobs (completion fields) |
 | `GET /api/v1/ops/cost-roi` | Cost records from job budget fields |
 | `GET /api/v1/ops/risk` | Risks + change orders derived from jobs/bids |
