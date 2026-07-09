@@ -204,23 +204,41 @@ router.get("/roseos/summary", async (req, res) => {
     insights.length > 0
       ? insights.map((i) => ({
           id: i.id,
+          section: i.section,
           title: i.title,
           verdict: i.verdict,
+          subject: i.subject,
+          rationale: i.rationale,
           summary: i.rationale,
           recommendation: i.recommendation,
+          sourceModule: i.sourceModule,
+          sourceSignal: i.sourceSignal,
+          confidence: i.confidence,
+          detectedAgo: i.detectedAgo,
           href: i.href,
           humanReviewed: i.humanReviewed,
-          section: i.section,
         }))
       : [
           {
             id: "rose-fallback",
+            section: "bid-risk" as const,
             title: "Pipeline follow-up pressure",
             verdict,
+            subject: "Active pipeline",
+            rationale:
+              overdue.length > 0
+                ? `${overdue.length} bid(s) need follow-up action this week.`
+                : "Follow-up queue is within normal range.",
             summary:
               overdue.length > 0
                 ? `${overdue.length} bid(s) need follow-up action this week.`
                 : "Follow-up queue is within normal range.",
+            recommendation: "Review follow-up queue and prioritize overdue bids before submission windows close.",
+            sourceModule: "BidIntelligenceOS" as const,
+            sourceSignal: "Pipeline snapshot",
+            confidence: "High" as const,
+            detectedAgo: "just now",
+            href: "/bids",
             humanReviewed: true,
           },
         ];

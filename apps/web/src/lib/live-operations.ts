@@ -1,12 +1,14 @@
 import type { AlertItem, AlertSeverity, BriefingItem, DailyBriefing } from "@core/operations";
 import type { CommandCenterProjection } from "@/hooks/use-command-center";
 import type { OpsAlert } from "@/hooks/use-ops";
+import type { ExecutivePriority, RoseInsight, RoseStats as RoseVerdictStats, Verdict } from "@core/roseos";
 
-type RoseInsight = {
+type AlertRoseInsight = {
   id: string;
   title: string;
   verdict: string;
-  summary: string;
+  summary?: string;
+  rationale?: string;
   recommendation?: string;
 };
 
@@ -54,7 +56,7 @@ function mapOpsAlert(a: OpsAlert): AlertItem {
 
 export function buildLiveAlerts(
   projection: CommandCenterProjection | undefined,
-  roseInsights: RoseInsight[] = [],
+  roseInsights: AlertRoseInsight[] = [],
   opsAlerts: OpsAlert[] = [],
 ): AlertItem[] {
   const alerts: AlertItem[] = [];
@@ -81,7 +83,7 @@ export function buildLiveAlerts(
         severity: verdictToSeverity(insight.verdict),
         category: "Follow-Up",
         title: insight.title,
-        detail: insight.summary,
+        detail: insight.summary ?? insight.rationale ?? "",
         time: "Today",
         action: insight.recommendation ?? "Review insight",
         resolved: false,
@@ -112,7 +114,7 @@ export function buildLiveAlerts(
 export function buildLiveBriefing(
   projection: CommandCenterProjection | undefined,
   roseStats: RoseStats | undefined,
-  roseInsights: RoseInsight[] = [],
+  roseInsights: AlertRoseInsight[] = [],
   userName?: string,
 ): DailyBriefing {
   const firstName = userName?.split(" ")[0] ?? "there";
@@ -157,7 +159,7 @@ export function buildLiveBriefing(
         id: `rose-brief-${insight.id}`,
         category: "Follow-Up",
         headline: insight.title,
-        detail: insight.summary,
+        detail: insight.summary ?? insight.rationale ?? "",
         priority: verdictToSeverity(insight.verdict),
         action: insight.recommendation ?? "Review ROSEOS insight",
       });
@@ -180,4 +182,62 @@ export function buildLiveBriefing(
     ],
     items,
   };
+}
+
+export type RoseSummaryInsight = {
+  id: string;
+  section?: string;
+  title: string;
+  verdict: string;
+  subject?: string;
+  rationale?: string;
+  summary?: string;
+  recommendation?: string;
+  sourceModule?: string;
+  sourceSignal?: string;
+  confidence?: string;
+  detectedAgo?: string;
+  href?: string;
+};
+
+export function mapRoseSummaryInsights(insights: RoseSummaryInsight[]): RoseInsight[] {
+  return insights.map((i) => ({
+    id: i.id,
+    section: (i.section ?? "bid-risk") as RoseInsight["section"],
+    verdict: i.verdict as Verdict,
+    title: i.title,
+    subject: i.subject ?? i.title,
+    rationale: i.rationale ?? i.summary ?? "",
+    recommendation: i.recommendation ?? "Review with your estimator team before client-facing use.",
+    sourceModule: (i.sourceModule ?? "BidIntelligenceOS") as RoseInsight["sourceModule"],
+    sourceSignal: i.sourceSignal ?? "Bid pipeline",
+    confidence: (i.confidence === "High" || i.confidence === "Low" ? i.confidence : "Medium") as RoseInsight["confidence"],
+    detectedAgo: i.detectedAgo ?? "just now",
+    href: i.href,
+  }));
+}
+
+export function roseStatsFromInsights(insights: RoseInsight[]): RoseVerdictStats {
+  return {
+    total: insights.length,
+    green: insights.filter((i) => i.verdict === "green").length,
+    yellow: insights.filter((i) => i.verdict === "yellow").length,
+    red: insights.filter((i) => i.verdict === "red").length,
+    modulesMonitored: new Set(insights.map((i) => i.sourceModule)).size || 1,
+  };
+}
+
+export function buildLiveExecutivePriorities(insights: RoseInsight[]): ExecutivePriority[] {
+  const ranked = [...insights].sort((a, b) => {
+    const order: Record<Verdict, number> = { red: 0, yellow: 1, green: 2 };
+    return order[a.verdict] - order[b.verdict];
+  });
+  return ranked.slice(0, 3).map((i) => ({
+    id: i.id,
+    verdict: i.verdict,
+    headline: i.title,
+    detail: i.rationale,
+    sourceModule: i.sourceModule,
+    href: i.href ?? "/roseos",
+  }));
 }

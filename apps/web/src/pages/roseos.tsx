@@ -1,14 +1,19 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "wouter";
 import { useRoseOsSummary } from "@/hooks/use-bids";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
+import {
+  buildLiveExecutivePriorities,
+  mapRoseSummaryInsights,
+  roseStatsFromInsights,
+} from "@/lib/live-operations";
+import { DemoDataBadge } from "@/components/demo-data-badge";
 import { Layout } from "@/components/layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAppContext } from "@/lib/context";
 import {
   roseInsights,
-  insightsBySection,
   executiveSummary,
   roseStats,
   ROSE_SECTIONS,
@@ -16,6 +21,7 @@ import {
   VERDICT_META,
   type Verdict,
   type RoseSectionMeta,
+  type RoseInsight,
 } from "@core/roseos";
 import {
   RoseOsLogo,
@@ -62,6 +68,32 @@ export default function RoseOs() {
   const { data: liveRose } = useRoseOsSummary();
   const [filter, setFilter] = useState<VerdictFilter>("all");
 
+  const displayInsights = useMemo(
+    () => (live && liveRose ? mapRoseSummaryInsights(liveRose.insights ?? []) : roseInsights),
+    [live, liveRose],
+  );
+  const displayStats = useMemo(
+    () => (live && liveRose ? roseStatsFromInsights(displayInsights) : roseStats),
+    [live, liveRose, displayInsights],
+  );
+  const displayPriorities = useMemo(
+    () =>
+      live && liveRose
+        ? buildLiveExecutivePriorities(displayInsights)
+        : executiveSummary.priorities,
+    [live, liveRose, displayInsights],
+  );
+  const asOf =
+    live && liveRose
+      ? new Date().toLocaleString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        })
+      : executiveSummary.asOf;
+
   const headline = live && liveRose?.executiveBrief?.headline
     ? liveRose.executiveBrief.headline
     : live && liveRose
@@ -70,14 +102,14 @@ export default function RoseOs() {
   const posture = (live && liveRose ? liveRose.verdict : executiveSummary.posture) as Verdict;
   const brainNarrative = live && liveRose?.executiveBrief?.narrative;
 
-  const filtered = (items: typeof roseInsights) =>
+  const filtered = (items: RoseInsight[]) =>
     filter === "all" ? items : items.filter((i) => i.verdict === filter);
 
   const verdictCounts: { key: VerdictFilter; label: string; count: number; color?: string }[] = [
-    { key: "all", label: "All verdicts", count: roseStats.total },
-    { key: "green", label: "Green Light", count: roseStats.green, color: VERDICT_META.green.color },
-    { key: "yellow", label: "Yellow Flag", count: roseStats.yellow, color: VERDICT_META.yellow.color },
-    { key: "red", label: "Red Alert", count: roseStats.red, color: VERDICT_META.red.color },
+    { key: "all", label: "All verdicts", count: displayStats.total },
+    { key: "green", label: "Green Light", count: displayStats.green, color: VERDICT_META.green.color },
+    { key: "yellow", label: "Yellow Flag", count: displayStats.yellow, color: VERDICT_META.yellow.color },
+    { key: "red", label: "Red Alert", count: displayStats.red, color: VERDICT_META.red.color },
   ];
 
   return (
@@ -94,6 +126,7 @@ export default function RoseOs() {
               <div className="flex items-center gap-3 flex-wrap mb-3">
                 <RoseOsLogo size={34} />
                 <RoseOsBadge />
+                {!live && <DemoDataBadge />}
               </div>
               <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight">
                 Executive decision intelligence for your {verticalConfig.name.toLowerCase()} operation
@@ -180,7 +213,7 @@ export default function RoseOs() {
                 </div>
                 <p className="text-[10px] text-slate-500 mt-0.5">
                   {v.key === "all"
-                    ? `across ${roseStats.modulesMonitored} connected modules`
+                    ? `across ${displayStats.modulesMonitored} connected modules`
                     : VERDICT_META[v.key as Verdict].action}
                 </p>
               </button>
@@ -195,7 +228,7 @@ export default function RoseOs() {
               <Radar className="w-4 h-4" style={{ color: ROSE_COLOR }} />
               EXECUTIVE INTELLIGENCE SUMMARY
             </CardTitle>
-            <span className="text-[10px] text-slate-500">As of {executiveSummary.asOf}</span>
+            <span className="text-[10px] text-slate-500">As of {asOf}</span>
           </CardHeader>
           <CardContent className="p-5">
             <div className="flex items-start gap-3 flex-wrap mb-3">
@@ -214,7 +247,7 @@ export default function RoseOs() {
               <p className="text-[10px] text-slate-400 mt-2">Rose Brain active — human review required before client use.</p>
             )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5">
-              {executiveSummary.priorities.map((p) => (
+              {displayPriorities.map((p) => (
                 <Link key={p.id} href={p.href}>
                   <div className="h-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3.5 hover:border-[#FDA4AF] transition-colors cursor-pointer">
                     <VerdictBadge verdict={p.verdict} size="sm" />
@@ -235,8 +268,8 @@ export default function RoseOs() {
         {/* Four intelligence sections */}
         {ROSE_SECTIONS.map((section) => {
           const Icon = SECTION_ICONS[section.key];
-          const items = filtered(insightsBySection(section.key));
-          const all = insightsBySection(section.key);
+          const all = displayInsights.filter((i) => i.section === section.key);
+          const items = filtered(all);
           return (
             <Card key={section.key} className="bg-white border-[#E2E8F0] shadow-sm overflow-hidden">
               <CardHeader className="p-4 border-b border-[#E2E8F0] flex flex-row items-center justify-between gap-3">

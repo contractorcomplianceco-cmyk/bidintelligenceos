@@ -11,7 +11,7 @@ import { DemoDataBadge } from "@/components/demo-data-badge";
 import { useCommandCenterProjection } from "@/hooks/use-command-center";
 import { useJobs } from "@/hooks/use-jobs";
 import { useOpsScheduling, useOpsPermits, useOpsLabor, useOpsCostRoi, useOpsWeather } from "@/hooks/use-ops";
-import { buildLiveBriefing } from "@/lib/live-operations";
+import { buildLiveBriefing, mapRoseSummaryInsights, roseStatsFromInsights } from "@/lib/live-operations";
 import { buildLiveWinRateSeries, buildLiveCostSnapshot, hasLiveChartData } from "@/lib/live-analytics";
 import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
@@ -174,6 +174,10 @@ export default function CommandCenter() {
     return { critical: overdue > 0 ? overdue : critical, total: overdue + critical };
   }, [live, projection]);
 
+  const liveRoseInsights = useMemo(
+    () => (live && liveRose ? mapRoseSummaryInsights(liveRose.insights ?? []) : []),
+    [live, liveRose],
+  );
   const rosePosture = (live && liveRose ? liveRose.verdict : executiveSummary.posture) as Verdict;
   const roseHeadline =
     live && liveRose?.executiveBrief?.headline
@@ -182,17 +186,13 @@ export default function CommandCenter() {
   const roseNarrative =
     live && liveRose?.executiveBrief?.narrative ? liveRose.executiveBrief.narrative : executiveSummary.narrative;
   const liveInsightCards =
-    live && liveRose?.insights?.length
-      ? liveRose.insights.filter((i) => i.verdict !== "green").slice(0, 3)
+    live && liveRose
+      ? liveRoseInsights.filter((i) => i.verdict !== "green").slice(0, 3)
       : roseInsights.filter((i) => i.verdict !== "green").slice(0, 3);
   const liveVerdictCounts =
     live && liveRose
-      ? {
-          green: liveRose.insights.filter((i) => i.verdict === "green").length,
-          yellow: liveRose.insights.filter((i) => i.verdict === "yellow").length,
-          red: liveRose.insights.filter((i) => i.verdict === "red").length,
-        }
-      : { green: roseStats.green, yellow: roseStats.yellow, red: roseStats.red };
+      ? roseStatsFromInsights(liveRoseInsights)
+      : { green: roseStats.green, yellow: roseStats.yellow, red: roseStats.red, total: roseStats.total, modulesMonitored: roseStats.modulesMonitored };
 
   const liveWonBids = allBids.filter((b) => b.status === "Won");
 

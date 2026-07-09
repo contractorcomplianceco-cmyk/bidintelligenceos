@@ -100,7 +100,22 @@ export function useRoseOsSummary() {
         roseBrain?: boolean;
         executiveBrief?: { headline: string; narrative: string; priorities: string[]; engine: string };
         stats: { activeBids: number; overdueFollowUps: number; totalBids: number; pendingHumanReview?: number };
-        insights: { id: string; title: string; verdict: string; summary: string; recommendation?: string }[];
+        insights: {
+          id: string;
+          section?: string;
+          title: string;
+          verdict: string;
+          subject?: string;
+          rationale?: string;
+          summary?: string;
+          recommendation?: string;
+          sourceModule?: string;
+          sourceSignal?: string;
+          confidence?: string;
+          detectedAgo?: string;
+          href?: string;
+          humanReviewed?: boolean;
+        }[];
       }>("/api/v1/intelligence/roseos/summary");
     },
     enabled: live,
