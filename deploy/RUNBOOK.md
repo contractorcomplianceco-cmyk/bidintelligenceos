@@ -30,6 +30,22 @@ cd /home/ubuntu/projects/bid-intelligence-os
 ./deploy/deploy.sh
 ```
 
+### Cache busting (Vite content hashes)
+
+The web app is built with **Vite**, which emits content-hashed filenames under `apps/web/dist/assets/` (for example `index-Cs2kPRGe.js`, `index-CXY24RMZ.css`). `index.html` references those hashed paths — **no manual `?v=` bump** is required.
+
+- **After any front-end change:** run `./deploy/deploy.sh` (runs `npm run build` then PM2 reload). New hashes are written to disk and served immediately.
+- **Verify live bundle after deploy:**
+
+  ```bash
+  curl -sS https://bidintelligence.cagteam.net/ | grep -oE '/assets/index-[A-Za-z0-9_-]+\.(js|css)'
+  ls apps/web/dist/assets/index-*
+  ```
+
+  Hashes in the live HTML must match files on disk.
+- **HTML entry:** served by the API with default Express static headers; browsers revalidate `index.html` on each load while hashed `/assets/*` files are safe for long cache (`immutable`) because the URL changes every build.
+- **Do not** hand-edit asset filenames in `index.html` — always rebuild via deploy.
+
 ## Postgres (production)
 
 When `DATABASE_URL` is set, the API uses Postgres with **org_id row-level security** on tenant tables. Application middleware sets `app.org_id` per authenticated request.
