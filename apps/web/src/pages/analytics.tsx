@@ -7,10 +7,20 @@ import { useAppContext } from "@/lib/context";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
-import { useWinLossAnalytics } from "@/hooks/use-bids";
+import { useBids, useWinLossAnalytics } from "@/hooks/use-bids";
 import { useJobs } from "@/hooks/use-jobs";
+import { useOpsCostRoi } from "@/hooks/use-ops";
 import { DemoDataBadge } from "@/components/demo-data-badge";
 import { AnalyticsChartEmpty } from "@/components/analytics-chart-empty";
+import {
+  buildLiveLossReasons,
+  buildLiveMarginByJob,
+  buildLiveOutcomeByType,
+  buildLiveOutcomeTimeline,
+  buildLiveWinRateSeries,
+  hasLiveChartData,
+  hasLiveOutcomeTimeline,
+} from "@/lib/live-analytics";
 import {
   TrendingUp,
   TrendingDown,
@@ -56,26 +66,59 @@ export default function Analytics() {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
+  const { data: allBids = [] } = useBids();
   const { data: winLoss } = useWinLossAnalytics();
   const { data: liveJobsRaw } = useJobs();
+  const { data: costData } = useOpsCostRoi();
   const liveJobs = live ? (liveJobsRaw ?? []) : jobDeployments;
   const [range, setRange] = useState<"6M" | "12M">("12M");
 
-  const winRateSeries = useMemo(
-    () => (range === "6M" ? analyticsData.winRateOverTime.slice(-6) : analyticsData.winRateOverTime),
-    [range],
+  const liveWinRateSeries = useMemo(
+    () => (live ? buildLiveWinRateSeries(allBids) : []),
+    [live, allBids],
   );
+  const liveOutcomeTimeline = useMemo(
+    () => (live ? buildLiveOutcomeTimeline(allBids) : []),
+    [live, allBids],
+  );
+  const liveLossReasons = useMemo(
+    () => (live ? buildLiveLossReasons(allBids) : []),
+    [live, allBids],
+  );
+  const liveOutcomeByType = useMemo(
+    () => (live ? buildLiveOutcomeByType(allBids, winLoss) : []),
+    [live, allBids, winLoss],
+  );
+  const liveMarginByJob = useMemo(
+    () => (live && costData?.records?.length ? buildLiveMarginByJob(costData.records) : []),
+    [live, costData],
+  );
+
+  const winRateSeries = useMemo(() => {
+    if (live && liveWinRateSeries.length > 0) {
+      return range === "6M" ? liveWinRateSeries.slice(-6) : liveWinRateSeries;
+    }
+    return range === "6M" ? analyticsData.winRateOverTime.slice(-6) : analyticsData.winRateOverTime;
+  }, [live, liveWinRateSeries, range]);
 
   const currentWinRate = live && winLoss?.summary.winRate != null
     ? winLoss.summary.winRate
     : analyticsData.winRateOverTime[analyticsData.winRateOverTime.length - 1].rate;
-  const priorWinRate = analyticsData.winRateOverTime[analyticsData.winRateOverTime.length - 2].rate;
+  const priorWinRate = live && liveWinRateSeries.length >= 2
+    ? liveWinRateSeries[liveWinRateSeries.length - 2].rate
+    : analyticsData.winRateOverTime[analyticsData.winRateOverTime.length - 2].rate;
   const winRateDelta = live && winLoss?.summary.winRate != null
-    ? 0
+    ? liveWinRateSeries.length >= 2
+      ? currentWinRate - priorWinRate
+      : 0
     : currentWinRate - priorWinRate;
 
-  const currentMargin = analyticsData.marginTrend[analyticsData.marginTrend.length - 1].margin;
-  const firstMargin = analyticsData.marginTrend[0].margin;
+  const currentMargin = live && costData?.summary?.avgMargin != null
+    ? costData.summary.avgMargin
+    : analyticsData.marginTrend[analyticsData.marginTrend.length - 1].margin;
+  const firstMargin = live && costData?.records?.length
+    ? costData.records.reduce((s, r) => s + r.grossMargin, 0) / costData.records.length
+    : analyticsData.marginTrend[0].margin;
   const marginDelta = +(currentMargin - firstMargin).toFixed(1);
 
   const totalWon = live && winLoss
@@ -121,14 +164,22 @@ export default function Analytics() {
       .map((j) => ({ name: j.name, completion: j.completion, status: j.status }));
   }, [live, liveJobs]);
 
-  const topLossReason = [...analyticsData.lossReasons].sort((a, b) => b.count - a.count)[0];
-  const bestType = [...analyticsData.projectTypes].sort(
-    (a, b) => b.won / (b.won + b.lost) - a.won / (a.won + a.lost)
-  )[0];
-  const weakestType = [...analyticsData.projectTypes].sort(
-    (a, b) => a.won / (a.won + a.lost) - b.won / (b.won + b.lost)
-  )[0];
-  const fadeRiskJobs = costRecords.filter((r) => r.profitFadeRisk === "High");
+  const topLossReason = live && liveLossReasons.length > 0
+    ? liveLossReasons[0]
+    : [...analyticsData.lossReasons].sort((a, b) => b.count - a.count)[0];
+  const bestType = live && liveOutcomeByType.length > 0
+    ? [...liveOutcomeByType].sort((a, b) => b.won / (b.won + b.lost || 1) - a.won / (a.won + a.lost || 1))[0]
+    : [...analyticsData.projectTypes].sort(
+        (a, b) => b.won / (b.won + b.lost) - a.won / (a.won + a.lost)
+      )[0];
+  const weakestType = live && liveOutcomeByType.length > 0
+    ? [...liveOutcomeByType].sort((a, b) => a.won / (a.won + a.lost || 1) - b.won / (b.won + b.lost || 1))[0]
+    : [...analyticsData.projectTypes].sort(
+        (a, b) => a.won / (a.won + a.lost) - b.won / (b.won + b.lost)
+      )[0];
+  const fadeRiskJobs = live
+    ? (costData?.records ?? []).filter((r) => r.profitFadeRisk === "High")
+    : costRecords.filter((r) => r.profitFadeRisk === "High");
 
   const insights = [
     {
@@ -166,7 +217,7 @@ export default function Analytics() {
       icon: Target,
       color: "#38BDF8",
     },
-    { label: "Avg Gross Margin", value: `${currentMargin}%`, delta: `${marginDelta >= 0 ? "+" : ""}${marginDelta}pp YTD`, positive: marginDelta >= 0, icon: Percent, color: "#22C55E" },
+    { label: "Avg Gross Margin", value: `${currentMargin}%`, delta: live && costData?.records?.length ? `Across ${costData.records.length} jobs` : `${marginDelta >= 0 ? "+" : ""}${marginDelta}pp YTD`, positive: marginDelta >= 0, icon: Percent, color: "#22C55E" },
     { label: "Avg Projected ROI", value: `${avgProjectedRoi}%`, delta: "Across active jobs", positive: true, icon: TrendingUp, color: "#0BA3A8" },
     { label: "Total Outcomes", value: `${totalOutcomes}`, delta: `${totalWon} won / ${totalLost} lost`, positive: true, icon: BarChart3, color: "#A855F7" },
   ];
@@ -246,8 +297,8 @@ export default function Analytics() {
               <span className="text-xs text-slate-500">{range === "6M" ? "Last 6 months" : "Trailing 12 months"}</span>
             </CardHeader>
             <CardContent className="p-5">
-              {live ? (
-                <AnalyticsChartEmpty label="Win rate trend requires historical outcomes" />
+              {live && !hasLiveChartData(allBids) ? (
+                <AnalyticsChartEmpty label="Win rate trend requires at least two recorded outcomes" />
               ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -275,8 +326,20 @@ export default function Analytics() {
               <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">GROSS MARGIN TREND</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
-              {live ? (
-                <AnalyticsChartEmpty label="Margin trend requires job cost tracking (Phase 4)" />
+              {live && liveMarginByJob.length === 0 ? (
+                <AnalyticsChartEmpty label="Margin trend requires job cost tracking on deployments" />
+              ) : live && liveMarginByJob.length > 0 ? (
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={liveMarginByJob} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
+                    <XAxis dataKey="name" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} unit="%" domain={["dataMin - 2", "dataMax + 2"]} />
+                    <RechartsTooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, "Gross margin"]} />
+                    <Bar dataKey="margin" fill="#22C55E" radius={[3, 3, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
               ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -306,12 +369,12 @@ export default function Analytics() {
               </div>
             </CardHeader>
             <CardContent className="p-5">
-              {live ? (
-                <AnalyticsChartEmpty label="Outcome timeline requires more recorded bid outcomes" />
+              {live && !hasLiveOutcomeTimeline(allBids) ? (
+                <AnalyticsChartEmpty label="Outcome timeline requires recorded bid outcomes" />
               ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analyticsData.bidOutcomeTimeline} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <BarChart data={live && liveOutcomeTimeline.length > 0 ? liveOutcomeTimeline : analyticsData.bidOutcomeTimeline} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
                     <XAxis dataKey="month" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
                     <YAxis stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} unit="M" />
@@ -331,12 +394,12 @@ export default function Analytics() {
               <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">WIN / LOSS BY TYPE</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
-              {live ? (
-                <AnalyticsChartEmpty label="Win/loss by project type requires categorized outcomes" />
+              {live && liveOutcomeByType.length === 0 ? (
+                <AnalyticsChartEmpty label="Win/loss by type requires categorized outcomes" />
               ) : (
               <div className="h-64 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analyticsData.projectTypes} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
+                  <BarChart data={live && liveOutcomeByType.length > 0 ? liveOutcomeByType : analyticsData.projectTypes} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" horizontal={false} />
                     <XAxis type="number" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} />
                     <YAxis type="category" dataKey="type" stroke="#64748B" fontSize={11} tickLine={false} axisLine={false} width={70} />
@@ -359,7 +422,7 @@ export default function Analytics() {
               <CardTitle className="text-sm font-bold text-slate-900 tracking-wide">LOSS REASONS</CardTitle>
             </CardHeader>
             <CardContent className="p-5">
-              {live ? (
+              {live && liveLossReasons.length === 0 ? (
                 <AnalyticsChartEmpty label="Loss reason breakdown requires lost bid annotations" />
               ) : (
               <div className="flex items-center gap-4">
@@ -367,7 +430,7 @@ export default function Analytics() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={analyticsData.lossReasons}
+                        data={live && liveLossReasons.length > 0 ? liveLossReasons : analyticsData.lossReasons}
                         dataKey="count"
                         nameKey="reason"
                         innerRadius={38}
@@ -375,7 +438,7 @@ export default function Analytics() {
                         paddingAngle={2}
                         stroke="none"
                       >
-                        {analyticsData.lossReasons.map((_, i) => (
+                        {((live && liveLossReasons.length > 0) ? liveLossReasons : analyticsData.lossReasons).map((_, i) => (
                           <Cell key={i} fill={LOSS_COLORS[i % LOSS_COLORS.length]} />
                         ))}
                       </Pie>
@@ -384,7 +447,7 @@ export default function Analytics() {
                   </ResponsiveContainer>
                 </div>
                 <div className="flex-1 space-y-2">
-                  {analyticsData.lossReasons.map((r, i) => (
+                  {((live && liveLossReasons.length > 0) ? liveLossReasons : analyticsData.lossReasons).map((r, i) => (
                     <div key={r.reason} className="flex items-center justify-between text-[11px]">
                       <span className="flex items-center gap-2 text-slate-500">
                         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: LOSS_COLORS[i % LOSS_COLORS.length] }} />

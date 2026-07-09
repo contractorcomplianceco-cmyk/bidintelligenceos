@@ -95,3 +95,29 @@ export function buildLiveOutcomeByType(
 export function hasLiveChartData(bids: Bid[]): boolean {
   return decidedBids(bids).length >= 2;
 }
+
+export function hasLiveOutcomeTimeline(bids: Bid[]): boolean {
+  return decidedBids(bids).length >= 1;
+}
+
+export function buildLiveMarginByJob(
+  records: { jobName: string; grossMargin: number }[],
+): { name: string; margin: number }[] {
+  return records.map((r) => ({
+    name: r.jobName.split(" ").slice(0, 2).join(" "),
+    margin: r.grossMargin,
+  }));
+}
+
+export function buildLiveCostSnapshot(
+  records: { estimatedCost: number; actualCost: number }[],
+): { week: string; budget: number; actual: number }[] {
+  if (records.length === 0) return [];
+  return [
+    {
+      week: "Portfolio",
+      budget: records.reduce((s, r) => s + r.estimatedCost, 0),
+      actual: records.reduce((s, r) => s + r.actualCost, 0),
+    },
+  ];
+}
