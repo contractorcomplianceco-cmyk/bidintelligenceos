@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { requireAuth } from "../../middleware/auth.js";
 import {
+  getBlsFeedStatus,
+  getSamGovFeedStatus,
+  getZohoSyncStatus,
+} from "../../lib/platform-feeds.js";
+import {
   computeVideoConnectStats,
   fetchVideoConnectWalkthroughs,
   getVideoConnectStatus,
@@ -50,6 +55,18 @@ router.get("/video-connect/walkthroughs", async (_req, res) => {
     stats: computeVideoConnectStats(walkthroughs),
     status,
   });
+});
+
+router.get("/sam-gov/status", (_req, res) => {
+  res.json(getSamGovFeedStatus());
+});
+
+router.get("/bls/status", (_req, res) => {
+  res.json(getBlsFeedStatus());
+});
+
+router.get("/zoho/status", (_req, res) => {
+  res.json(getZohoSyncStatus());
 });
 
 export default router;

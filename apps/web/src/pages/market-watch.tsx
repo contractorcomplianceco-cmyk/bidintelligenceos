@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { useResearchExportReadyPreview } from "@/hooks/use-bids";
+import { useBlsFeedStatus } from "@/hooks/use-platform-feeds";
 import { DemoDataBadge } from "@/components/demo-data-badge";
 import { OpsModuleEmpty } from "@/components/ops-module-empty";
 import {
@@ -97,6 +98,7 @@ export default function MarketWatch() {
   const { toast } = useToast();
   const { isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
+  const { data: blsFeed } = useBlsFeedStatus(live);
   const { data: researchPreview, isLoading: researchLoading } = useResearchExportReadyPreview("FL", 12, live);
 
   const useLiveFeed = live && hasLiveMarketWatch(researchPreview);
@@ -197,6 +199,11 @@ export default function MarketWatch() {
   return (
     <Layout>
       <div className="space-y-6 max-w-[1600px] mx-auto">
+        {live && blsFeed && !blsFeed.configured && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <strong>BLS market feed not configured.</strong> {blsFeed.message}
+          </div>
+        )}
         {/* Header */}
         <Card className="bg-white border-[#E2E8F0] shadow-sm overflow-hidden relative">
           <div className="absolute top-0 right-0 p-6 opacity-[0.05] pointer-events-none">

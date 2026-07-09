@@ -18,6 +18,7 @@ import {
   type CertStatus,
   type GovAlertSeverity,
 } from "@core/government";
+import { useSamGovFeedStatus } from "@/hooks/use-platform-feeds";
 import { useAuth } from "@/lib/auth-context";
 import { useLiveData } from "@/lib/data-mode";
 import { useBids, type ComplianceEligibility } from "@/hooks/use-bids";
@@ -148,6 +149,7 @@ function daysChip(days: number) {
 export default function Government() {
   const { isAuthenticated } = useAuth();
   const live = useLiveData(isAuthenticated);
+  const { data: samGovFeed } = useSamGovFeedStatus(live);
   const { data: allBids = [], isLoading: bidsLoading } = useBids();
 
   const govBids = useMemo(
@@ -245,6 +247,11 @@ export default function Government() {
     <Layout>
       <div className="space-y-6 max-w-[1600px] mx-auto">
         {!live && <DemoDataBadge />}
+        {live && samGovFeed && !samGovFeed.configured && (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <strong>SAM.gov feed not configured.</strong> {samGovFeed.message}
+          </div>
+        )}
         {/* Header */}
         <Card className="bg-white shadow-sm border-[#E2E8F0] overflow-hidden relative rounded-xl">
           <div className="absolute top-0 right-0 p-6 opacity-[0.06] pointer-events-none">

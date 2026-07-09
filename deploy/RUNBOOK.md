@@ -408,3 +408,22 @@ pm2 save
 ```
 
 Both `bid-intelligence-os` and `bid-intelligence-health-monitor` must stay online. `./deploy/deploy.sh` reloads the API and leaves the monitor running.
+
+## Custom domain cutover (enterprise white-label)
+
+Organizations can save a `customDomain` hostname on their org profile (Settings → Enterprise). TLS automation is **not** implemented — Carmen provisions certificates manually after DNS is verified.
+
+### DNS (customer side)
+
+1. Customer adds a **CNAME** record: `{customDomain}` → `bidintelligence.cagteam.net`
+2. Optional: verify propagation with `dig +short CNAME bids.customer.com`
+3. Save the hostname in BidOS Settings before requesting TLS
+
+### TLS (Carmen / ops — deferred automation)
+
+1. Confirm CNAME resolves to the team URL origin
+2. Issue or attach TLS cert for the custom hostname on nginx/Cloudflare (same origin as team URL)
+3. Add nginx `server_name` block or Cloudflare custom hostname mapping
+4. Smoke: `curl -sS -o /dev/null -w '%{http_code}' https://{customDomain}/api/health` → `200`
+
+**Not automated in Phase 5:** cert issuance, nginx reload for new hostnames, or Clerk allowed-origin updates for custom domains. Track in Phase 6 if Clerk must accept the custom domain for auth redirects.
