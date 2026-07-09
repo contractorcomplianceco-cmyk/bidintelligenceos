@@ -100,19 +100,20 @@ Integration is **working end-to-end**. No BidOS code changes required for this c
 | State | **OPEN** (not merged — awaiting Rose confirmation) |
 | Mergeable | Yes |
 | CI | All green (vitest, typecheck, portal trade-secret guard) |
-| Commits ahead of `main` | 6 (on remote branch) |
+| Commits ahead of `main` | 8 (on remote branch) |
+| Remote branch tip | **`9e45521`** — `feat(deploy): add audit API PM2 stack for Rose 3.2` |
 
-**Local server branch (not yet on remote PR tip):**
+**Remote push (2026-07-08):**
 
-- `feat/safe-alignment-phase1` is **2 commits ahead** of `origin/feat/safe-alignment-phase1`:
-  - `08b9500` — feat(scoring): add shared BidOS score engine
-  - `9e45521` — feat(deploy): add audit API PM2 stack for Rose 3.2
-- Additional **uncommitted WIP** (jurisdiction rules / RF library seeds) — not part of PR #2.
+- `08b9500` — feat(scoring): add shared BidOS score engine — **on `origin/feat/safe-alignment-phase1`**
+- `9e45521` — feat(deploy): add audit API PM2 stack for Rose 3.2 — **on `origin/feat/safe-alignment-phase1`**
+- PR #2 head updated to `9e45521`; **still OPEN — awaiting Rose merge confirmation** (do not merge without sign-off).
+
+Additional **uncommitted WIP** on this server (jurisdiction rules / RF library seeds) — not part of PR #2.
 
 ### Blockers for Rose (action items)
 
-1. **PR #2 not merged** — safe-alignment phase 1 (CI, auth flag, model versioning, additive DB tables) is ready but needs explicit approval before merge to `main`. **Do not merge without Rose sign-off.**
-2. **Push local audit commits** — PM2 deploy stack + shared score engine commits exist locally only; push to `feat/safe-alignment-phase1` (or fold into PR #2) before other environments can reproduce this stack from git.
-3. **WIP jurisdiction/RF library work** — uncommitted on server; separate from PR #2; decide whether to include in phase 1 or a follow-up PR.
-4. **BidOS PM2 restarts** — `bid-intelligence-os` shows frequent restarts (~55); prod compliance briefly returned 502 during a restart window; monitor if flapping continues.
-5. **Clerk cutover** — unchanged pending item from main alignment doc.
+1. **PR #2 not merged** — safe-alignment phase 1 (CI, auth flag, model versioning, additive DB tables, shared BidOS score engine, PM2 deploy stack) is ready on remote but needs explicit approval before merge to `main`. **Do not merge without Rose sign-off.**
+2. **WIP jurisdiction/RF library work** — uncommitted on server; separate from PR #2; decide whether to include in phase 1 or a follow-up PR.
+3. **BidOS PM2 restarts** — `bid-intelligence-os` shows frequent restarts (~55); prod compliance briefly returned 502 during a restart window; monitor if flapping continues.
+4. **Clerk cutover** — unchanged pending item from main alignment doc.
