@@ -4,6 +4,7 @@
 
 - Liveness: `GET /api/health` — returns `200` when API and database are OK (`driver: postgres` or `sqlite`)
 - After deploy: `./deploy/deploy.sh` runs an automatic health curl
+- Optional post-deploy smoke: when `BIOS_SMOKE_PASSWORD` is set (shell env or server `.env`), deploy runs `node scripts/smoke-team-url.mjs` after the health curl and **fails the deploy** on `SMOKE FAIL`. When unset, deploy skips smoke with a message (non-blocking). Password is never printed.
 
 ## Environment (production)
 
@@ -29,6 +30,14 @@ RESEARCH_HUB_SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 cd /home/ubuntu/projects/bid-intelligence-os
 ./deploy/deploy.sh
 ```
+
+**Post-deploy smoke (optional):** set `BIOS_SMOKE_PASSWORD` in server `.env` (or export before deploy). The deploy script runs `scripts/smoke-team-url.mjs` automatically after the local health curl. Omit the variable to skip smoke during deploy; run manually when needed:
+
+```bash
+BIOS_SMOKE_PASSWORD='…' node scripts/smoke-team-url.mjs
+```
+
+See `docs/CARMEN_SETUP.md` for smoke user accounts and env vars (`BIOS_SMOKE_URL`, `BIOS_SMOKE_EMAIL`).
 
 ### Cache busting (Vite content hashes)
 
