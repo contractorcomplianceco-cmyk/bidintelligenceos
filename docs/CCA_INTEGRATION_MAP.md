@@ -53,3 +53,22 @@ VITE_CLERK_PUBLISHABLE_KEY=
 
 - Changing license/trigger status in **Audit** product updates bid compliance on next `POST /api/v1/bids/:id/score` when `AUDIT_ENGINE_API_URL` points at the live audit API and a matching audit exists for bid state/trade.
 - Browser never receives scoring weights/multipliers — only category points, verdict, and compliance flags.
+
+## Live verification (2026-07-08)
+
+| Check | Result |
+|-------|--------|
+| `AUDIT_ENGINE_API_URL` in BidOS `.env` | Set → `http://127.0.0.1:3002` (local `cca-audit-api`) |
+| `GET /api/health` → `auditEngine` | `true` (local `:5001` and prod `bidintelligence.cagteam.net`) |
+| `cca-audit-api` PM2 | **online** — cwd `Audit-Risk-Model/artifacts/api-server`, port **3002** |
+| FL acceptance audit `CCA-2026-BIOS-FL` | Present in audit API (`id: 1`, 1 critical trigger `license_expired`) |
+| `GET /api/v1/research/compliance-eligibility?state=FL` | `auditConnected: true`, `auditCode: CCA-2026-BIOS-FL`, `auditFinalStatus: Critical Review Required`, `eligibilityPoints: 0` (expected — unresolved critical trigger) |
+| Prod compliance smoke | Same audit pull confirmed on `https://bidintelligence.cagteam.net` |
+
+**Notes**
+
+- Research Hub jurisdiction rows for `FL` may fall back to another priority state when no export-ready FL rows exist; audit matching is independent and correctly resolves `CCA-2026-BIOS-FL` for Florida.
+- `GET /api/v1/bids/:id/compliance-eligibility` requires auth (org-scoped); use the research route for unauthenticated smoke tests.
+- Audit API has no dedicated `/api/health` route; liveness is verified via `GET /api/audits`.
+
+See also: `docs/ROSE_GITHUB_MAIN_ALIGNMENT.md` appendix — Audit-Risk-Model merge status.

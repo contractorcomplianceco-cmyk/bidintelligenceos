@@ -75,3 +75,44 @@ feat/bidos-production-2026-07               → 640e785  (aligned with main)
 - **Method:** Direct push (`force-with-lease`), not a GitHub PR — unrelated histories.
 - **Record commit:** This file, committed to `main` after alignment.
 - **GitHub compare (archive → main):** https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/compare/archive/main-promo-video-pre-bidos-2026-07...main
+
+---
+
+## Appendix — Audit-Risk-Model integration & merge status (2026-07-08)
+
+### BidOS ↔ Audit stack (live on this server)
+
+| Component | Status |
+|-----------|--------|
+| BidOS `AUDIT_ENGINE_API_URL` | Configured → local audit API `:3002` |
+| BidOS health `auditEngine` | `true` (local + production) |
+| PM2 `cca-audit-api` | **online** on branch `feat/safe-alignment-phase1` |
+| Acceptance audit `CCA-2026-BIOS-FL` | Seeded; compliance pull returns critical trigger as expected |
+| Prod smoke | `GET …/compliance-eligibility?state=FL` → `auditCode: CCA-2026-BIOS-FL` |
+
+Integration is **working end-to-end**. No BidOS code changes required for this check.
+
+### GitHub PR — Audit-Risk-Model `feat/safe-alignment-phase1` → `main`
+
+| Field | Value |
+|-------|-------|
+| PR | [#2 — feat: safe scoring-engine alignment (phase 1)](https://github.com/contractorcomplianceco-cmyk/Audit-Risk-Model/pull/2) |
+| State | **OPEN** (not merged — awaiting Rose confirmation) |
+| Mergeable | Yes |
+| CI | All green (vitest, typecheck, portal trade-secret guard) |
+| Commits ahead of `main` | 6 (on remote branch) |
+
+**Local server branch (not yet on remote PR tip):**
+
+- `feat/safe-alignment-phase1` is **2 commits ahead** of `origin/feat/safe-alignment-phase1`:
+  - `08b9500` — feat(scoring): add shared BidOS score engine
+  - `9e45521` — feat(deploy): add audit API PM2 stack for Rose 3.2
+- Additional **uncommitted WIP** (jurisdiction rules / RF library seeds) — not part of PR #2.
+
+### Blockers for Rose (action items)
+
+1. **PR #2 not merged** — safe-alignment phase 1 (CI, auth flag, model versioning, additive DB tables) is ready but needs explicit approval before merge to `main`. **Do not merge without Rose sign-off.**
+2. **Push local audit commits** — PM2 deploy stack + shared score engine commits exist locally only; push to `feat/safe-alignment-phase1` (or fold into PR #2) before other environments can reproduce this stack from git.
+3. **WIP jurisdiction/RF library work** — uncommitted on server; separate from PR #2; decide whether to include in phase 1 or a follow-up PR.
+4. **BidOS PM2 restarts** — `bid-intelligence-os` shows frequent restarts (~55); prod compliance briefly returned 502 during a restart window; monitor if flapping continues.
+5. **Clerk cutover** — unchanged pending item from main alignment doc.
