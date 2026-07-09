@@ -120,3 +120,5 @@ Summary pointer for Slack/email:
 ---
 
 *Last updated: 2026-07-08 · Baseline `afe436e`+ · Doc commit on production branch line.*
+
+*Last verified: 2026-07-09 @ `13e0e15` — health `200` OK (postgres/rls); local typecheck + check:security + smoke:dry-run PASS; GitHub CI FAIL (Audit-Risk-Model sibling checkout, run [29017830988](https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/actions/runs/29017830988)).*
