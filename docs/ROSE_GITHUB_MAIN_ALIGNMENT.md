@@ -25,7 +25,7 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
    git push origin origin/feat/bidos-production-2026-07:main --force-with-lease
    ```
    - Production baseline from feature branch: **`6ff2c75`** — `feat: enrich closeout stats and package scope from bid summary`
-   - Current `main` tip: **`66f18c9`** — `feat: human review approve UX`
+   - Current `main` tip: **`cf630a2`** — `feat: live labor-burn chart on cost-roi`
    - No PR was opened (histories were unrelated); this doc serves as the merge record.
 
 3. **Clerk cutover** remains **pending** — see `deploy/RUNBOOK.md` § Clerk cutover checklist. Production still uses legacy smoke-test auth until redirect URLs and deploy are completed.
@@ -46,7 +46,7 @@ Production is live at **https://bidintelligence.cagteam.net** from the feature b
 > **What we did:**
 > - **Preserved** the old promo-video `main` on archive branch **`archive/main-promo-video-pre-bidos-2026-07`** (tip `58352bc`) — nothing was deleted:  
 >   https://github.com/contractorcomplianceco-cmyk/bidintelligenceos/tree/archive/main-promo-video-pre-bidos-2026-07
-> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`66f18c9`**). **`main` is now the production branch.**
+> - **Updated `main`** to the BidOS production line (baseline `6ff2c75`; current tip **`cf630a2`**). **`main` is now the production branch.**
 > - **Production app** remains at **https://bidintelligence.cagteam.net** (unchanged by this git operation).
 >
 > **Still pending (unchanged):** Clerk shared-auth cutover per `deploy/RUNBOOK.md` — do not enable `AUTH_ENABLED=true` until Clerk redirect URLs for `bidintelligence.cagteam.net` are configured and we run `./deploy/deploy.sh`. Preflight: `node scripts/clerk-cutover-preflight.mjs --check-only`.
@@ -77,8 +77,8 @@ Smoke users: `carmen@ccacontact.com`, `rose@ccacontact.com` (`node scripts/seed-
 
 ```
 archive/main-promo-video-pre-bidos-2026-07  → 58352bc  (promo video era — preserved)
-main                                        → 66f18c9  (BidOS production line)
-feat/bidos-production-2026-07               → 66f18c9  (aligned with main)
+main                                        → cf630a2  (BidOS production line)
+feat/bidos-production-2026-07               → cf630a2  (aligned with main)
 ```
 
 ## Merge / PR record

@@ -4,7 +4,7 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 **Last verified:** 2026-07-08  
 **Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)  
-**Verified at:** `9ae2d9d`+ (through `ef0f123` authed demo-seed gate pass)
+**Verified at:** `cf630a2` (human review UX, enterprise licenses/certifications, labor-burn chart on cost-roi)
 
 **Legend:** `live` = persisted API data when signed in · `partial live` = mix of live API + demo fixtures or honest empty · `demo` = seed fixtures / marketing showcase only · `planned` = not built
 
@@ -12,8 +12,8 @@ Living map of marketing promises → routes → data status. Update when a modul
 
 | Status | Count | Sections |
 |--------|------:|----------|
-| **live** | 8 | Bid Intelligence, New bid intake, Package Builder, Won Jobs, Job Deployment, Scheduling, Labor & Subs, Job Closeout |
-| **partial live** | 19 | Operations (3), Bid lifecycle partials (4), Job execution partials (4), Intelligence (6), Account (2) |
+| **partial live** | 18 | Operations (2), Bid lifecycle partials (4), Job execution partials (4), Intelligence (5), Account (2) |
+| **live** | 9 | Bid Intelligence, New bid intake, Package Builder, Won Jobs, Job Deployment, Scheduling, Labor & Subs, Job Closeout, ROSEOS |
 | **demo** | 11 | Add-ons marketplace (6), Orphan routes (5) |
 | **planned** | 0 | — |
 
@@ -31,7 +31,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs + live ROSEOS brief when signed in; ops tiles from `/api/v1/ops/*` when jobs exist; VoiceConnect / MarketWatch add-on cards hidden for authed users; CompetitorWatch coming-soon card remains |
+| Command Center | `/`, `/dashboard` | **partial live** | Bid KPIs + live ROSEOS brief and insight cards when signed in; ops tiles from `/api/v1/ops/*` when jobs exist; VoiceConnect / MarketWatch add-on cards hidden for authed users; CompetitorWatch coming-soon card remains |
 | Daily Briefings | `/briefings` | **partial live** | Live brief from pipeline tasks, ROSEOS, and compliance counts when signed in; demo fixtures otherwise; briefing archive is demo for anonymous sessions, empty for authed (no archive API) |
 | Alerts | `/alerts` | **partial live** | Overdue follow-ups, compliance gaps, ROSEOS insights, and ops alerts (`/api/v1/ops/alerts`) when signed in; demo fixtures otherwise |
 
@@ -65,7 +65,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| ROSEOS | `/roseos` | **partial live** | Live executive brief + Rose Brain when `/api/v1/intelligence/roseos/summary` returns data; section insight cards and verdict counts still render demo seed for authed users (known gap) |
+| ROSEOS | `/roseos` | **live** | Live executive brief, section insight cards, verdict counts, and priorities from `/api/v1/intelligence/roseos/summary` + bid context when signed in; demo fixtures for anonymous sessions |
 | Analytics | `/analytics` | **partial live** | Win/loss KPIs + bid outcome charts from API when signed in; margin/ROI charts from `/api/v1/ops/cost-roi` when jobs exist; post-job learning loop from live outcomes when ≥3 decided bids (hidden when insufficient); honest empty states otherwise |
 | Bid DNA | `/bid-dna` | **partial live** | Derived from closeout jobs, won bids, and score history when signed in; demo fixtures otherwise; `OpsModuleEmpty` when authed with no learning data |
 | Market Watch | `/market-watch` | **partial live** | Demo fixtures for anonymous sessions; read-only Research Hub export-ready preview when bridge configured; `OpsModuleEmpty` for authed users without bridge data |
@@ -86,7 +86,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses and certifications editable in Settings enterprise tab; leadership and identity fields empty until org profile is populated |
+| Business profile | `/business-profile` | **partial live** | Org name + job/win-rate KPIs from `/api/v1/org/profile` and live jobs when signed in; licenses and certifications read from org profile JSON when signed in (honest empty when none saved); demo fixtures for anonymous sessions only; edit credentials in Settings → Enterprise & White Label; leadership and identity fields empty until org profile is populated |
 | Settings | `/settings` | **partial live** | Org/user prefs from `/api/v1/org/profile` when signed in; enterprise tab persists `licenses` and `certifications` JSON arrays; white-label, multi-location, and RBAC deferred Phase 5 |
 
 ## Orphan routes (not in nav)
