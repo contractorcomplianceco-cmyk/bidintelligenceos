@@ -8,3 +8,7 @@ data/
 .env.local
 *.tsbuildinfo
 .DS_Store
+
+# Local ops notes / WIP routes — keep on disk, do not commit
+STATUS-*.md
+apps/api/src/routes/staffPresentationUnlock.ts

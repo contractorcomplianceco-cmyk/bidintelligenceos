@@ -7,16 +7,20 @@ import {
   AUTOPSY_REASON_CODES,
   countOutcomesForTrade,
   getAutopsyForBid,
+  otherRequiresNote,
   recordAutopsy,
   syncBidStatusFromOutcome,
 } from "../../lib/autopsy.js";
 import { rowToBid } from "../../lib/bid-mapper.js";
 import { persistBidScoreForBid } from "../../lib/bid-score-service.js";
+import { resolveApprovedLearningTrades } from "../../lib/learning-approvals.js";
 import {
+  canUseLearningMode,
   serializePublicBidScore,
   type BidScoreResult,
   type RoseSignalInputs,
 } from "@workspace/cca-core";
+import { organizations } from "../../db/schema.js";
 import bidDocumentsRoutes from "./bid-documents.js";
 import { computeComplianceEligibility } from "../../lib/compliance-eligibility.js";
 import { nextId, nowIso } from "../../lib/ids.js";
@@ -61,23 +65,46 @@ const bidInputSchema = z.object({
   fit: z.number().optional(),
 });
 
-const outcomeSchema = z.object({
-  outcome: z.enum(["won", "lost", "no-bid"]),
-  reason: z.string().max(1000).optional(),
-  /** Autopsy fields (≤8): outcome + reason codes + optional competitor notes + trade + snapshot */
-  reasonCodes: z.array(z.enum(AUTOPSY_REASON_CODES)).max(6).optional(),
-  competitorNotes: z.string().max(500).optional(),
-  trade: z.string().max(64).optional(),
-  scoredSnapshotId: z.string().max(80).optional(),
-});
+const outcomeSchema = z
+  .object({
+    outcome: z.enum(["won", "lost", "no-bid"]),
+    reason: z.string().max(1000).optional(),
+    /** Autopsy fields: outcome + 6 Rose reason codes; `other` requires a note */
+    reasonCodes: z.array(z.enum(AUTOPSY_REASON_CODES)).max(6).optional(),
+    competitorNotes: z.string().max(500).optional(),
+    trade: z.string().max(64).optional(),
+    scoredSnapshotId: z.string().max(80).optional(),
+  })
+  .superRefine((val, ctx) => {
+    if (otherRequiresNote(val.reasonCodes ?? [], val.competitorNotes ?? val.reason)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "reason code 'other' requires a one-line note",
+        path: ["competitorNotes"],
+      });
+    }
+  });
 
-const autopsyPatchSchema = z.object({
-  outcome: z.enum(["won", "lost", "no-bid"]).optional(),
-  reasonCodes: z.array(z.enum(AUTOPSY_REASON_CODES)).max(6).optional(),
-  competitorNotes: z.string().max(500).optional().nullable(),
-  trade: z.string().max(64).optional(),
-  scoredSnapshotId: z.string().max(80).optional().nullable(),
-});
+const autopsyPatchSchema = z
+  .object({
+    outcome: z.enum(["won", "lost", "no-bid"]).optional(),
+    reasonCodes: z.array(z.enum(AUTOPSY_REASON_CODES)).max(6).optional(),
+    competitorNotes: z.string().max(500).optional().nullable(),
+    trade: z.string().max(64).optional(),
+    scoredSnapshotId: z.string().max(80).optional().nullable(),
+  })
+  .superRefine((val, ctx) => {
+    if (
+      val.competitorNotes !== null &&
+      otherRequiresNote(val.reasonCodes ?? [], val.competitorNotes)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "reason code 'other' requires a one-line note",
+        path: ["competitorNotes"],
+      });
+    }
+  });
 
 const overrideSchema = z.object({
   reasonCode: z.enum(OVERRIDE_REASON_CODES),
@@ -353,18 +380,24 @@ router.post("/:id/outcome", async (req, res) => {
     res.status(404).json({ error: "Bid not found" });
     return;
   }
-  const autopsy = await recordAutopsy(
-    bid.id,
-    orgId,
-    {
-      outcome: parsed.data.outcome,
-      reasonCodes: parsed.data.reasonCodes,
-      competitorNotes: parsed.data.competitorNotes,
-      trade: parsed.data.trade ?? bid.type,
-      scoredSnapshotId: parsed.data.scoredSnapshotId,
-    },
-    bid.type,
-  );
+  let autopsy;
+  try {
+    autopsy = await recordAutopsy(
+      bid.id,
+      orgId,
+      {
+        outcome: parsed.data.outcome,
+        reasonCodes: parsed.data.reasonCodes,
+        competitorNotes: parsed.data.competitorNotes ?? parsed.data.reason,
+        trade: parsed.data.trade ?? bid.type,
+        scoredSnapshotId: parsed.data.scoredSnapshotId,
+      },
+      bid.type,
+    );
+  } catch (e) {
+    res.status(400).json({ error: e instanceof Error ? e.message : "Autopsy failed" });
+    return;
+  }
   await syncBidStatusFromOutcome(bid.id, parsed.data.outcome, parsed.data.reason);
   const db = getDb();
   const rows = await db.select().from(bids).where(eq(bids.id, bid.id)).limit(1);
@@ -403,24 +436,30 @@ router.patch("/:id/autopsy", async (req, res) => {
     res.status(400).json({ error: "outcome required when no autopsy exists yet" });
     return;
   }
-  const autopsy = await recordAutopsy(
-    bid.id,
-    orgId,
-    {
-      outcome,
-      reasonCodes: parsed.data.reasonCodes ?? (existing?.reasonCodes as typeof AUTOPSY_REASON_CODES[number][] | undefined),
-      competitorNotes:
-        parsed.data.competitorNotes === null
-          ? undefined
-          : parsed.data.competitorNotes ?? existing?.competitorNotes,
-      trade: parsed.data.trade ?? existing?.trade ?? bid.type,
-      scoredSnapshotId:
-        parsed.data.scoredSnapshotId === null
-          ? undefined
-          : parsed.data.scoredSnapshotId ?? existing?.scoredSnapshotId,
-    },
-    bid.type,
-  );
+  let autopsy;
+  try {
+    autopsy = await recordAutopsy(
+      bid.id,
+      orgId,
+      {
+        outcome,
+        reasonCodes: parsed.data.reasonCodes ?? (existing?.reasonCodes as typeof AUTOPSY_REASON_CODES[number][] | undefined),
+        competitorNotes:
+          parsed.data.competitorNotes === null
+            ? undefined
+            : parsed.data.competitorNotes ?? existing?.competitorNotes,
+        trade: parsed.data.trade ?? existing?.trade ?? bid.type,
+        scoredSnapshotId:
+          parsed.data.scoredSnapshotId === null
+            ? undefined
+            : parsed.data.scoredSnapshotId ?? existing?.scoredSnapshotId,
+      },
+      bid.type,
+    );
+  } catch (e) {
+    res.status(400).json({ error: e instanceof Error ? e.message : "Autopsy failed" });
+    return;
+  }
   await syncBidStatusFromOutcome(bid.id, outcome);
   const tradeStats = await countOutcomesForTrade(orgId, autopsy.trade);
   res.json({ autopsy, tradeStats });
@@ -435,7 +474,18 @@ router.get("/:id/learning-status", async (req, res) => {
   }
   const trade = (typeof req.query.trade === "string" && req.query.trade) || bid.type || "generic";
   const tradeStats = await countOutcomesForTrade(orgId, trade);
-  res.json({ tradeStats });
+  const db = getDb();
+  const orgRows = await db.select().from(organizations).where(eq(organizations.id, orgId)).limit(1);
+  const approvedLearningTrades = resolveApprovedLearningTrades(orgRows[0]?.profileJson);
+  const flipApproved = canUseLearningMode(trade, approvedLearningTrades);
+  res.json({
+    tradeStats,
+    learning: {
+      flipApproved,
+      approvedLearningTrades,
+      canRequestLearning: tradeStats.learningEligible && flipApproved,
+    },
+  });
 });
 
 router.post("/:id/score/second-reviewer", async (req, res) => {

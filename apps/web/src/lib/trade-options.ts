@@ -25,4 +25,7 @@ export const GENERIC_TRADE_HONESTY_BANNER =
   "Trade not set — accuracy limited. Select a trade to improve this score.";
 
 export const STARTUP_HONESTY_BANNER =
-  "Public + this-bid only. No company history yet. Pursuit Confidence Index (relative) — not a calibrated win rate.";
+  "Public + this-bid only. No company history yet. Pursuit Confidence Index (relative) — not calibrated award odds.";
+
+export const LEARNING_HONESTY_BANNER =
+  "Learning mode: past outcomes inform calibrated award-odds basis. Pursuit ROI is still EV vs pursuit cost — keep those labels separate.";

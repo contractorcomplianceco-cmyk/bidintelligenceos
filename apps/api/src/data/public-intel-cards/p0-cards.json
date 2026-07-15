@@ -369,6 +369,12 @@
   ],
   "refresh": {
     "lastRun": "2026-07-15",
-    "sources": []
+    "mode": "manual",
+    "sources": [],
+    "skips": [
+      "FRED_API_KEY not set — card numbers not auto-pulled; as_of_date stamped only",
+      "BLS_API_KEY not set — PPI series not auto-pulled (manual refresh of card copy still required)"
+    ],
+    "honestyLabel": "Market anchors as of 2026-07-15, manual — FRED/BLS not live-pulled"
   }
 }

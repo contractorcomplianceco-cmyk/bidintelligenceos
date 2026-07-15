@@ -153,7 +153,7 @@ Exit `0` = all checks passed; `1` = failure (no secrets in output). Smoke users:
 
 ---
 
-## Step 7 — Manual smoke test checklist (10 min)
+## Step 7 — Manual smoke test checklist (10 min, signed-in)
 
 | # | Action | Expected |
 |---|--------|----------|
@@ -161,11 +161,15 @@ Exit `0` = all checks passed; `1` = failure (no secrets in output). Smoke users:
 | 2 | `/login` → register or sign in | Lands on Command Center |
 | 3 | **Bids** → **New bid** | Saves; appears in list |
 | 4 | Upload PDF or DOCX on bid | Extraction status `ready` or `metadata_only` |
-| 5 | **Compute bid score** | Pursuit Confidence Index smoke: score + verdict (not “win probability”) |
+| 5 | **Compute bid score** | Pursuit Confidence Index + verdict (not “win probability”); market-anchors stamp shows `as of [date], manual` when FRED/BLS keys unset |
 | 6 | **Approve for client use** | `humanReviewed` badge |
 | 7 | **Lock score** | Locked for submission |
-| 8 | **Won / Lost / No-bid** | Bid status updates |
-| 9 | https://demo.ccabidintelligence.com | Demo funnel still works (no login required) |
+| 8 | **Outcome autopsy** | Won / Lost / No-bid; reason code is one of the **6** locked codes (`price`, `schedule`, `relationship_incumbent`, `scope_qualification`, `compliance_eligibility`, `other`); `other` requires a note |
+| 9 | **Override journal (G8)** (owner) | Record an override with a G8 reason code; entry appears in the journal list |
+| 10 | **Manual-heavy Strong Go** (optional) | If scope is manual-heavy, second-reviewer confirm is required before Strong Go clears |
+| 11 | https://demo.ccabidintelligence.com | Demo funnel still works (no login required) |
+
+**Learning mode note:** Learning only applies after ≥40 outcomes/trade **and** first-flip approval (`BIOS_APPROVED_LEARNING_TRADES` or org `profileJson.approvedLearningTrades`). Unapproved trades stay in startup — never silent personalization.
 
 ---
 

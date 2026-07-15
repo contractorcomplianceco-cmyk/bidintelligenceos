@@ -1,28 +1,28 @@
 /**
- * Bid outcome autopsy (Rose G3 / G5 spirit) — ≤8 product fields.
+ * Bid outcome autopsy (Rose G3 / G5 spirit) — 6 reason codes (Rose #3 LOCKED).
  * Org-scoped; per-trade outcome counts feed learning-mode eligibility.
  * Never invent win rates.
  */
 
 import { and, desc, eq } from "drizzle-orm";
-import { LEARNING_MODE_MIN_OUTCOMES } from "@workspace/cca-core";
+import {
+  AUTOPSY_REASON_CODE_IDS,
+  AUTOPSY_REASON_CODES as AUTOPSY_REASON_CODE_META,
+  LEARNING_MODE_MIN_OUTCOMES,
+  type AutopsyReasonCode,
+} from "@workspace/cca-core";
 import { getDb } from "../db/client.js";
 import { bidAutopsies, bidScores, bids } from "../db/schema.js";
 import { nextId, nowIso } from "./ids.js";
 
-export const AUTOPSY_REASON_CODES = [
-  "price",
-  "relationship",
-  "capacity",
-  "scope",
-  "schedule",
-  "competitor-strength",
-  "compliance",
-  "strategic-no-bid",
-  "other",
-] as const;
+/** Zod / UI tuple — exactly the 6 Rose-locked codes. */
+export const AUTOPSY_REASON_CODES = AUTOPSY_REASON_CODE_IDS as [
+  AutopsyReasonCode,
+  ...AutopsyReasonCode[],
+];
 
-export type AutopsyReasonCode = (typeof AUTOPSY_REASON_CODES)[number];
+export { AUTOPSY_REASON_CODE_META };
+export type { AutopsyReasonCode };
 
 export type AutopsyInput = {
   outcome: "won" | "lost" | "no-bid";
@@ -81,6 +81,11 @@ function rowToAutopsy(row: typeof bidAutopsies.$inferSelect): AutopsyRecord {
   };
 }
 
+export function otherRequiresNote(reasonCodes: readonly string[], note?: string | null): boolean {
+  if (!reasonCodes.includes("other")) return false;
+  return !(note && note.trim().length > 0);
+}
+
 export async function getLatestScoreId(bidId: string, orgId: string): Promise<string | null> {
   const db = getDb();
   const rows = await db
@@ -101,8 +106,16 @@ export async function recordAutopsy(
   const db = getDb();
   const ts = nowIso();
   const trade = (input.trade?.trim() || bidTradeFallback?.trim() || "generic").toLowerCase();
-  const reasonCodes = (input.reasonCodes ?? []).slice(0, 6);
+  const allowed = new Set<string>(AUTOPSY_REASON_CODES);
+  const reasonCodes = (input.reasonCodes ?? [])
+    .filter((c) => allowed.has(c))
+    .slice(0, 6) as AutopsyReasonCode[];
   const competitorNotes = input.competitorNotes?.trim().slice(0, 500) || null;
+
+  if (otherRequiresNote(reasonCodes, competitorNotes)) {
+    throw new Error("reason code 'other' requires a one-line note");
+  }
+
   const scoredSnapshotId =
     input.scoredSnapshotId?.trim() || (await getLatestScoreId(bidId, orgId)) || null;
 
@@ -124,8 +137,12 @@ export async function recordAutopsy(
         updatedAt: ts,
       })
       .where(eq(bidAutopsies.id, existing[0].id));
-    const rows = await db.select().from(bidAutopsies).where(eq(bidAutopsies.id, existing[0].id)).limit(1);
-    return rowToAutopsy(rows[0]!);
+    const updated = await db
+      .select()
+      .from(bidAutopsies)
+      .where(eq(bidAutopsies.id, existing[0].id))
+      .limit(1);
+    return rowToAutopsy(updated[0]!);
   }
 
   const id = nextId("CCA-AUTOPSY");
@@ -141,11 +158,14 @@ export async function recordAutopsy(
     createdAt: ts,
     updatedAt: ts,
   });
-  const rows = await db.select().from(bidAutopsies).where(eq(bidAutopsies.id, id)).limit(1);
-  return rowToAutopsy(rows[0]!);
+  const inserted = await db.select().from(bidAutopsies).where(eq(bidAutopsies.id, id)).limit(1);
+  return rowToAutopsy(inserted[0]!);
 }
 
-export async function getAutopsyForBid(bidId: string, orgId: string): Promise<AutopsyRecord | null> {
+export async function getAutopsyForBid(
+  bidId: string,
+  orgId: string,
+): Promise<AutopsyRecord | null> {
   const db = getDb();
   const rows = await db
     .select()
@@ -155,8 +175,10 @@ export async function getAutopsyForBid(bidId: string, orgId: string): Promise<Au
   return rows[0] ? rowToAutopsy(rows[0]) : null;
 }
 
-/** Count org-scoped autopsies for a trade (won/lost/no-bid). */
-export async function countOutcomesForTrade(orgId: string, trade: string): Promise<TradeOutcomeStats> {
+export async function countOutcomesForTrade(
+  orgId: string,
+  trade: string,
+): Promise<TradeOutcomeStats> {
   const db = getDb();
   const t = trade.trim().toLowerCase() || "generic";
   const rows = await db

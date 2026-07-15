@@ -218,9 +218,25 @@ export type BidScoreSnapshot = {
     winLikelihoodBasis: string;
     assumptions: string[];
     summary: string;
+    roiLabel?: string;
+    awardOddsLabel?: string;
+  };
+  marketAnchors?: {
+    asOfDate: string;
+    mode: "manual" | "live" | "partial";
+    label: string;
   };
   evidenceCitations?: string[];
   manualHeavyVerify?: boolean;
+  learning?: {
+    requested: boolean;
+    applied: boolean;
+    outcomeCount: number;
+    minOutcomes: number;
+    pastPerfWinrate: number | null;
+    flipApproved: boolean;
+    approvedLearningTrades: string[];
+  };
 };
 
 export type ComputeBidScoreBody = {

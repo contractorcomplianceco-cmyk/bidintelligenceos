@@ -3,16 +3,30 @@
  */
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { LEARNING_MODE_MIN_OUTCOMES, applyModeWeights, resolveWeights } from "@workspace/cca-core";
-import { AUTOPSY_REASON_CODES } from "./autopsy.js";
+import {
+  LEARNING_MODE_MIN_OUTCOMES,
+  applyModeWeights,
+  canUseLearningMode,
+  resolveWeights,
+} from "@workspace/cca-core";
+import { AUTOPSY_REASON_CODES, otherRequiresNote } from "./autopsy.js";
 import { cosineSimilarity, parseEmbeddingJson } from "./embeddings.js";
+import { parseApprovedLearningTrades } from "./learning-approvals.js";
 import { OVERRIDE_REASON_CODES, canConfirmSecondReviewer } from "./override-journal.js";
+import { buildPublicIntelRefreshHonesty } from "./publicIntelPack.js";
 import { citationFor, createMemoryVectorStore, retrieveEvidence } from "./retrieveEvidence.js";
 
 describe("autopsy / learning gates", () => {
-  it("exposes ≤8-spirit reason codes and LEARNING_MODE_MIN_OUTCOMES=40", () => {
-    assert.ok(AUTOPSY_REASON_CODES.length >= 5);
-    assert.ok(AUTOPSY_REASON_CODES.includes("price"));
+  it("exposes exactly 6 Rose-locked reason codes and LEARNING_MODE_MIN_OUTCOMES=40", () => {
+    assert.equal(AUTOPSY_REASON_CODES.length, 6);
+    assert.deepEqual([...AUTOPSY_REASON_CODES], [
+      "price",
+      "schedule",
+      "relationship_incumbent",
+      "scope_qualification",
+      "compliance_eligibility",
+      "other",
+    ]);
     assert.equal(LEARNING_MODE_MIN_OUTCOMES, 40);
   });
 
@@ -30,6 +44,27 @@ describe("autopsy / learning gates", () => {
     assert.equal(pastPerf, null);
     const learningEligible = 40 >= LEARNING_MODE_MIN_OUTCOMES && pastPerf != null;
     assert.equal(learningEligible, false);
+  });
+
+  it("requires note for autopsy other + requires flip approval for learning", () => {
+    assert.equal(otherRequiresNote(["other"], ""), true);
+    assert.equal(otherRequiresNote(["other"], "thin margin"), false);
+    assert.equal(otherRequiresNote(["price"], ""), false);
+    assert.equal(canUseLearningMode("electrical", []), false);
+    assert.equal(canUseLearningMode("electrical", ["electrical"]), true);
+    assert.deepEqual(parseApprovedLearningTrades("electrical, roofing"), ["electrical", "roofing"]);
+  });
+
+  it("stamps FRED/BLS honesty as manual when no live sources", () => {
+    const honesty = buildPublicIntelRefreshHonesty({
+      version: 1,
+      layer: "public",
+      cards: [{ id: "x", trades: ["all"], region: "nationwide", topic: "t", title: "t", asOfDate: "2026-07-15", text: "t" }],
+      refresh: { lastRun: "2026-07-15", mode: "manual", sources: [] },
+    });
+    assert.equal(honesty.mode, "manual");
+    assert.match(honesty.label, /manual/i);
+    assert.match(honesty.label, /2026-07-15/);
   });
 });
 

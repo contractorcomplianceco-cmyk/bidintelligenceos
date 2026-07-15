@@ -139,24 +139,36 @@ function tradeMatches(audit: AuditEngineSummary, trade: string | null | undefine
   return trades.some((t) => t.includes(needle) || needle.includes(t));
 }
 
-async function fetchJson<T>(url: string): Promise<T | null> {
+async function fetchJson<T>(
+  url: string,
+): Promise<{ ok: true; data: T } | { ok: false; status: number | null }> {
   try {
     const headers: Record<string, string> = { Accept: "application/json" };
     const token = process.env.AUDIT_ENGINE_API_TOKEN?.trim();
     if (token) headers.Authorization = `Bearer ${token}`;
     const res = await fetch(url, { headers, signal: AbortSignal.timeout(12_000) });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
+    if (!res.ok) return { ok: false, status: res.status };
+    return { ok: true, data: (await res.json()) as T };
   } catch {
-    return null;
+    return { ok: false, status: null };
   }
 }
 
 export async function fetchAuditSummaries(): Promise<AuditEngineSummary[]> {
   const base = auditApiBase();
   if (!base) return [];
-  const data = await fetchJson<AuditEngineSummary[] | { audits?: AuditEngineSummary[] }>(`${base}/api/audits`);
-  if (!data) return [];
+  const result = await fetchJson<AuditEngineSummary[] | { audits?: AuditEngineSummary[] }>(
+    `${base}/api/audits`,
+  );
+  if (!result.ok) {
+    if (result.status === 401 || result.status === 403) {
+      console.warn(
+        "[audit-engine] unauthorized fetching audits — set AUDIT_ENGINE_API_TOKEN to match audit API service token",
+      );
+    }
+    return [];
+  }
+  const data = result.data;
   if (Array.isArray(data)) return data;
   return data.audits ?? [];
 }
@@ -164,7 +176,8 @@ export async function fetchAuditSummaries(): Promise<AuditEngineSummary[]> {
 export async function fetchAuditScorecard(auditId: number): Promise<AuditEngineScorecard | null> {
   const base = auditApiBase();
   if (!base) return null;
-  return fetchJson<AuditEngineScorecard>(`${base}/api/audits/${auditId}/scorecard`);
+  const result = await fetchJson<AuditEngineScorecard>(`${base}/api/audits/${auditId}/scorecard`);
+  return result.ok ? result.data : null;
 }
 
 export async function findBestAuditForBid(

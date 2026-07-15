@@ -97,6 +97,7 @@ for (const card of pack.cards ?? []) {
 pack.refresh = pack.refresh || {};
 pack.refresh.lastRun = today;
 pack.refresh.sources = [];
+pack.refresh.skips = [];
 
 if (fredKey) {
   try {
@@ -122,8 +123,23 @@ if (!blsKey) {
   skips.push("BLS_API_KEY not set — PPI series not auto-pulled (manual refresh of card copy still required)");
 }
 
+pack.refresh.skips = skips;
+const livePulled = (pack.refresh.sources ?? []).length > 0;
+const keysMissing = !fredKey || !blsKey;
+if (livePulled && !keysMissing && skips.length === 0) {
+  pack.refresh.mode = "live";
+  pack.refresh.honestyLabel = `Market anchors as of ${today}, live FRED/BLS refresh`;
+} else if (livePulled) {
+  pack.refresh.mode = "partial";
+  pack.refresh.honestyLabel = `Market anchors as of ${today}, partial (some series live; treat others as manual)`;
+} else {
+  pack.refresh.mode = "manual";
+  pack.refresh.honestyLabel = `Market anchors as of ${today}, manual — FRED/BLS not live-pulled`;
+}
+
 writeFileSync(cardsPath, `${JSON.stringify(pack, null, 2)}\n`);
 console.log(`Updated as_of_date on ${(pack.cards ?? []).length} cards → ${today}`);
+console.log(`Refresh honesty: ${pack.refresh.honestyLabel}`);
 if (skips.length) {
   console.log("Skips / reminders:");
   for (const s of skips) console.log(`  - ${s}`);
@@ -132,6 +148,7 @@ if (skips.length) {
     [
       `BidIntelligenceOS weekly public-intel refresh ran at ${new Date().toISOString()}.`,
       `Cards stamped as_of_date=${today} (${(pack.cards ?? []).length} cards).`,
+      `Honesty stamp: ${pack.refresh.honestyLabel}`,
       "",
       "Skipped / follow-ups (no secrets):",
       ...skips.map((s) => `• ${s}`),

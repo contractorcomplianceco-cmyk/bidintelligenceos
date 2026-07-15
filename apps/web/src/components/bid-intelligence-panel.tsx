@@ -682,12 +682,26 @@ function ScoreBody({
             </div>
           )}
 
+          {score.marketAnchors && (
+            <p className="text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-md px-2 py-1.5">
+              {score.marketAnchors.label}
+            </p>
+          )}
+
           {score.pursuitRoi && (
             <div className="rounded-lg border border-[#E2E8F0] p-3 space-y-1">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Pursuit ROI (stub)</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                {score.pursuitRoi.roiLabel || "Pursuit ROI"}
+              </p>
               <p className="text-sm font-semibold text-slate-900">{score.pursuitRoi.summary}</p>
               <p className="text-xs text-slate-600">
-                Recommendation: {score.pursuitRoi.recommendation} · basis: {score.pursuitRoi.winLikelihoodBasis}
+                Recommendation: {score.pursuitRoi.recommendation}
+              </p>
+              <p className="text-xs text-slate-500">
+                {score.pursuitRoi.awardOddsLabel ||
+                  (score.pursuitRoi.winLikelihoodBasis === "calibrated-outcomes"
+                    ? "Calibrated award odds basis (separate from ROI recommendation)"
+                    : "Award odds not available in startup — relative index only")}
               </p>
             </div>
           )}
@@ -755,30 +769,33 @@ function ScoreBody({
               {autopsyOutcome && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label className="text-xs text-slate-600">Reason code</Label>
+                    <Label className="text-xs text-slate-600">Reason code (6 locked)</Label>
                     <select
                       className="h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm"
                       value={reasonCode}
                       onChange={(e) => setReasonCode(e.target.value)}
                     >
-                      <option value="price">Price</option>
-                      <option value="relationship">Relationship</option>
-                      <option value="capacity">Capacity</option>
-                      <option value="scope">Scope</option>
-                      <option value="schedule">Schedule</option>
-                      <option value="competitor-strength">Competitor strength</option>
-                      <option value="compliance">Compliance</option>
-                      <option value="strategic-no-bid">Strategic no-bid</option>
-                      <option value="other">Other</option>
+                      <option value="price">Price / margin</option>
+                      <option value="schedule">Schedule / timeline</option>
+                      <option value="relationship_incumbent">Relationship / incumbent</option>
+                      <option value="scope_qualification">Scope / qualification</option>
+                      <option value="compliance_eligibility">Compliance / eligibility</option>
+                      <option value="other">Other (note required)</option>
                     </select>
                   </div>
                   <div className="space-y-1 sm:col-span-2">
-                    <Label className="text-xs text-slate-600">Competitor notes (optional)</Label>
+                    <Label className="text-xs text-slate-600">
+                      {reasonCode === "other" ? "Note (required for Other)" : "Competitor notes (optional)"}
+                    </Label>
                     <Input
                       className="h-9"
                       value={competitorNotes}
                       onChange={(e) => setCompetitorNotes(e.target.value)}
-                      placeholder="Optional — who won / why"
+                      placeholder={
+                        reasonCode === "other"
+                          ? "One-line note required for Other"
+                          : "Optional — who won / why"
+                      }
                       maxLength={500}
                     />
                   </div>
@@ -786,7 +803,9 @@ function ScoreBody({
                     type="button"
                     size="sm"
                     className="sm:col-span-2 bg-teal-700 hover:bg-teal-600"
-                    disabled={recordingOutcome}
+                    disabled={
+                      recordingOutcome || (reasonCode === "other" && !competitorNotes.trim())
+                    }
                     onClick={() =>
                       onOutcome({
                         outcome: autopsyOutcome,

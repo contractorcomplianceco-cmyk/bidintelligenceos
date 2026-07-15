@@ -5,6 +5,31 @@
  * Restart: pm2 restart bid-intelligence-os
  * Deploy:  ./deploy/deploy.sh
  */
+const fs = require("fs");
+
+function loadEnvFile(file) {
+  const out = {};
+  if (!fs.existsSync(file)) return out;
+  for (const line of fs.readFileSync(file, "utf8").split("\n")) {
+    const t = line.trim();
+    if (!t || t.startsWith("#")) continue;
+    const eq = t.indexOf("=");
+    if (eq === -1) continue;
+    const key = t.slice(0, eq);
+    let val = t.slice(eq + 1);
+    if (
+      (val.startsWith('"') && val.endsWith('"')) ||
+      (val.startsWith("'") && val.endsWith("'"))
+    ) {
+      val = val.slice(1, -1);
+    }
+    out[key] = val;
+  }
+  return out;
+}
+
+const fileEnv = loadEnvFile("/home/ubuntu/projects/bid-intelligence-os/.env");
+
 module.exports = {
   apps: [
     {
@@ -20,8 +45,8 @@ module.exports = {
         NODE_ENV: "production",
         HOST: "0.0.0.0",
         API_PORT: "5001",
+        ...fileEnv,
       },
-      env_file: "/home/ubuntu/projects/bid-intelligence-os/.env",
       instances: 1,
       autorestart: true,
       watch: false,
@@ -41,6 +66,7 @@ module.exports = {
       env: {
         BIOS_PM2_APPS:
           "bid-intelligence-os,bid-intelligence-health-monitor,bid-intelligence-ppi-refresh",
+        ...fileEnv,
       },
       instances: 1,
       autorestart: true,
@@ -57,6 +83,9 @@ module.exports = {
         "-c 'while true; do node scripts/refresh-public-intel-anchors.mjs || true; sleep 604800; done'",
       interpreter: "none",
       exec_mode: "fork",
+      env: {
+        ...fileEnv,
+      },
       instances: 1,
       autorestart: true,
       watch: false,
