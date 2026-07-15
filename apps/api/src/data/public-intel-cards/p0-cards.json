@@ -10,7 +10,7 @@
       "region": "nationwide",
       "topic": "materials-inflation",
       "title": "Nonresidential construction inputs PPI +8.4% YoY (May–Jun 2026)",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.bls.gov/ppi/",
       "text": "BLS producer price series for nonresidential construction inputs remained elevated through the May–June 2026 window, with the blended proxy tracking about +8.4% year over year versus mid-2025. That figure is the startup baseline for price_pressure when a bid does not identify a dominant commodity. AGC contractor surveys over the same period continued to flag materials volatility as a bidding friction even where individual SKUs looked calm month-to-month. For Rose scoring, treat this card as a nationwide public baseline: use it to set a mid-band materials risk when trade-specific cards are absent, and pair it with escalation-clause practice (MAT-ESC-11) on pursuits with long buyouts. Do not read +8.4% as a forecast of award price; it is an evidence as-of Jun 2026 inflation anchor for relative Pursuit Confidence Index inputs. Refresh cadence is monthly against BLS PPI tables. Estimators should still lock quotes on hot SKUs rather than relying on this blended print alone."
     },
@@ -22,7 +22,7 @@
       "region": "nationwide",
       "topic": "materials-inflation",
       "title": "Copper PPI 533.24 (+38.3% YoY) — electrical price_pressure",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://fred.stlouisfed.org/",
       "text": "Electrical pursers face a copper-driven materials shock in May–June 2026: the copper PPI print cited in Gap-Fill sits near 533.24, about +38.3% year over year. That move dominates wire, cable, bus, and gear copper content and is why electrical weight tables elevate price_pressure relative to base. FRED/BLS releases through Jun 2026 kept the series hot after spring spikes; substitutes rarely erase exposure on code-driven copper specs. For Rose retrieveEvidence, this card should surface for electrical price_pressure and not for roofing asphalt contexts. Pair with MAT-ELEC-03 on switchgear lead times when the schedule cannot absorb long-lead gear. Escalation protection or PO locks materially change the scored risk; without them, treat copper as a structural ceiling on optimism for Strong Go. As-of date: 2026-06. Source tier: primary gov (BLS/FRED). Refresh monthly."
     },
@@ -35,7 +35,7 @@
       "region": "nationwide",
       "topic": "lead-time",
       "title": "Switchgear lead times 2–4 years (schedule_risk)",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.constructionsupplymagazine.com/",
       "text": "Construction Supply Magazine and OEM channel notes through May–June 2026 continued to report medium-voltage and large low-voltage switchgear lead times commonly in the 2–4 year band for congested SKUs, with occasional relief only on stocked or already-reserved factory slots. That is a schedule_risk signal for electrical and mechanical pursuits that depend on gear delivery before energization. Rose kill gates encode gear-lead failure when lead time exceeds remaining schedule; this card is the public evidence quote. Estimators should not score Strong Go on clean drawings alone if the one-line calls for gear that cannot arrive before substantial completion. Pre-order confirmation and factory reservation letters are the mitigations. Topic tag is lead-time (not materials-inflation). As-of 2026-06; refresh monthly against OEM/distributor bulletins. Distributors in May and June 2026 also warned that cancellation fees and slot deposits are increasingly required to hold factory positions, so a “gear available” verbal from a salesperson is not schedule evidence. Rose should require written reservation dates before clearing electricalGearLeadFail or mechanicalLeadFail soft paths. If the project allows temporary power or phased energization, document that mitigation explicitly in the pursuit file so evidence quality is not marked low by default."
     },
@@ -47,7 +47,7 @@
       "region": "nationwide",
       "topic": "lead-time",
       "title": "HVAC equipment lead 6–16 weeks (16–24 high-efficiency)",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.raiven.com/",
       "text": "Raiven and related HVAC procurement digests in the May–June 2026 window described packaged and applied equipment lead times commonly 6–16 weeks, extending to roughly 16–24 weeks for high-efficiency or constrained refrigerant configurations. That schedule_risk profile is milder than electrical switchgear but still kills pursuits when commissioning dates ignore factory reality. Mechanical weight tables elevate schedule_risk accordingly. Use this card when retrieving evidence for mechanical lead-time vs schedule gates; do not apply asphalt or copper narratives here. Mitigations: early PO, approved equals with stock, and explicit float in the CPM. As-of 2026-06; monthly refresh. Pair with MAT-MECH-05 when the submittal locks R-454B premium product. In the same May–June 2026 window, freight and crane calendars compounded equipment slips when rooftop units and chillers needed after-hours lifts. Estimators should compare OEM ship promises against the owner's substantial-completion date and any liquidated-damages clause before claiming Conditional or Strong Go. Rose schedule_risk inputs improve when pre-order confirmation and approved-equal stock lists are attached; otherwise leave the signal nearer neutral and let the lead-time gate speak."
     },
@@ -59,7 +59,7 @@
       "region": "nationwide",
       "topic": "materials-inflation",
       "title": "R-410A phasedown / R-454B premium +8–15%",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://ifactory.com/",
       "text": "iFactory and OEM pricing notes through May–June 2026 flagged ongoing R-410A phasedown effects with R-454B and related A2L equipment carrying an approximate +8–15% product premium versus legacy configurations. Combined with steel and copper exposure on coils and refrigerant piping, mechanical price_pressure stays elevated even when labor markets are merely tight. For Rose, this is a materials-inflation topic card scoped to mechanical — not a generic all-trade print. Estimators should confirm refrigerant type in the basis of design before claiming escalation protection. AHJ and training readiness for A2L also interact with specialty gates on some campuses. As-of 2026-06; quarterly refresh acceptable if OEM bulletins are quiet month-to-month. Service contractors also reported training and tool upgrades for A2L handling during spring 2026, adding soft cost that does not appear in the refrigerant product premium alone. For Pursuit Confidence Index scoring, treat unspecified refrigerant as a scope_clarity drag as well as a materials inflation issue. Prefer manufacturer bulletins dated May or June 2026 when citing evidence so the as-of stamp stays honest."
     },
@@ -73,7 +73,7 @@
       "region": "nationwide",
       "topic": "materials-inflation",
       "title": "Steel PPI 357.11 (+11.4% YoY) rebar/structural",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://fred.stlouisfed.org/",
       "text": "BLS/FRED steel PPI near 357.11 printed about +11.4% year over year into the May–June 2026 window, lifting rebar, structural, and equipment steel content. Gap-Fill maps this card to mechanical, concrete, and GC trades where steel exposure is material. Concrete pursers should not let calm ready-mix mask a rebar-heavy package; GC integration risk absorbs steel through sub buyouts. Use for price_pressure retrieval when trade is mechanical, concrete, or gc. Pair with escalation practice on long fabrication windows. As-of 2026-06; monthly BLS refresh. This is not an electrical copper card and should not displace MAT-ELEC-02 for wire-heavy scopes. Mill and service-center quotes in May–June 2026 remained jumpy week to week even when the monthly PPI smoothed the move, so long fixed-price buyouts without escalation remain fragile. GC teams should confirm whether structural and misc-metals subs have locked mill or warehouse pricing. Concrete rebar fabricators similarly pushed shorter quote validity. Rose uses this card to justify elevated price_pressure contribution when steel-bearing trades are selected."
     },
@@ -85,7 +85,7 @@
       "region": "nationwide",
       "topic": "materials-inflation",
       "title": "PVC calm (~+1¢/lb); copper hot; fixtures +6.6%",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.plasticstoday.com/",
       "text": "Plumbing materials mixed in May–June 2026: Plastics Tech noted PVC near calm (~+1¢/lb moves), while copper remained hot on the same PPI impulse as electrical (+38.3% YoY). Plumbing fixtures PPI near 379.9 showed about +6.6% YoY per Datum. Net price_pressure for plumbing is therefore mid — not copper-max, not flat. Rose plumbing weights reflect that blend. Retrieve this card for plumbing materials-inflation; do not return asphalt roofing calm here. Fixture lead confirmation remains a separate schedule check. Escalation clauses help on copper-heavy repipes. As-of 2026-06; monthly refresh. Fixture houses in May–June 2026 still quoted multi-week leads on specialty trim and sensor flushometers even while PVC resin looked calm, so plumbing schedule risk is not fully captured by commodity prints. Copper-heavy hospitals and labs should pair this card with escalation practice. Rose plumbing weight tables intentionally sit between electrical copper-max and roofing asphalt-calm; do not substitute MAT-ELEC-02 text into a plumbing explainability citation."
     },
@@ -97,7 +97,7 @@
       "region": "nationwide",
       "topic": "materials-inflation",
       "title": "Ready-mix PPI 393.9 (+1.7%) vs rebar hot",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.bls.gov/ppi/",
       "text": "BuildRefs/BLS ready-mix prints around PPI 393.9 showed roughly +1.7% YoY into May–June 2026 — calm relative to rebar riding the steel +11.4% impulse. Concrete price_pressure is therefore de-emphasized unless the package is rebar-heavy. Capacity and pour-window weather often dominate verdict more than cement price in this window. Rose should surface this card for concrete materials-inflation and MAT-STEEL-06 when rebar flags are set. False positive to avoid: scoring Go on calm ready-mix while ignoring steel. As-of 2026-06; monthly refresh. Ready-mix calm in May–June 2026 does not erase testing, inspection, and finish-spec scope gaps that often decide concrete pursuits. When rebar tonnage is high, elevate steel evidence and consider an estimator flag for rebar-heavy packages. Pour-window weather remains a separate schedule_risk drive. Public PPI alone should never clear a missing inspection scope on public work."
     },
@@ -109,7 +109,7 @@
       "region": "nationwide",
       "topic": "materials-inflation",
       "title": "Asphalt roofing −0.9% (calm); metal +11–19%",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.datum.com/",
       "text": "Datum and related PPI reads for May–June 2026 showed asphalt roofing products roughly −0.9% YoY (calm) while metal roofing products ran roughly +11–19% depending on substrate. That split is why roofing price_pressure is not a copper story and why electrical copper cards must not appear for roofing retrieval. Occupied-building and active-leak conditions still dominate schedule and weather gates (see BID-ROOF-28). For metal roofs, treat steel exposure seriously; for asphalt tear-offs, materials inflation is secondary to labor and weather windows. As-of 2026-06; monthly refresh. Public layer only. Metal roofing’s May–June 2026 inflation band also interacted with fastener and insulation accessories that track steel and petrochemical inputs differently than asphalt shingles or BUR. Roofing estimators should still prioritize occupied-building logistics and leak staging over materials prints when those conditions apply. Electrical copper evidence must not appear in roofing price_pressure retrieval — this card is the positive control for trade filtering."
     },
@@ -121,7 +121,7 @@
       "region": "nationwide",
       "topic": "materials-inflation",
       "title": "Diesel swing +73–106% YoY on haul-heavy scopes",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.bls.gov/ppi/",
       "text": "Aggregates Now/BLS diesel reads into May–June 2026 kept a violent YoY swing band cited around +73–106% depending on the comparison month — the primary civil price_pressure driver on haul-heavy earthwork. Unit-price public work often embeds diesel via bid items, but negotiated and design-build packages still need escalation or fuel indexes (ESC-CIVIL-29). Rose civil weights elevate price_pressure for this reason. Do not confuse with asphalt roofing calm. Permit and utility readiness remain separate gates. As-of 2026-06; monthly refresh. Haul distance and idle-time under traffic control magnified diesel sensitivity on Florida and Southeast sitework through May–June 2026. Where owners refuse fuel indexes, civil contractors should widen contingency or prefer unit-price structures that re-measure haul. Rose civil price_pressure weights exist for this reason; combine with ESC-CIVIL-29 when evaluating escalation_protection claims."
     },
@@ -133,7 +133,7 @@
       "region": "nationwide",
       "topic": "bidding-practice",
       "title": "Escalation clause practice ~3–5% threshold",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.constructionbids.ai/",
       "text": "Industry bidding-practice digests through May–June 2026 continued to describe materials escalation clauses commonly triggered around a 3–5% threshold on multi-month buyouts, with wide owner pushback on fully open-ended language. For Rose, this card supports escalation_protection evidence quality when the estimator claims a clause or PO lock. Claiming protection without a document should stay medium/low evidence. Pair with trade materials cards (copper, steel, diesel, refrigerant) rather than using this alone to clear price risk. As-of 2026-06; quarterly refresh. Public layer; nationwide. Clause drafting in May–June 2026 frequently carved out labor and only indexed materials, or capped cumulative recovery — estimators must read the actual language before toggling escalation_protection high. A letter of intent without price adjustment mechanics is not protection. Rose evidence quality should stay medium until a PO, quote lock, or contract clause citation is present."
     },
@@ -145,7 +145,7 @@
       "region": "nationwide",
       "topic": "market",
       "title": "AIA ABI 44.5 — leading demand 9–12 months",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.aia.org/",
       "text": "AIA Architecture Billings Index prints through the May–June 2026 window sat near 44.5, below the 50 expansion threshold, signaling softer design billings that typically lead construction demand by roughly 9–12 months. For Rose market_heat, a sub-50 ABI is a cooling public signal, not a bid-specific loss forecast. Use as a nationwide demand backdrop when scoring competitive intensity and backlog stress. Regional outs (South ABI) can diverge — see MKT-SE-13. As-of 2026-06; monthly AIA refresh. Honesty: relative index input only. ABI weakness in May–June 2026 coexists with still-long backlogs at many contractors, so market_heat should be read as mixed rather than collapse. Institutional and public work can lag private design billings. Rose uses ABI as one public ingredient beside ABC backlog and Dodge momentum — never as a calibrated win rate for a named bid."
     },
@@ -157,7 +157,7 @@
       "region": "SE",
       "topic": "market",
       "title": "South ABI 49.6 — best U.S. region in window",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.aia.org/",
       "text": "AIA regional ABI for the South printed near 49.6 in the May–June 2026 comparison set — the strongest major region versus a weaker national ABI near 44.5. Southeast pursuits (including Florida) may therefore see less demand-side cooling than northern markets, though still not a broad expansion print above 50. Rose region filter should prefer this card when region is SE or FL for market_heat. Do not treat as a win forecast. As-of 2026-06; monthly refresh. Southeast resilience in the May–June 2026 ABI split matters for Florida electrical, roofing, and civil pipelines that still see public and tourism-adjacent work. National averages alone can understate SE opportunity heat. Still keep honesty banners: relative Pursuit Confidence Index only, public evidence only in startup mode."
     },
@@ -169,7 +169,7 @@
       "region": "nationwide",
       "topic": "market",
       "title": "ABC backlog 9.1 months — busy but nervous",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.abc.org/",
       "text": "Associated Builders and Contractors backlog readings near 9.1 months in the May–June 2026 commentary described a busy-but-nervous posture: enough work to keep crews utilized, not enough visibility to ignore bid selectivity. For Rose, backlog supports market_heat and competitive intensity interpretation — crowded bid lists coexist with contractors defending margin. Pair with DMI planning pipeline (MKT-ALL-15). As-of 2026-06; monthly/quarterly ABC refresh. Public evidence only; not private win rates. The 9.1-month backlog snapshot for May–June 2026 implies crews are busy enough that chase-everything strategies raise pursuit_cost_ratio risk. Selectivity and Bid-Light recommendations from pursuitRoi become more relevant. Public backlog is not private utilization — learning mode will personalize later when outcomes accumulate. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -181,7 +181,7 @@
       "region": "nationwide",
       "topic": "market",
       "title": "Dodge Momentum Index 275.7 planning pipeline",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.equipmentinsider.com/",
       "text": "Equipment Insider and Dodge Momentum Index commentary around index level 275.7 in the May–June 2026 window pointed to a still-substantial planning pipeline even as billings soft patches appeared. That supports a mixed market_heat read: future starts exist, near-term pursuit competition remains real. Use as a public planning-side complement to ABI and ABC backlog. As-of 2026-06; monthly refresh. Relative index evidence — not calibrated win probability. Planning-pipeline strength near DMI 275.7 in May–June 2026 suggests future starts even while ABI is soft, which can keep competitive intensity elevated on attractive packages. Rose market retrieval should present both cooling billings and solid planning signals so estimators do not overfit a single index. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -193,7 +193,7 @@
       "region": "FL",
       "topic": "market",
       "title": "Florida FY budget $117.6B; ~+2,600 construction jobs context",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.flgov.com/",
       "text": "Florida government budget materials cited a roughly $117.6B state budget frame with continued construction-related job gains on the order of about +2,600 in the referenced May–June 2026 economic talking points. For Rose, this is a Florida market_heat / demand backdrop for local pursuits, not a guarantee of public lettings on any one bid. Pair with FDOT award tabs (AWD-FL-23) for civil/GC unit prices and LAB-SE-19 for labor scarcity. As-of 2026-06; annual budget refresh with monthly labor overlays. Budget and jobs context for Florida in May–June 2026 supports regional demand but does not clear bonding, licensing, or permit gates on a specific pursuit. Combine with DBPR vendor checks and FDOT tabs for civil. Startup mode still forbids win-probability language when discussing state spending."
     },
@@ -205,7 +205,7 @@
       "region": "nationwide",
       "topic": "labor",
       "title": "Construction AHE $41.36/hr; +4.4–4.8% YoY",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.bls.gov/ces/",
       "text": "BLS Current Employment Statistics average hourly earnings for construction printed near $41.36/hr with about +4.4–4.8% YoY into the May–June 2026 window. That is the Rose nationwide labor_pressure wage anchor. Trade premiums (electrical, mechanical) often run above this average — see LAB-TRADE-20. Wage growth alone does not equal shortage severity; combine with ABC/CSCI vacancy estimates (LAB-ALL-18). As-of 2026-06; monthly CES refresh. Public layer. Wage prints near $41.36/hr with +4.4–4.8% YoY through May–June 2026 set the minimum labor inflation story for every locked trade. Overtime, per diems, and travel premiums on storm or remote work can exceed that band. Rose labor_pressure should not be zeroed because a single local hiring fair looked busy. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -217,7 +217,7 @@
       "region": "nationwide",
       "topic": "labor",
       "title": "~349K construction worker shortage estimate (2026)",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.abc.org/",
       "text": "ABC/CSCI shortage commentary for 2026 continued to cite on the order of ~349K unfilled construction roles nationally in the spring–early summer updates used by Gap-Fill. That scarcity lifts labor_pressure even when headline wage prints look merely mid-single-digit. Rose should treat this as a nationwide capacity drag, stronger in licensed trades. Mitigations are crew commitments and realistic self-perform %, not optimistic schedule compression. As-of 2026-06; quarterly refresh. Shortage estimates near 349K for 2026, restated in spring and early summer industry notes, reinforce capacity_fit and labor_pressure even when commodity prints diverge by trade. Apprentice pipelines are slow relative to billings cycles. Document crew commitments before Strong Go. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -229,7 +229,7 @@
       "region": "SE",
       "topic": "labor",
       "title": "Florida ~439K short; Miami-Dade wage +7.2% context",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.amundson.com/",
       "text": "Amundson and related Southeast labor notes used in Gap-Fill cited Florida shortage magnitude near ~439K with Miami-Dade wage pressure examples around +7.2% in the May–June 2026 comparison set — hotter than the national construction AHE band. Rose applies SE/FL labor uplift when region filters match. Pair with MKT-FL-16 demand. This remains a public proxy; verify crew availability on the specific pursuit. As-of 2026-06; quarterly refresh. Florida and Miami-Dade pressure markers used in May–June 2026 Gap-Fill lock justify SE labor uplift in config tables. Visiting crews and housing costs can erase apparent wage advantages. Pair with hurricane-season roofing constraints when the trade is roofing. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -241,7 +241,7 @@
       "region": "nationwide",
       "topic": "labor",
       "title": "BLS OEWS trade wage benchmarks (e.g. elec $29.71)",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.bls.gov/oes/",
       "text": "BLS OEWS trade wage benchmarks remain the annual public reference set for Rose labor differentiation. Gap-Fill cites examples such as electrician mean wages near $29.71 in the referenced table vintage used for May–June 2026 engineering lock — always confirm the latest OEWS release when refreshing. Use to explain why MEP trades can exceed blended construction AHE pressure. Not a private utilization database. As-of 2026-06; annual OEWS refresh with monthly CES overlays from LAB-ALL-17. OEWS trade benchmarks give May–June 2026 explainability citations a primary-gov source tier when estimators ask why electrical or mechanical labor differs from blended construction AHE. Always prefer the latest OEWS release on refresh. Do not invent org-specific wage averages in startup mode. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -253,7 +253,7 @@
       "region": "nationwide",
       "topic": "awards",
       "title": "SAM.gov opportunities + awards API patterns",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://sam.gov/",
       "text": "SAM.gov remains the primary federal opportunities and awards surface for public competitive_intensity evidence. Through May–June 2026, API/export patterns continued to support opportunity discovery and award history pulls for set-asides and NAICS filters. Rose uses this as a public awards topic card — not as private Bid DNA. Pair with set-aside narrowing (AWD-ALL-24) when eligibility reduces the bidder pool. Daily refresh when live feeds are wired; this pack ships static guidance as-of 2026-06. Practical May–June 2026 usage: filter SAM opportunities by NAICS, place of performance, and set-aside, then count recent awards in the same lane as a competitive intensity proxy. This pack’s tag filter returns the guidance card until a live API sync exists. Citations must keep as-of dates honest. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -265,7 +265,7 @@
       "region": "nationwide",
       "topic": "awards",
       "title": "USAspending open API for award amounts",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.usaspending.gov/",
       "text": "USAspending.gov open APIs supply federal award amounts and recipient patterns useful for competitive intensity and market sizing. Gap-Fill treats this as a P0 awards card alongside SAM.gov. In May–June 2026 startup mode, BidOS may cite the source pattern even before a production ETL lands; tag-filter retrieval returns this card for awards topics. Do not invent org win rates from public award scrapes without learning-mode outcomes. As-of 2026-06; daily when wired. USAspending pulls for May–June 2026 engineering demos should be labeled public proxy and never mixed into private Bid DNA win rates. Amount fields help size expected value in pursuitRoi stubs. Refresh daily once ETL is productionized; until then this static card remains the retrieval hit. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -278,7 +278,7 @@
       "region": "FL",
       "topic": "awards",
       "title": "FDOT lettings + bid tabs (unit prices)",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.fdot.gov/",
       "text": "Florida DOT lettings and bid tabulations remain the best public unit-price benchmarks for civil and GC site packages in-state. May–June 2026 pursuit reviewers should pull recent tabs for earthwork, asphalt, and drainage comps rather than relying on national PPI alone. Rose region=FL + trades civil/gc should surface this card for awards / competitive intensity. Event-driven refresh around lettings. Public layer only. FDOT bid tabs from lettings around the May–June 2026 season remain the preferred civil/GC unit-price evidence for Florida. Compare earthwork and drainage units carefully; diesel and haul assumptions may be embedded. Event-level refresh beats monthly PPI for price discovery on public sitework. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -290,7 +290,7 @@
       "region": "nationwide",
       "topic": "awards",
       "title": "Set-asides narrow the competitor field",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://sam.gov/",
       "text": "Federal and many state set-aside designations (small business, 8(a), HUBZone, SDVOSB, etc.) structurally narrow the qualified competitor field. SAM.gov opportunity records through May–June 2026 continue to expose these flags for competitive_intensity adjustment. Rose should treat set-aside eligibility as a public awards signal: fewer qualified bidders can improve relative pursuit posture without implying a calibrated win probability. Verify the firm’s certifications before claiming the narrowing benefit. As-of 2026-06; event refresh per opportunity. Set-aside narrowing is only as strong as certification validity on bid day. May–June 2026 pursuits should re-check SAM entity registration and state certifications rather than relying on last year’s screenshot. Rose competitive_intensity can ease when the field is truly restricted — still not a win probability. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -302,7 +302,7 @@
       "region": "FL",
       "topic": "vendor",
       "title": "Florida DBPR license verification",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.myfloridalicense.com/",
       "text": "Florida DBPR license lookup remains the public vendor/license verification path for contractors and qualifying agents. Gap-Fill marks this P0 for vendor_quality_proxy and compliance gates. In startup mode Rose can only point to the verification pattern — not fabricate vendor scores. May–June 2026 pursuits in Florida should confirm active licenses before Strong Go narratives. Per-lookup freshness; card as-of 2026-06. DBPR lookups for May–June 2026 must capture license class sufficiency for the work (not merely an active number). Qualifying agent and insurance linkage often sit beside the license record. Rose compliance gates stay separate from vendor topic evidence; both can fail a pursuit. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -314,7 +314,7 @@
       "region": "nationwide",
       "topic": "vendor",
       "title": "Bonding capacity as financial proxy (SFAA/AGC)",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.surety.org/",
       "text": "SFAA/AGC surety practice treats bonding capacity as a coarse financial and capacity proxy when audited financials are unavailable. For Rose, bonding infeasible is a hard/soft gate input; this card explains the public proxy logic for May–June 2026 startup scoring. Claiming high capacity_fit with low bonding should warn. Annual refresh of framing; deal-specific capacity letters supersede. Public layer; not a private underwriting file. Surety capacity letters dated in the May–June 2026 chase window beat generic SFAA framing. If bonding is infeasible for the penal sum, Rose bondingInfeasible gate should dominate category scores. Public proxy language belongs in honesty labels. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -326,7 +326,7 @@
       "region": "nationwide",
       "topic": "delivery-method",
       "title": "Delivery method fit: lump / unit / GMP / DB / CMAR / JOC",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.agc.org/",
       "text": "AGC/DBIA/CMAA delivery-method guidance remains the public reference for mapping lump-sum, unit price, GMP, design-build, CMAR, and JOC risk to strategy_fit. May–June 2026 startup scoring uses delivery method as a manual/contextual field, not a scraped private win model. Misaligned delivery (e.g., incomplete scope on hard lump-sum) should drag scope_clarity and strategy_fit. As-of 2026-06; annual framing refresh. Mis-fit delivery methods in May–June 2026 most often appear as GMP language on incomplete drawings or lump-sum asks with allowance abuse. Strategy_fit and scope_clarity both move. Educate estimators that delivery method is scored context, not a free-text gut feeling field (rejected in G5). Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -338,7 +338,7 @@
       "region": "SE",
       "topic": "weather",
       "title": "Hurricane-season tear-off window risk (NOAA/NWS)",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.nhc.noaa.gov/",
       "text": "NOAA/NWS Atlantic hurricane season framing for 2026 plus roofing trade practice make May–November tear-off windows a schedule_risk and weather gate issue in the Southeast. Gap-Fill roofing cards emphasize occupied buildings and active leaks alongside this seasonal constraint. Rose should return this weather topic for roofing — never copper electrical materials cards. As-of 2026-06 (seasonal). Pair with MAT-ROOF-09 for materials calm/hot split. NOAA seasonal outlooks and NWS local forecasts for May–June 2026 onward should be paired with owner access constraints on occupied campuses. Tear-off without weatherproofing capacity is a classic roofing false-positive Go. This weather card must retrieve for roofing schedule_risk, distinct from MAT-ROOF-09 materials. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -350,7 +350,7 @@
       "region": "nationwide",
       "topic": "bidding-practice",
       "title": "Diesel escalation practice on haul-heavy civil",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://www.bls.gov/ppi/",
       "text": "Given diesel’s May–June 2026 YoY swing band (+73–106% in Gap-Fill citations), civil bidding practice increasingly uses fuel indexes or escalation allowances on haul-heavy scopes. This card supports escalation_protection / bidding-practice retrieval for civil specifically, complementing MAT-CIVIL-10. Owners on FDOT-style unit price may already embed fuel; private negotiated work may not. As-of 2026-06; monthly alongside diesel PPI. Civil escalation mechanics in May–June 2026 often reference on-highway diesel indexes rather than blended construction PPI. Document the index series in the bid if protection is claimed. Without it, keep escalation_protection subdued even when MAT-CIVIL-10 shows extreme diesel YoY. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     },
@@ -362,9 +362,13 @@
       "region": "nationwide",
       "topic": "governance",
       "title": "Compliance-as-gate + AI-review disclaimer",
-      "asOfDate": "2026-06",
+      "asOfDate": "2026-07-15",
       "sourceUrl": "https://bidintelligence.cagteam.net/",
       "text": "Internal Rose/BidOS governance for May–June 2026 lock: compliance is a GATE, not a weighted score category; Pursuit Confidence Index remains decision-support; every client-facing artifact requires human review under the Powered by AI · Reviewed by humans standard. Startup mode bans win-probability language. This card is public-layer governance evidence for scope/governance retrieval and auditor education. As-of 2026-06; annual unless product contract changes. Not a materials inflation card. Governance card for May–June 2026 lock reminds implementers that weights never ship to the browser and that manual-heavy Strong Go needs second-reviewer confirmation. Use in retrieval when signalIds include scope or governance topics. Product contract and PRODUCT_CONTRACT.md stay the operator source of truth for live vs demo. Public evidence for Rose retrieveEvidence tag-filter v1; verify primary sources on refresh."
     }
-  ]
+  ],
+  "refresh": {
+    "lastRun": "2026-07-15",
+    "sources": []
+  }
 }
