@@ -385,7 +385,7 @@ BidIntelligenceOS follows the CCA uptime rule: durable PM2 process manager, 15-m
 
 **Checks on each run**
 
-1. PM2 apps online: `bid-intelligence-os`, `bid-intelligence-health-monitor` (override with `BIOS_PM2_APPS`)
+1. PM2 apps online: `bid-intelligence-os`, `bid-intelligence-health-monitor`, `bid-intelligence-ppi-refresh` (override with `BIOS_PM2_APPS`)
 2. Local API health: `http://127.0.0.1:5001/api/health`
 3. Public site: `https://ccabidintelligence.com/`
 4. Public API health: `https://ccabidintelligence.com/api/health`
@@ -407,7 +407,7 @@ pm2 start deploy/ecosystem.config.cjs --only bid-intelligence-health-monitor
 pm2 save
 ```
 
-Both `bid-intelligence-os` and `bid-intelligence-health-monitor` must stay online. `./deploy/deploy.sh` reloads the API and leaves the monitor running.
+Keep `bid-intelligence-os`, `bid-intelligence-health-monitor`, and `bid-intelligence-ppi-refresh` online. `./deploy/deploy.sh` reloads the API and leaves the monitor/PPI refresh loops running.
 
 ## Custom domain cutover (enterprise white-label)
 

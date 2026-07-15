@@ -21,7 +21,7 @@ const ALERT_FROM = process.env.BIOS_ALERT_FROM || "bid-intelligence-monitor@loca
 const LOCAL_HEALTH = process.env.BIOS_LOCAL_HEALTH_URL || "http://127.0.0.1:5001/api/health";
 const PUBLIC_URL = process.env.BIOS_PUBLIC_URL || "https://ccabidintelligence.com/";
 const PUBLIC_HEALTH = process.env.BIOS_PUBLIC_HEALTH_URL || "https://ccabidintelligence.com/api/health";
-const REQUIRED_PM2_APPS = (process.env.BIOS_PM2_APPS || "bid-intelligence-os,bid-intelligence-health-monitor")
+const REQUIRED_PM2_APPS = (process.env.BIOS_PM2_APPS || "bid-intelligence-os,bid-intelligence-health-monitor,bid-intelligence-ppi-refresh")
   .split(",")
   .map((item) => item.trim())
   .filter(Boolean);

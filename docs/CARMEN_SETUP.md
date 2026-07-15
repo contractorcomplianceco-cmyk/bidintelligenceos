@@ -161,7 +161,7 @@ Exit `0` = all checks passed; `1` = failure (no secrets in output). Smoke users:
 | 2 | `/login` → register or sign in | Lands on Command Center |
 | 3 | **Bids** → **New bid** | Saves; appears in list |
 | 4 | Upload PDF or DOCX on bid | Extraction status `ready` or `metadata_only` |
-| 5 | **Compute bid score** | 12 categories + verdict |
+| 5 | **Compute bid score** | Pursuit Confidence Index smoke: score + verdict (not “win probability”) |
 | 6 | **Approve for client use** | `humanReviewed` badge |
 | 7 | **Lock score** | Locked for submission |
 | 8 | **Won / Lost / No-bid** | Bid status updates |

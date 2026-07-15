@@ -38,6 +38,10 @@ module.exports = {
         "-c 'while true; do node scripts/monitor-bid-intelligence-health.mjs || true; sleep 900; done'",
       interpreter: "none",
       exec_mode: "fork",
+      env: {
+        BIOS_PM2_APPS:
+          "bid-intelligence-os,bid-intelligence-health-monitor,bid-intelligence-ppi-refresh",
+      },
       instances: 1,
       autorestart: true,
       watch: false,
