@@ -1,10 +1,11 @@
 /**
  * retrieveEvidence — BidOS evidence/RAG contract (Rose handoff).
  * Pluggable VectorStore. Never lives in cca-core.
- * v1 default store: G6 P0 public intel pack (tag/keyword filter, no vector DB).
+ * Prefer stored embedding vectors (cosine) when available; else tag-filter G6 pack.
  */
 
 import { loadPublicIntelPack } from "./publicIntelPack.js";
+import { countStoredEmbeddings, createDbEmbeddingStore } from "./vectorStorePg.js";
 
 export type EvidenceLayer = "public" | "private";
 
@@ -130,24 +131,45 @@ export function createMemoryVectorStore(chunks: EvidenceChunk[] = []): VectorSto
  * Public: trade ∈ {trade, all}, region ∈ {region, nationwide}.
  * Private: learning mode only, org_id-scoped.
  */
-/** Default v1 store: G6 P0 public pack (tag filter). Override via params.store in tests. */
+/** Tag-filter fallback: G6 P0 public pack. */
 export function createPublicIntelStore(): VectorStore {
   return createMemoryVectorStore(loadPublicIntelPack());
+}
+
+/**
+ * Prefer DB embedding store when rows exist; else tag-filter pack.
+ * Tests may still inject params.store.
+ */
+export async function resolveDefaultStore(): Promise<{
+  store: VectorStore;
+  retrieval: "vector" | "tag-filter";
+}> {
+  const n = await countStoredEmbeddings();
+  if (n > 0) {
+    return { store: createDbEmbeddingStore(), retrieval: "vector" };
+  }
+  return { store: createPublicIntelStore(), retrieval: "tag-filter" };
 }
 
 export async function retrieveEvidence(params: RetrieveEvidenceParams): Promise<RetrievedEvidence> {
   const trade = params.trade.trim().toLowerCase() || "generic";
   const region = params.region ?? "nationwide";
   const mode = params.mode ?? "startup";
-  const store = params.store ?? createPublicIntelStore();
+  let store = params.store;
+  let retrieval: "vector" | "tag-filter" = "tag-filter";
+  if (!store) {
+    const resolved = await resolveDefaultStore();
+    store = resolved.store;
+    retrieval = resolved.retrieval;
+  }
 
   const bySignal: Record<string, EvidenceChunk[]> = {};
   const citations: string[] = [];
 
   for (const signalId of params.signalIds) {
     const topics = TOPIC_BY_SIGNAL[signalId] ?? [signalId];
-    const raw = await store.search({
-      text: signalId,
+    let raw = await store.search({
+      text: `${signalId} ${topics.join(" ")} ${trade}`,
       trade,
       region,
       topics,
@@ -155,6 +177,18 @@ export async function retrieveEvidence(params: RetrieveEvidenceParams): Promise<
       orgId: params.orgId,
       limit: 5,
     });
+    // Vector path with zero hits → tag-filter fallback for that signal
+    if (!raw.length && retrieval === "vector" && !params.store) {
+      raw = await createPublicIntelStore().search({
+        text: signalId,
+        trade,
+        region,
+        topics,
+        layer: "any",
+        orgId: params.orgId,
+        limit: 5,
+      });
+    }
     const filtered = raw.filter((c) => passesFilters(c, trade, region, mode, params.orgId));
     bySignal[signalId] = filtered;
     for (const c of filtered) citations.push(citationFor(c));

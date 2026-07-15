@@ -169,11 +169,79 @@ export const bidScores = pgTable(
     humanReviewed: boolean("human_reviewed").notNull().default(false),
     reviewedBy: text("reviewed_by"),
     reviewedAt: text("reviewed_at"),
+    secondReviewerUserId: text("second_reviewer_user_id"),
+    secondReviewerAt: text("second_reviewer_at"),
     lockedAt: text("locked_at").notNull(),
     createdAt: text("created_at").notNull(),
   },
   (t) => [index("bid_scores_bid_idx").on(t.bidId)],
 );
+
+export const bidAutopsies = pgTable(
+  "bid_autopsies",
+  {
+    id: text("id").primaryKey(),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id),
+    bidId: text("bid_id")
+      .notNull()
+      .references(() => bids.id),
+    outcome: text("outcome").notNull(),
+    reasonCodesJson: text("reason_codes_json").notNull().default("[]"),
+    competitorNotes: text("competitor_notes"),
+    trade: text("trade").notNull().default(""),
+    scoredSnapshotId: text("scored_snapshot_id"),
+    createdAt: text("created_at").notNull(),
+    updatedAt: text("updated_at").notNull(),
+  },
+  (t) => [
+    index("bid_autopsies_org_trade_idx").on(t.orgId, t.trade),
+    index("bid_autopsies_bid_uidx").on(t.bidId),
+  ],
+);
+
+export const scoreOverrideJournal = pgTable(
+  "score_override_journal",
+  {
+    id: text("id").primaryKey(),
+    orgId: text("org_id")
+      .notNull()
+      .references(() => organizations.id),
+    bidId: text("bid_id")
+      .notNull()
+      .references(() => bids.id),
+    scoreId: text("score_id"),
+    gateId: text("gate_id"),
+    fromVerdict: text("from_verdict"),
+    toVerdict: text("to_verdict"),
+    overrideRole: text("override_role").notNull(),
+    reasonCode: text("reason_code").notNull(),
+    reasonText: text("reason_text"),
+    userId: text("user_id").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (t) => [
+    index("score_override_journal_bid_idx").on(t.bidId),
+    index("score_override_journal_org_idx").on(t.orgId),
+  ],
+);
+
+export const publicIntelEmbeddings = pgTable("public_intel_embeddings", {
+  chunkId: text("chunk_id").primaryKey(),
+  trade: text("trade").notNull().default("all"),
+  region: text("region").notNull().default("nationwide"),
+  topic: text("topic").notNull().default(""),
+  title: text("title"),
+  sourceUrl: text("source_url"),
+  asOfDate: text("as_of_date"),
+  layer: text("layer").notNull().default("public"),
+  text: text("text").notNull(),
+  embeddingJson: text("embedding_json").notNull(),
+  model: text("model").notNull().default(""),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
 
 export const bidDocuments = pgTable(
   "bid_documents",

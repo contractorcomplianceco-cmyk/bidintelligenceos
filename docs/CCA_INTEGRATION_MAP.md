@@ -6,7 +6,7 @@ Which repo owns each capability and what BidOS consumes vs builds.
 
 | Capability | Owner repo | BidOS role |
 |------------|------------|------------|
-| Scoring engine IP (`computeBidScore` / Rose Pursuit Confidence v1, Layer A/B) | `Audit-Risk-Model/lib/cca-core` | **Consume** via path import in `apps/api` only — see [ROSE_CONFIDENCE_FORMULA_V1.md](./ROSE_CONFIDENCE_FORMULA_V1.md) |
+| Scoring engine IP (`computeBidScore` / Rose Pursuit Confidence v1, Layer A/B) | `Audit-Risk-Model/lib/cca-core` on **main** | **Consume** via path import in `apps/api` only — pin in [ARM_ENGINE_PIN.md](./ARM_ENGINE_PIN.md); formula [ROSE_CONFIDENCE_FORMULA_V1.md](./ROSE_CONFIDENCE_FORMULA_V1.md) |
 | Browser-safe types (`BidComplianceSnapshot`) | `Audit-Risk-Model/lib/cca-shared` | Types mirrored in web hooks (no package import required) |
 | Contractor audits + scorecards | `Audit-Risk-Model/artifacts/api-server` | **Pull** via `AUDIT_ENGINE_API_URL` |
 | Jurisdiction rules (export-ready) | `cca-research-hub` | **Pull** via Supabase bridge env |

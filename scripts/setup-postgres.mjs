@@ -18,7 +18,7 @@ if (!url) {
   process.exit(1);
 }
 
-const migrations = ["001_init.sql", "002_org_invites.sql"];
+const migrations = ["001_init.sql", "002_org_invites.sql", "003_confidence_ops.sql"];
 const pool = new pg.Pool({ connectionString: url });
 
 try {

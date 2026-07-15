@@ -250,8 +250,57 @@ function runSqliteMigrations(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS org_invites_org_idx ON org_invites(org_id);
     CREATE UNIQUE INDEX IF NOT EXISTS org_invites_org_email_pending_idx
       ON org_invites(org_id, email) WHERE status = 'pending';
+    CREATE TABLE IF NOT EXISTS bid_autopsies (
+      id TEXT PRIMARY KEY,
+      org_id TEXT NOT NULL REFERENCES organizations(id),
+      bid_id TEXT NOT NULL REFERENCES bids(id),
+      outcome TEXT NOT NULL,
+      reason_codes_json TEXT NOT NULL DEFAULT '[]',
+      competitor_notes TEXT,
+      trade TEXT NOT NULL DEFAULT '',
+      scored_snapshot_id TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS bid_autopsies_org_trade_idx ON bid_autopsies(org_id, trade);
+    CREATE UNIQUE INDEX IF NOT EXISTS bid_autopsies_bid_uidx ON bid_autopsies(bid_id);
+    CREATE TABLE IF NOT EXISTS score_override_journal (
+      id TEXT PRIMARY KEY,
+      org_id TEXT NOT NULL REFERENCES organizations(id),
+      bid_id TEXT NOT NULL REFERENCES bids(id),
+      score_id TEXT,
+      gate_id TEXT,
+      from_verdict TEXT,
+      to_verdict TEXT,
+      override_role TEXT NOT NULL,
+      reason_code TEXT NOT NULL,
+      reason_text TEXT,
+      user_id TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS score_override_journal_bid_idx ON score_override_journal(bid_id);
+    CREATE INDEX IF NOT EXISTS score_override_journal_org_idx ON score_override_journal(org_id);
+    CREATE TABLE IF NOT EXISTS public_intel_embeddings (
+      chunk_id TEXT PRIMARY KEY,
+      trade TEXT NOT NULL DEFAULT 'all',
+      region TEXT NOT NULL DEFAULT 'nationwide',
+      topic TEXT NOT NULL DEFAULT '',
+      title TEXT,
+      source_url TEXT,
+      as_of_date TEXT,
+      layer TEXT NOT NULL DEFAULT 'public',
+      text TEXT NOT NULL,
+      embedding_json TEXT NOT NULL,
+      model TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS public_intel_embeddings_trade_topic_idx
+      ON public_intel_embeddings(trade, topic);
   `);
   ensureColumn(database, "bid_analyses", "payload_json", "TEXT NOT NULL DEFAULT '{}'");
+  ensureColumn(database, "bid_scores", "second_reviewer_user_id", "TEXT");
+  ensureColumn(database, "bid_scores", "second_reviewer_at", "TEXT");
 }
 
 function ensureColumn(database: Database.Database, table: string, column: string, definition: string) {

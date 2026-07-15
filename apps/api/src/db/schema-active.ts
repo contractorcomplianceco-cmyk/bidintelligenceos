@@ -14,5 +14,8 @@ export const bidAnalyses = active.bidAnalyses;
 export const voiceConnectDrafts = active.voiceConnectDrafts;
 export const bidScores = active.bidScores;
 export const bidDocuments = active.bidDocuments;
+export const bidAutopsies = active.bidAutopsies;
+export const scoreOverrideJournal = active.scoreOverrideJournal;
+export const publicIntelEmbeddings = active.publicIntelEmbeddings;
 
 export type ActiveBidsRow = typeof bids.$inferSelect;

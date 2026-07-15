@@ -306,19 +306,126 @@ export function useLockBidScore() {
   });
 }
 
+export type AutopsyReasonCode =
+  | "price"
+  | "relationship"
+  | "capacity"
+  | "scope"
+  | "schedule"
+  | "competitor-strength"
+  | "compliance"
+  | "strategic-no-bid"
+  | "other";
+
+export type RecordOutcomeBody = {
+  bidId: string;
+  outcome: "won" | "lost" | "no-bid";
+  reason?: string;
+  reasonCodes?: AutopsyReasonCode[];
+  competitorNotes?: string;
+  trade?: string;
+  scoredSnapshotId?: string;
+};
+
+export type TradeOutcomeStats = {
+  trade: string;
+  outcomeCount: number;
+  won: number;
+  lost: number;
+  noBid: number;
+  pastPerfWinrate: number | null;
+  learningEligible: boolean;
+};
+
+export type OverrideReasonCode =
+  | "client-relationship"
+  | "strategic-loss-leader"
+  | "verified-exception"
+  | "data-corrected"
+  | "other";
+
+export type OverrideJournalEntry = {
+  id: string;
+  bidId: string;
+  reasonCode: string;
+  reasonText?: string;
+  fromVerdict?: string;
+  toVerdict?: string;
+  gateId?: string;
+  userId: string;
+  overrideRole: string;
+  createdAt: string;
+};
+
 export function useRecordBidOutcome() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ bidId, outcome, reason }: { bidId: string; outcome: "won" | "lost" | "no-bid"; reason?: string }) =>
-      apiFetch<{ bid: Bid }>(`/api/v1/bids/${bidId}/outcome`, {
-        method: "POST",
-        body: JSON.stringify({ outcome, reason }),
-      }),
+    mutationFn: ({ bidId, ...body }: RecordOutcomeBody) =>
+      apiFetch<{ bid: Bid; autopsy: unknown; tradeStats: TradeOutcomeStats }>(
+        `/api/v1/bids/${bidId}/outcome`,
+        {
+          method: "POST",
+          body: JSON.stringify(body),
+        },
+      ),
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: ["bids"] });
       qc.invalidateQueries({ queryKey: ["bid", vars.bidId] });
       qc.invalidateQueries({ queryKey: ["roseos-summary"] });
       qc.invalidateQueries({ queryKey: ["win-loss-analytics"] });
+      qc.invalidateQueries({ queryKey: ["bid-autopsy", vars.bidId] });
+      qc.invalidateQueries({ queryKey: ["learning-status", vars.bidId] });
+    },
+  });
+}
+
+export function useOverrideJournal(bidId: string | undefined, enabled = true) {
+  return useQuery({
+    queryKey: ["score-overrides", bidId],
+    enabled: enabled && !!bidId,
+    queryFn: () =>
+      apiFetch<{ journal: OverrideJournalEntry[] }>(`/api/v1/bids/${bidId}/score/overrides`),
+  });
+}
+
+export function useRecordScoreOverride() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      bidId,
+      ...body
+    }: {
+      bidId: string;
+      reasonCode: OverrideReasonCode;
+      reasonText?: string;
+      fromVerdict?: string;
+      toVerdict?: string;
+      gateId?: string;
+      scoreId?: string;
+    }) =>
+      apiFetch<{ entry: OverrideJournalEntry }>(`/api/v1/bids/${bidId}/score/override`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["score-overrides", vars.bidId] });
+    },
+  });
+}
+
+export function useConfirmSecondReviewer() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ bidId, scoreId }: { bidId: string; scoreId?: string }) =>
+      apiFetch<{ ok: boolean; secondReviewerUserId: string; secondReviewerAt: string }>(
+        `/api/v1/bids/${bidId}/score/second-reviewer`,
+        {
+          method: "POST",
+          body: JSON.stringify(scoreId ? { scoreId } : {}),
+        },
+      ),
+    onSuccess: (_d, vars) => {
+      qc.invalidateQueries({ queryKey: ["bid-score", vars.bidId] });
     },
   });
 }

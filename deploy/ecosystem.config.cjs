@@ -43,5 +43,20 @@ module.exports = {
       watch: false,
       max_memory_restart: "64M",
     },
+    {
+      // Weekly public-intel as_of refresh + honest skip email to Carmen (no secrets).
+      // sleep ~7d between runs; deploy does not wait on this loop.
+      name: "bid-intelligence-ppi-refresh",
+      cwd: "/home/ubuntu/projects/bid-intelligence-os",
+      script: "/usr/bin/bash",
+      args:
+        "-c 'while true; do node scripts/refresh-public-intel-anchors.mjs || true; sleep 604800; done'",
+      interpreter: "none",
+      exec_mode: "fork",
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: "64M",
+    },
   ],
 };

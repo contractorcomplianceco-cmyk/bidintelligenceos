@@ -3,6 +3,13 @@ import { and, desc, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "../../db/client.js";
 import { bidScores, bids } from "../../db/schema.js";
+import {
+  AUTOPSY_REASON_CODES,
+  countOutcomesForTrade,
+  getAutopsyForBid,
+  recordAutopsy,
+  syncBidStatusFromOutcome,
+} from "../../lib/autopsy.js";
 import { rowToBid } from "../../lib/bid-mapper.js";
 import { persistBidScoreForBid } from "../../lib/bid-score-service.js";
 import {
@@ -13,6 +20,14 @@ import {
 import bidDocumentsRoutes from "./bid-documents.js";
 import { computeComplianceEligibility } from "../../lib/compliance-eligibility.js";
 import { nextId, nowIso } from "../../lib/ids.js";
+import {
+  appendOverrideJournal,
+  canConfirmSecondReviewer,
+  canOverrideVerdict,
+  listOverrideJournal,
+  OVERRIDE_REASON_CODES,
+  recordSecondReviewer,
+} from "../../lib/override-journal.js";
 import { hashBidScoreInputs, logScoreAccess } from "../../lib/score-access-log.js";
 import { computeWinLossAnalytics } from "../../lib/win-loss-analytics.js";
 import { parseStateFromLocation } from "../../lib/state-parse.js";
@@ -49,6 +64,28 @@ const bidInputSchema = z.object({
 const outcomeSchema = z.object({
   outcome: z.enum(["won", "lost", "no-bid"]),
   reason: z.string().max(1000).optional(),
+  /** Autopsy fields (≤8): outcome + reason codes + optional competitor notes + trade + snapshot */
+  reasonCodes: z.array(z.enum(AUTOPSY_REASON_CODES)).max(6).optional(),
+  competitorNotes: z.string().max(500).optional(),
+  trade: z.string().max(64).optional(),
+  scoredSnapshotId: z.string().max(80).optional(),
+});
+
+const autopsyPatchSchema = z.object({
+  outcome: z.enum(["won", "lost", "no-bid"]).optional(),
+  reasonCodes: z.array(z.enum(AUTOPSY_REASON_CODES)).max(6).optional(),
+  competitorNotes: z.string().max(500).optional().nullable(),
+  trade: z.string().max(64).optional(),
+  scoredSnapshotId: z.string().max(80).optional().nullable(),
+});
+
+const overrideSchema = z.object({
+  reasonCode: z.enum(OVERRIDE_REASON_CODES),
+  reasonText: z.string().max(500).optional(),
+  gateId: z.string().max(64).optional(),
+  fromVerdict: z.string().max(64).optional(),
+  toVerdict: z.string().max(64).optional(),
+  scoreId: z.string().max(80).optional(),
 });
 
 router.get("/", async (req, res) => {
@@ -316,25 +353,155 @@ router.post("/:id/outcome", async (req, res) => {
     res.status(404).json({ error: "Bid not found" });
     return;
   }
-  const statusByOutcome = {
-    won: "Won",
-    lost: "Lost",
-    "no-bid": "No-Bid",
-  } as const;
-  const ts = nowIso();
-  const outcomeNote = parsed.data.reason ? `Outcome reason: ${parsed.data.reason}` : undefined;
-  const notes = [bid.notes, outcomeNote].filter(Boolean).join("\n\n");
+  const autopsy = await recordAutopsy(
+    bid.id,
+    orgId,
+    {
+      outcome: parsed.data.outcome,
+      reasonCodes: parsed.data.reasonCodes,
+      competitorNotes: parsed.data.competitorNotes,
+      trade: parsed.data.trade ?? bid.type,
+      scoredSnapshotId: parsed.data.scoredSnapshotId,
+    },
+    bid.type,
+  );
+  await syncBidStatusFromOutcome(bid.id, parsed.data.outcome, parsed.data.reason);
   const db = getDb();
-  await db
-    .update(bids)
-    .set({
-      status: statusByOutcome[parsed.data.outcome],
-      notes,
-      updatedAt: ts,
-    })
-    .where(eq(bids.id, bid.id));
   const rows = await db.select().from(bids).where(eq(bids.id, bid.id)).limit(1);
-  res.json({ bid: rowToBid(rows[0]!) });
+  const tradeStats = await countOutcomesForTrade(orgId, autopsy.trade);
+  res.json({ bid: rowToBid(rows[0]!), autopsy, tradeStats });
+});
+
+router.get("/:id/autopsy", async (req, res) => {
+  const { orgId } = (req as unknown as AuthedRequest).auth;
+  const bid = await loadBidForOrg(req.params.id, orgId);
+  if (!bid) {
+    res.status(404).json({ error: "Bid not found" });
+    return;
+  }
+  const autopsy = await getAutopsyForBid(bid.id, orgId);
+  const trade = autopsy?.trade || bid.type || "generic";
+  const tradeStats = await countOutcomesForTrade(orgId, trade);
+  res.json({ autopsy, tradeStats });
+});
+
+router.patch("/:id/autopsy", async (req, res) => {
+  const parsed = autopsyPatchSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
+    return;
+  }
+  const { orgId } = (req as unknown as AuthedRequest).auth;
+  const bid = await loadBidForOrg(req.params.id, orgId);
+  if (!bid) {
+    res.status(404).json({ error: "Bid not found" });
+    return;
+  }
+  const existing = await getAutopsyForBid(bid.id, orgId);
+  const outcome = parsed.data.outcome ?? (existing?.outcome as "won" | "lost" | "no-bid" | undefined);
+  if (!outcome) {
+    res.status(400).json({ error: "outcome required when no autopsy exists yet" });
+    return;
+  }
+  const autopsy = await recordAutopsy(
+    bid.id,
+    orgId,
+    {
+      outcome,
+      reasonCodes: parsed.data.reasonCodes ?? (existing?.reasonCodes as typeof AUTOPSY_REASON_CODES[number][] | undefined),
+      competitorNotes:
+        parsed.data.competitorNotes === null
+          ? undefined
+          : parsed.data.competitorNotes ?? existing?.competitorNotes,
+      trade: parsed.data.trade ?? existing?.trade ?? bid.type,
+      scoredSnapshotId:
+        parsed.data.scoredSnapshotId === null
+          ? undefined
+          : parsed.data.scoredSnapshotId ?? existing?.scoredSnapshotId,
+    },
+    bid.type,
+  );
+  await syncBidStatusFromOutcome(bid.id, outcome);
+  const tradeStats = await countOutcomesForTrade(orgId, autopsy.trade);
+  res.json({ autopsy, tradeStats });
+});
+
+router.get("/:id/learning-status", async (req, res) => {
+  const { orgId } = (req as unknown as AuthedRequest).auth;
+  const bid = await loadBidForOrg(req.params.id, orgId);
+  if (!bid) {
+    res.status(404).json({ error: "Bid not found" });
+    return;
+  }
+  const trade = (typeof req.query.trade === "string" && req.query.trade) || bid.type || "generic";
+  const tradeStats = await countOutcomesForTrade(orgId, trade);
+  res.json({ tradeStats });
+});
+
+router.post("/:id/score/second-reviewer", async (req, res) => {
+  const { orgId, userId, role, email } = (req as unknown as AuthedRequest).auth;
+  if (!canConfirmSecondReviewer(role, email)) {
+    res.status(403).json({ error: "Owner/admin confirmation required" });
+    return;
+  }
+  const bid = await loadBidForOrg(req.params.id, orgId);
+  if (!bid) {
+    res.status(404).json({ error: "Bid not found" });
+    return;
+  }
+  try {
+    const scoreId =
+      typeof (req.body as { scoreId?: string })?.scoreId === "string"
+        ? (req.body as { scoreId: string }).scoreId
+        : undefined;
+    const result = await recordSecondReviewer({ bidId: bid.id, orgId, userId, scoreId });
+    res.json({ ok: true, ...result });
+  } catch (e) {
+    res.status(404).json({ error: e instanceof Error ? e.message : "Second reviewer failed" });
+  }
+});
+
+router.get("/:id/score/overrides", async (req, res) => {
+  const { orgId } = (req as unknown as AuthedRequest).auth;
+  const bid = await loadBidForOrg(req.params.id, orgId);
+  if (!bid) {
+    res.status(404).json({ error: "Bid not found" });
+    return;
+  }
+  const journal = await listOverrideJournal(bid.id, orgId);
+  res.json({ journal });
+});
+
+router.post("/:id/score/override", async (req, res) => {
+  const parsed = overrideSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ error: parsed.error.flatten() });
+    return;
+  }
+  const { orgId, userId, role, email } = (req as unknown as AuthedRequest).auth;
+  if (!canOverrideVerdict(role, email)) {
+    res.status(403).json({ error: "Owner/admin override required" });
+    return;
+  }
+  const bid = await loadBidForOrg(req.params.id, orgId);
+  if (!bid) {
+    res.status(404).json({ error: "Bid not found" });
+    return;
+  }
+  const entry = await appendOverrideJournal({
+    orgId,
+    bidId: bid.id,
+    scoreId: parsed.data.scoreId,
+    gateId: parsed.data.gateId,
+    fromVerdict: parsed.data.fromVerdict,
+    toVerdict: parsed.data.toVerdict,
+    overrideRole: role,
+    reasonCode: parsed.data.reasonCode,
+    reasonText: parsed.data.reasonText,
+    userId,
+    bidForHash: bid,
+  });
+  res.status(201).json({ entry });
 });
 
 router.get("/:id", async (req, res) => {

@@ -35,7 +35,8 @@ cca-core owns: `config.ts`, `computeConfidence.ts`, `evaluateKillGates.ts` (serv
 - Evidence-quality cap Option A: LOW on any ≥10%-weight signal → score capped at **71**
 - Soft/data holds demote Strong Go → Conditional; hard → No-Go
 - Gates LOCKED: license-class, permit-utility, cert-AHJ (+ soft variants), GC sub-coverage
-- `LEARNING_MODE_MIN_OUTCOMES = 40`; Learning Option A (`past_perf` 0.06) **LOCKED** documented stub — not auto-activated without outcomes
+- `LEARNING_MODE_MIN_OUTCOMES = 40`; Learning Option A (`past_perf` 0.06) applied when BidOS sets `mode=learning` after ≥40 org/trade autopsies with a measured win rate (never invented)
+- Engine pin: [`ARM_ENGINE_PIN.md`](./ARM_ENGINE_PIN.md) · Vector RAG: [`VECTOR_RAG.md`](./VECTOR_RAG.md)
 - Manual-heavy Strong Go: `manualHeavy` / `secondReviewerConfirmed` API flags (G11 #11)
 - Honesty: startup index is **never** "win probability"
 - Generic trade: honesty banner *"Trade not set — accuracy limited…"*

@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import {
   computePursuitConfidence,
+  LEARNING_MODE_MIN_OUTCOMES,
   serializePublicBidScore,
   type RoseGateFlags,
   type RoseSignalInputs,
@@ -9,6 +10,7 @@ import {
 } from "@workspace/cca-core";
 import { getDb } from "../db/client.js";
 import { bidScores, bids } from "../db/schema.js";
+import { countOutcomesForTrade } from "./autopsy.js";
 import { computeComplianceEligibility } from "./compliance-eligibility.js";
 import { nextId, nowIso } from "./ids.js";
 import { parseStateFromLocation } from "./state-parse.js";
@@ -39,6 +41,13 @@ export type PersistedScoreResponse = ReturnType<typeof serializePublicBidScore> 
   evidenceCitations?: string[];
   /** G11 #11 — surface for UI badge (also reflected in gates). */
   manualHeavyVerify?: boolean;
+  learning?: {
+    requested: boolean;
+    applied: boolean;
+    outcomeCount: number;
+    minOutcomes: number;
+    pastPerfWinrate: number | null;
+  };
 };
 
 /**
@@ -53,7 +62,20 @@ export async function persistBidScoreForBid(
   meta?: { userId?: string },
 ): Promise<PersistedScoreResponse> {
   const trade = opts.trade?.trim() || bid.type?.trim() || "generic";
-  const mode = opts.mode ?? "startup";
+  const requestedLearning = opts.mode === "learning";
+  const tradeStats = await countOutcomesForTrade(orgId, trade);
+  // Learning only when N≥40 AND measured win rate exists — never invent past_perf.
+  const learningApplied = requestedLearning && tradeStats.learningEligible;
+  const mode: "startup" | "learning" = learningApplied ? "learning" : "startup";
+
+  const signals: RoseSignalInputs = { ...(opts.signals ?? {}) };
+  if (learningApplied && tradeStats.pastPerfWinrate != null) {
+    signals.past_perf_winrate = tradeStats.pastPerfWinrate;
+  } else {
+    // Defensive: never pass a fabricated win rate in startup
+    delete signals.past_perf_winrate;
+  }
+
   const state = parseStateFromLocation(bid.location);
   const compliance = await computeComplianceEligibility(state, {
     trade,
@@ -73,15 +95,15 @@ export async function persistBidScoreForBid(
       publicPrivate: bid.publicPrivate ?? undefined,
       trade,
       mode,
-      signals: opts.signals,
+      signals,
       gates: opts.roseGates,
       evidenceQuality: opts.evidenceQuality,
     },
     compliance,
   );
 
-  const signalIds = Object.keys(opts.signals ?? {}).length
-    ? (Object.keys(opts.signals!) as string[])
+  const signalIds = Object.keys(signals).length
+    ? (Object.keys(signals) as string[])
     : ["price_pressure", "labor_pressure", "market_heat", "schedule_risk", "escalation_protection"];
 
   const region = state || "nationwide";
@@ -99,9 +121,14 @@ export async function persistBidScoreForBid(
     evidenceBySignal[sid] = chunks.map((c) => ({ citation: citationFor(c) }));
   }
 
+  let honestyLabel = result.honestyLabel;
+  if (learningApplied) {
+    honestyLabel = `Personalized from ${tradeStats.outcomeCount} recorded outcomes for ${trade} (as of ${new Date().toISOString().slice(0, 10)}). Option A past_perf weight active — not a guaranteed win rate.`;
+  }
+
   const explanation = await explainScore({
-    result,
-    inputs: opts.signals,
+    result: { ...result, honestyLabel },
+    inputs: signals,
     evidenceBySignal,
   });
 
@@ -110,6 +137,7 @@ export async function persistBidScoreForBid(
     amount: bid.amount ?? 0,
     pursuitHours: opts.pursuitHours,
     expectedMarginPct: bid.margin != null ? bid.margin / 100 : undefined,
+    calibratedWinRate: learningApplied ? tradeStats.pastPerfWinrate ?? undefined : undefined,
   });
 
   const manualHeavyVerify = Boolean(
@@ -168,16 +196,25 @@ export async function persistBidScoreForBid(
 
   return {
     ...publicScore,
-    honestyLabel: explanation.honestyLabel,
+    honestyLabel: explanation.honestyLabel ?? honestyLabel,
     explanation,
     pursuitRoi: {
       recommendation: roi.recommendation,
       roiRatio: roi.roiRatio,
       winLikelihoodBasis: roi.winLikelihoodBasis,
       assumptions: roi.assumptions,
-      summary: `Pursuit ROI: ${roi.recommendation} (relative heuristic — not win probability).`,
+      summary: learningApplied
+        ? `Pursuit ROI: ${roi.recommendation} (calibrated from trade outcomes — still decision-support).`
+        : `Pursuit ROI: ${roi.recommendation} (relative heuristic — not win probability).`,
     },
     evidenceCitations: evidence.citations.slice(0, 12),
     manualHeavyVerify,
+    learning: {
+      requested: requestedLearning,
+      applied: learningApplied,
+      outcomeCount: tradeStats.outcomeCount,
+      minOutcomes: LEARNING_MODE_MIN_OUTCOMES,
+      pastPerfWinrate: tradeStats.pastPerfWinrate,
+    },
   };
 }

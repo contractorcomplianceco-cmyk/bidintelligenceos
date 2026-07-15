@@ -19,11 +19,16 @@ import {
   useComplianceEligibility,
   useComplianceEligibilityByState,
   useComputeBidScore,
+  useConfirmSecondReviewer,
   useLockBidScore,
+  useOverrideJournal,
   useRecordBidOutcome,
+  useRecordScoreOverride,
+  type AutopsyReasonCode,
   type BidScoreSnapshot,
   type ComplianceEligibility,
   type ComputeBidScoreBody,
+  type OverrideReasonCode,
 } from "@/hooks/use-bids";
 import { Loader2, ShieldCheck, ShieldAlert, Lock, CheckCircle2, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -312,12 +317,18 @@ function ScoreBody({
   onApprove,
   onLock,
   onOutcome,
+  onOverride,
+  onSecondReviewer,
+  journal,
   computing,
   approving,
   locking,
   recordingOutcome,
+  overriding,
+  confirmingReviewer,
   canRun,
   canApprove,
+  canOverride,
 }: {
   score?: BidScoreSnapshot | null;
   manual: ManualFields;
@@ -325,14 +336,37 @@ function ScoreBody({
   onCompute: () => void;
   onApprove: () => void;
   onLock: () => void;
-  onOutcome: (outcome: "won" | "lost" | "no-bid") => void;
+  onOutcome: (payload: {
+    outcome: "won" | "lost" | "no-bid";
+    reasonCodes?: string[];
+    competitorNotes?: string;
+  }) => void;
+  onOverride?: (payload: { reasonCode: string; reasonText?: string }) => void;
+  onSecondReviewer?: () => void;
+  journal?: {
+    id: string;
+    reasonCode: string;
+    reasonText?: string;
+    userId: string;
+    createdAt: string;
+    fromVerdict?: string;
+    toVerdict?: string;
+  }[];
   computing?: boolean;
   approving?: boolean;
   locking?: boolean;
   recordingOutcome?: boolean;
+  overriding?: boolean;
+  confirmingReviewer?: boolean;
   canRun: boolean;
   canApprove: boolean;
+  canOverride: boolean;
 }) {
+  const [autopsyOutcome, setAutopsyOutcome] = useState<"won" | "lost" | "no-bid" | null>(null);
+  const [reasonCode, setReasonCode] = useState("price");
+  const [competitorNotes, setCompetitorNotes] = useState("");
+  const [overrideCode, setOverrideCode] = useState("verified-exception");
+  const [overrideText, setOverrideText] = useState("");
   const trade = manual.trade || "generic";
   const isGeneric = trade === "generic";
   const showElecMech = trade === "electrical" || trade === "mechanical";
@@ -702,17 +736,124 @@ function ScoreBody({
             )}
           </div>
           {canRun && score.humanReviewed && (
-            <div className="flex flex-wrap gap-2 pt-2 border-t border-[#E2E8F0]">
-              <p className="w-full text-xs font-bold uppercase tracking-wider text-slate-500">Record outcome (Bid DNA)</p>
-              <Button type="button" size="sm" variant="outline" disabled={recordingOutcome} onClick={() => onOutcome("won")}>
-                Won
-              </Button>
-              <Button type="button" size="sm" variant="outline" disabled={recordingOutcome} onClick={() => onOutcome("lost")}>
-                Lost
-              </Button>
-              <Button type="button" size="sm" variant="outline" disabled={recordingOutcome} onClick={() => onOutcome("no-bid")}>
-                No-bid
-              </Button>
+            <div className="flex flex-col gap-2 pt-2 border-t border-[#E2E8F0]">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Outcome autopsy</p>
+              <div className="flex flex-wrap gap-2">
+                {(["won", "lost", "no-bid"] as const).map((o) => (
+                  <Button
+                    key={o}
+                    type="button"
+                    size="sm"
+                    variant={autopsyOutcome === o ? "default" : "outline"}
+                    disabled={recordingOutcome}
+                    onClick={() => setAutopsyOutcome(o)}
+                  >
+                    {o === "no-bid" ? "No-bid" : o === "won" ? "Won" : "Lost"}
+                  </Button>
+                ))}
+              </div>
+              {autopsyOutcome && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-slate-600">Reason code</Label>
+                    <select
+                      className="h-9 w-full rounded-md border border-slate-200 bg-white px-2 text-sm"
+                      value={reasonCode}
+                      onChange={(e) => setReasonCode(e.target.value)}
+                    >
+                      <option value="price">Price</option>
+                      <option value="relationship">Relationship</option>
+                      <option value="capacity">Capacity</option>
+                      <option value="scope">Scope</option>
+                      <option value="schedule">Schedule</option>
+                      <option value="competitor-strength">Competitor strength</option>
+                      <option value="compliance">Compliance</option>
+                      <option value="strategic-no-bid">Strategic no-bid</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label className="text-xs text-slate-600">Competitor notes (optional)</Label>
+                    <Input
+                      className="h-9"
+                      value={competitorNotes}
+                      onChange={(e) => setCompetitorNotes(e.target.value)}
+                      placeholder="Optional — who won / why"
+                      maxLength={500}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="sm:col-span-2 bg-teal-700 hover:bg-teal-600"
+                    disabled={recordingOutcome}
+                    onClick={() =>
+                      onOutcome({
+                        outcome: autopsyOutcome,
+                        reasonCodes: [reasonCode],
+                        competitorNotes: competitorNotes || undefined,
+                      })
+                    }
+                  >
+                    {recordingOutcome ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                    Save autopsy
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {canOverride && score && (
+            <div className="flex flex-col gap-2 pt-2 border-t border-[#E2E8F0]">
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Override journal (G8)</p>
+              {journal && journal.length > 0 ? (
+                <ul className="text-xs text-slate-600 space-y-1 max-h-28 overflow-auto">
+                  {journal.map((j) => (
+                    <li key={j.id}>
+                      {j.createdAt.slice(0, 10)} · {j.reasonCode}
+                      {j.fromVerdict && j.toVerdict ? ` · ${j.fromVerdict}→${j.toVerdict}` : ""}
+                      {j.reasonText ? ` — ${j.reasonText}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-slate-500">No overrides recorded.</p>
+              )}
+              <div className="flex flex-wrap gap-2 items-end">
+                <select
+                  className="h-9 rounded-md border border-slate-200 bg-white px-2 text-sm"
+                  value={overrideCode}
+                  onChange={(e) => setOverrideCode(e.target.value)}
+                >
+                  <option value="client-relationship">Client relationship</option>
+                  <option value="strategic-loss-leader">Strategic loss-leader</option>
+                  <option value="verified-exception">Verified exception</option>
+                  <option value="data-corrected">Data corrected</option>
+                  <option value="other">Other</option>
+                </select>
+                <Input
+                  className="h-9 flex-1 min-w-[140px]"
+                  value={overrideText}
+                  onChange={(e) => setOverrideText(e.target.value)}
+                  placeholder="Optional note"
+                  maxLength={500}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={overriding || !onOverride}
+                  onClick={() => onOverride?.({ reasonCode: overrideCode, reasonText: overrideText || undefined })}
+                >
+                  {overriding ? <Loader2 className="w-4 h-4 animate-spin" /> : "Record override"}
+                </Button>
+              </div>
+              {score.manualHeavyVerify && onSecondReviewer && (
+                <Button type="button" size="sm" variant="secondary" disabled={confirmingReviewer} onClick={onSecondReviewer}>
+                  {confirmingReviewer ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                  Confirm second reviewer
+                </Button>
+              )}
             </div>
           )}
         </>
@@ -729,6 +870,7 @@ export function BidIntelligencePanel(props: Props) {
   const { toast } = useToast();
   const { user } = useAuth();
   const canApprove = user?.role === "owner";
+  const canOverride = user?.role === "owner" || user?.role === "admin";
   const stateCode = useMemo(
     () => parseStateFromLocation(props.mode === "state" ? props.location : props.location),
     [props.location, props.mode],
@@ -742,10 +884,13 @@ export function BidIntelligencePanel(props: Props) {
   const bidId = props.mode === "bid" ? props.bidId : undefined;
   const live = props.mode === "bid" ? props.live : false;
   const { data: scoreData, isLoading: scoreLoading } = useBidScore(bidId, live);
+  const { data: journalData } = useOverrideJournal(bidId, live);
   const computeScore = useComputeBidScore();
   const approveScore = useApproveBidScore();
   const lockScore = useLockBidScore();
   const recordOutcome = useRecordBidOutcome();
+  const recordOverride = useRecordScoreOverride();
+  const confirmSecond = useConfirmSecondReviewer();
 
   const [manual, setManualState] = useState<ManualFields>(DEFAULT_MANUAL);
   const setManual = (patch: Partial<ManualFields>) => setManualState((prev) => ({ ...prev, ...patch }));
@@ -796,15 +941,60 @@ export function BidIntelligencePanel(props: Props) {
     }
   };
 
-  const handleOutcome = async (outcome: "won" | "lost" | "no-bid") => {
+  const handleOutcome = async (payload: {
+    outcome: "won" | "lost" | "no-bid";
+    reasonCodes?: string[];
+    competitorNotes?: string;
+  }) => {
     if (!bidId) return;
     try {
-      await recordOutcome.mutateAsync({ bidId, outcome });
-      toast({ title: "Outcome recorded", description: `Bid marked ${outcome}.` });
+      await recordOutcome.mutateAsync({
+        bidId,
+        outcome: payload.outcome,
+        reasonCodes: payload.reasonCodes as AutopsyReasonCode[] | undefined,
+        competitorNotes: payload.competitorNotes,
+        trade: manual.trade || undefined,
+        scoredSnapshotId: scoreData?.score?.id,
+      });
+      toast({ title: "Autopsy saved", description: `Bid marked ${payload.outcome}.` });
     } catch (e) {
       toast({
         title: "Outcome failed",
         description: e instanceof Error ? e.message : "Could not record outcome",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleOverride = async (payload: { reasonCode: string; reasonText?: string }) => {
+    if (!bidId) return;
+    try {
+      await recordOverride.mutateAsync({
+        bidId,
+        reasonCode: payload.reasonCode as OverrideReasonCode,
+        reasonText: payload.reasonText,
+        fromVerdict: scoreData?.score?.verdict,
+        scoreId: scoreData?.score?.id,
+      });
+      toast({ title: "Override recorded", description: "Append-only journal updated." });
+    } catch (e) {
+      toast({
+        title: "Override failed",
+        description: e instanceof Error ? e.message : "Could not record override",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSecondReviewer = async () => {
+    if (!bidId) return;
+    try {
+      await confirmSecond.mutateAsync({ bidId, scoreId: scoreData?.score?.id });
+      toast({ title: "Second reviewer confirmed", description: "Timestamp recorded on score snapshot." });
+    } catch (e) {
+      toast({
+        title: "Confirmation failed",
+        description: e instanceof Error ? e.message : "Could not confirm second reviewer",
         variant: "destructive",
       });
     }
@@ -861,12 +1051,18 @@ export function BidIntelligencePanel(props: Props) {
                 onApprove={handleApprove}
                 onLock={handleLock}
                 onOutcome={handleOutcome}
+                onOverride={handleOverride}
+                onSecondReviewer={handleSecondReviewer}
+                journal={journalData?.journal}
                 computing={computeScore.isPending}
                 approving={approveScore.isPending}
                 locking={lockScore.isPending}
                 recordingOutcome={recordOutcome.isPending}
+                overriding={recordOverride.isPending}
+                confirmingReviewer={confirmSecond.isPending}
                 canRun={live && !!bidId}
                 canApprove={canApprove}
+                canOverride={canOverride}
               />
             )}
           </CardContent>
