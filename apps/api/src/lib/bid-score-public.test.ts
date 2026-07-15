@@ -237,13 +237,14 @@ describe("Rose handoff WOW layer (BidOS)", () => {
 });
 
 describe("Gap-Fill Pack (BidOS consumers)", () => {
-  it("optional trade strings include provisional GC/Mech/Plumbing/Concrete/Civil/Specialty", () => {
+  it("optional trade strings include LOCKED GC/Mech/Plumbing/Concrete/Civil/Specialty", () => {
     const ids = listBidOsTradeIds();
     for (const id of ["gc", "mechanical", "plumbing", "concrete", "civil", "specialty", "generic"]) {
       assert.ok(ids.includes(id), `missing trade ${id}`);
     }
-    assert.equal(BIDOS_OPTIONAL_TRADES.find((t) => t.id === "mechanical")?.status, "provisional");
+    assert.equal(BIDOS_OPTIONAL_TRADES.find((t) => t.id === "mechanical")?.status, "locked");
     assert.equal(BIDOS_OPTIONAL_TRADES.find((t) => t.id === "electrical")?.status, "locked");
+    assert.equal(BIDOS_OPTIONAL_TRADES.find((t) => t.id === "generic")?.status, "fallback");
   });
 
   it("generic honesty banner appears on disclaimer", () => {
@@ -252,9 +253,14 @@ describe("Gap-Fill Pack (BidOS consumers)", () => {
       compliance,
     );
     assert.match(result.disclaimer, new RegExp(GENERIC_TRADE_HONESTY_BANNER.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    assert.match(result.honestyLabel, /Pursuit Confidence Index/i);
+    assert.doesNotMatch(
+      result.honestyLabel.toLowerCase(),
+      /chance of winning|win chance|\d+(\.\d+)?%\s*win/,
+    );
   });
 
-  it("provisional trade weight tables sum ≈ 1", () => {
+  it("Gap-Fill locked trade weight tables sum ≈ 1", () => {
     for (const trade of ["gc", "mechanical", "plumbing", "concrete", "civil", "specialty"]) {
       const w = applyModeWeights(resolveWeights(trade), "startup");
       const sum = Object.values(w).reduce((a, b) => a + b, 0);

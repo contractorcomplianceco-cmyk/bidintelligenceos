@@ -146,7 +146,18 @@ const scoreBodySchema = z
         roofingWeatherWindowFail: z.boolean().optional(),
         roofingActiveLeakOccupied: z.boolean().optional(),
         electricalGearLeadFail: z.boolean().optional(),
+        mechanicalLeadFail: z.boolean().optional(),
+        softHold: z.boolean().optional(),
         licensedTrades: z.array(z.string()).optional(),
+        licenseClassGap: z.boolean().optional(),
+        licenseClassGapSoft: z.boolean().optional(),
+        permitUtilityUnresolved: z.boolean().optional(),
+        certAhjGap: z.boolean().optional(),
+        certAhjGapSoft: z.boolean().optional(),
+        gcSubCoverageFail: z.boolean().optional(),
+        /** G11 #11 — manual-heavy Strong Go needs second reviewer */
+        manualHeavy: z.boolean().optional(),
+        secondReviewerConfirmed: z.boolean().optional(),
       })
       .optional(),
   })

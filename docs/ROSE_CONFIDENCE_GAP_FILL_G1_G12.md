@@ -3,12 +3,16 @@
 **Canonical full pack (save/edit here):**  
 [`Audit-Risk-Model/lib/cca-core/docs/ROSE_CONFIDENCE_GAP_FILL_G1_G12.md`](../../Audit-Risk-Model/lib/cca-core/docs/ROSE_CONFIDENCE_GAP_FILL_G1_G12.md)
 
-BidOS does **not** own weights. Gap-Fill provisional trade tables, bands, `trade_required_days`, FL/SE labor uplift, and new gates live in `cca-core` `config.ts` / `evaluateKillGates.ts`.
+**G11 status (2026-07-14):** ALL 12 decisions APPROVED (every row Y / ✅).  
+**READY_FOR_ENGINEERING:** YES · **READY_LOCKED:** YES
+
+BidOS does **not** own weights. Gap-Fill locked trade tables, bands, `trade_required_days`, FL/SE labor uplift, and gates live in `cca-core` `config.ts` / `evaluateKillGates.ts`.
 
 **BidOS consumers:**
 
-- Optional trade strings: `apps/api/src/lib/trade-options.ts` (GC, Mechanical, Plumbing, Concrete, Civil, Specialty + locked Electrical/Roofing + Generic fallback)
-- Generic honesty banner comes from cca-core (`GENERIC_TRADE_HONESTY_BANNER`) and is included in score disclaimer / honestyLabel
+- Optional trade strings: `apps/api/src/lib/trade-options.ts` (all trades `locked` except Generic `fallback`)
+- Generic honesty banner from cca-core (`GENERIC_TRADE_HONESTY_BANNER`) on score disclaimer / honestyLabel
+- Score API accepts Gap-Fill `roseGates` including `manualHeavy` / `secondReviewerConfirmed`
 - WOW layer unchanged: `retrieveEvidence` / `explainScore` / `pursuitRoi`
 
-**Still waiting on Rose:** G11 Yes/No deck (12 items) before marking provisional trades LOCKED.
+**Not deploy/merge to main until Carmen asks** — lock-in only on `feat/rose-confidence-formula-v1`.
