@@ -2,10 +2,10 @@
 
 Living map of marketing promises → routes → data status. Update when a module goes live.
 
-**Last verified:** 2026-07-09  
+**Last verified:** 2026-07-15  
 **Team URL:** [https://bidintelligence.cagteam.net](https://bidintelligence.cagteam.net)  
-**Auth:** Clerk (`AUTH_ENABLED=true` on team URL)  
-**Verified at:** `7566d3c`+ (Clerk live; PDF/DOCX export; RBAC invites; VoiceConnect + VideoConnect bridges; white-label sidebar; Phase 5 roadmap in `docs/PHASE_5_ROADMAP.md`)
+**Auth (Rose smoke):** `AUTH_ENABLED=false` + team smoke login (`rose@` / `carmen@`); Clerk remains wired but not flipped for tonight’s QA  
+**Verified at:** live soft-deploy 2026-07-15 (Pursuit Confidence plain language; trade/location dropdowns on New Bid; Industry Use Cases walkthrough ungated for all sessions; HTML `Cache-Control: no-store`)
 
 **Legend:** `live` = persisted API data when signed in · `partial live` = mix of live API + demo fixtures or honest empty · `demo` = seed fixtures / marketing showcase only · `planned` = not built
 
@@ -14,8 +14,8 @@ Living map of marketing promises → routes → data status. Update when a modul
 | Status | Count | Sections |
 |--------|------:|----------|
 | **partial live** | 19 | Operations (2), Bid lifecycle partials (4), Job execution partials (4), Intelligence (5), Account (2), Add-ons (1) |
-| **live** | 9 | Bid Intelligence, New bid intake, Package Builder, Won Jobs, Job Deployment, Scheduling, Labor & Subs, Job Closeout, ROSEOS |
-| **demo** | 10 | Add-ons marketplace (5), Orphan routes (5) |
+| **live** | 10 | Bid Intelligence, New bid intake, Package Builder, Won Jobs, Job Deployment, Scheduling, Labor & Subs, Job Closeout, ROSEOS, Industry Use Cases |
+| **demo** | 9 | Add-ons marketplace (5), Orphan routes (4) |
 | **planned** | 0 | — |
 
 Public marketing surfaces (3) are **live** as static/demo-entry experiences — not counted above.
@@ -98,7 +98,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | Insights | `/insights` | demo | Orphan win/loss chart; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | Documents hub | `/documents` | demo | Orphan compliance docs view; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
 | Competitors | `/competitors` | demo | Orphan competitor signals; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
-| Industry use cases | `/industry-use-cases` | demo | Marketing vertical walkthrough; demo fixtures for anonymous sessions; `OpsModuleEmpty` for authed team users |
+| Industry use cases | `/industry-use-cases` | **live** | Static 10-vertical walkthrough from `@core/industry-use-cases` for all sessions (anonymous and authed); no `OpsModuleGate` |
 
 ## Guardrails
 
@@ -139,7 +139,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 | Settings enterprise — multi-location | **partial live** | `locations[]` with `parentRegion`, `isPrimary`; regional grouping on business profile + analytics; region filter in settings |
 | Settings enterprise — RBAC | **partial live** | Role templates + permission matrix on Team tab; `PATCH /api/v1/org/members/:userId/role`; org invites live |
 | `GET/PATCH /api/v1/org/profile` enterprise extras | **partial live** | `licenses`, `certifications`, `phone`, `contactEmail`, `leadership`, white-label fields, `customDomain`, and `locations` persist in `organizations.profile_json` |
-| Clerk production cutover | **live** | `AUTH_ENABLED=true` on team URL; legacy login disabled when Clerk enabled |
+| Clerk production cutover | **ready / smoke override** | Clerk wired; Rose smoke night uses `AUTH_ENABLED=false` + team smoke login — do not flip Clerk mid-QA |
 | Full client export PDF/DOCX | **live** | Server-side generation after `humanReviewApproved` on bid score |
 | VideoConnect capture upload | **partial live** | VideoConnect API: JSON/multipart `POST /api/walkthroughs`, persisted list, `/capture` form; video processing + visual intelligence deferred |
 | Platform feeds (SAM.gov / BLS / Zoho) | **partial live** | Env-gated status routes + honest UI when keys missing; live feed wiring deferred |

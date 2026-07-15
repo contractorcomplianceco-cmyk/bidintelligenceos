@@ -6,7 +6,7 @@ BidOS scores via path import to the **sibling** Audit-Risk-Model tree — not an
 |-------|--------|
 | Sibling path | `/home/ubuntu/projects/Audit-Risk-Model` |
 | Branch | `main` |
-| Commit (pinned) | `3d70093330b9eef8b145272067f3b9b2cfee96f4` |
+| Commit (pinned) | `4d136b337cddd848dbb933b667016346ed7403d7` |
 | Engine package | `lib/cca-core` (`computeBidScore` → `computeConfidence`) |
 | Resolve map | `apps/api/tsconfig.json` → `@workspace/cca-core` → `../../../Audit-Risk-Model/lib/cca-core/src/index.ts` |
 
@@ -15,7 +15,7 @@ BidOS scores via path import to the **sibling** Audit-Risk-Model tree — not an
 ```bash
 cd /home/ubuntu/projects/Audit-Risk-Model
 git checkout main && git pull --ff-only
-git rev-parse HEAD   # expect 3d70093… or later fast-forward on main
+git rev-parse HEAD   # expect 4d136b3… or later fast-forward on main
 pnpm test            # cca-core / workspace tests green
 
 cd /home/ubuntu/projects/bid-intelligence-os

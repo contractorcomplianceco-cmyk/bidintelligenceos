@@ -111,7 +111,7 @@ const navGroups: NavGroup[] = [
     items: [
       { href: "/roseos", label: "ROSEOS Intelligence", icon: Compass, badge: "AI" },
       { href: "/bid-dna", label: "Bid DNA", icon: Dna },
-      { href: "/industry-use-cases", label: "Industry Use Cases", icon: Factory },
+      { href: "/industry-use-cases", label: "Industry Use Cases", icon: Factory, badge: "Guide" },
       { href: "/analytics", label: "Analytics", icon: BarChart3 },
     ],
   },

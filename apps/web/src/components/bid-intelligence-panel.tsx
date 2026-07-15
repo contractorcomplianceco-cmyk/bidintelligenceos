@@ -36,7 +36,9 @@ import { useAuth } from "@/lib/auth-context";
 import {
   BIDOS_OPTIONAL_TRADES,
   GENERIC_TRADE_HONESTY_BANNER,
+  SCOPE_CLARITY_OPTIONS,
   STARTUP_HONESTY_BANNER,
+  SUB_BENCH_DEPTH_OPTIONS,
 } from "@/lib/trade-options";
 
 const AI_REVIEW_LABEL = "Powered by AI · Reviewed by humans";
@@ -196,11 +198,13 @@ function buildScoreBody(m: ManualFields): ComputeBidScoreBody {
 function YnSelect({
   id,
   label,
+  hint,
   value,
   onChange,
 }: {
   id: string;
   label: string;
+  hint?: string;
   value: "" | "yes" | "no";
   onChange: (v: "" | "yes" | "no") => void;
 }) {
@@ -209,6 +213,7 @@ function YnSelect({
       <Label htmlFor={id} className="text-xs text-slate-600">
         {label}
       </Label>
+      {hint ? <p className="text-[11px] text-slate-500 leading-snug">{hint}</p> : null}
       <Select value={value || undefined} onValueChange={(v) => onChange(v as "yes" | "no")}>
         <SelectTrigger id={id} className="h-9">
           <SelectValue placeholder="—" />
@@ -378,8 +383,9 @@ function ScoreBody({
   return (
     <div className="space-y-5">
       <div className="rounded-lg border border-sky-200 bg-sky-50 p-3 space-y-1">
+
         <p className="text-xs font-semibold text-sky-950">How this score works</p>
-        <p className="text-xs text-sky-900">{STARTUP_HONESTY_BANNER}</p>
+        <p className="text-xs text-sky-900 leading-relaxed">{STARTUP_HONESTY_BANNER}</p>
       </div>
       {isGeneric && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
@@ -389,6 +395,7 @@ function ScoreBody({
 
       <div className="space-y-3 rounded-lg border border-[#E2E8F0] p-3">
         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+
           About this bid
         </p>
         <div className="grid grid-cols-1 gap-3">
@@ -402,7 +409,6 @@ function ScoreBody({
                 {BIDOS_OPTIONAL_TRADES.map((t) => (
                   <SelectItem key={t.id} value={t.id}>
                     {t.label}
-                    {t.status === "fallback" ? " (fallback)" : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -422,18 +428,22 @@ function ScoreBody({
         <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-xs text-slate-600">How clear is the scope? (1 = vague, 5 = fully spec&apos;d — your estimate)</Label>
+
+            <Label className="text-xs text-slate-600">How clear is the scope?</Label>
+            <p className="text-[11px] text-slate-500 leading-snug">
+              1 = vague drawings; 5 = fully defined and bid-ready.
+            </p>
             <Select
               value={manual.scopeClarity || undefined}
               onValueChange={(v) => setManual({ scopeClarity: v })}
             >
               <SelectTrigger className="h-9">
-                <SelectValue placeholder="Required for best score" />
+                <SelectValue placeholder="Pick 1–5" />
               </SelectTrigger>
               <SelectContent>
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <SelectItem key={n} value={String(n)}>
-                    {n}
+                {SCOPE_CLARITY_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -441,51 +451,72 @@ function ScoreBody({
           </div>
           <YnSelect
             id="escalation"
-            label="Price protection in contract? (locks material costs)"
+
+            label="Price escalation clause?"
+            hint="Does the contract let you adjust price if materials rise?"
             value={manual.escalation}
             onChange={(v) => setManual({ escalation: v })}
           />
-          <div className="space-y-1">
-            <Label className="text-xs text-slate-600">Hours to chase this bid (optional)</Label>
+          <div className="space-y-1 sm:col-span-2">
+            <Label className="text-xs text-slate-600">Estimate hours to pursue (optional)</Label>
+            <p className="text-[11px] text-slate-500 leading-snug">
+              Rough time your team will spend to bid this job.
+            </p>
             <Input
               type="number"
               min={0}
-              className="h-9"
+              className="h-9 max-w-[12rem]"
               value={manual.pursuitHours}
               onChange={(e) => setManual({ pursuitHours: e.target.value })}
               placeholder="e.g. 40"
             />
           </div>
-          <div className="flex items-center gap-2 pt-5">
+          <div className="flex items-start gap-2 sm:col-span-2 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] p-3">
             <Checkbox
               id="bonding"
+              className="mt-0.5"
               checked={manual.bondingInfeasible}
               onCheckedChange={(c) => setManual({ bondingInfeasible: c === true })}
             />
-            <Label htmlFor="bonding" className="text-xs text-slate-700">
-              Can&apos;t meet the bond requirement
-            </Label>
+
+            <div className="space-y-0.5">
+              <Label htmlFor="bonding" className="text-xs text-slate-800 font-medium">
+                We cannot bond this job at the required capacity
+              </Label>
+              <p className="text-[11px] text-slate-500 leading-snug">
+                Check if bonding is not available or too low for this bid amount.
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-2 pt-5">
+          <div className="flex items-start gap-2 sm:col-span-2">
             <Checkbox
               id="scopeDocs"
+              className="mt-0.5"
               checked={manual.hasScopeDocs}
               onCheckedChange={(c) => setManual({ hasScopeDocs: c === true })}
             />
+
             <Label htmlFor="scopeDocs" className="text-xs text-slate-700">
               Plans / specs uploaded
             </Label>
           </div>
           {Number(manual.scopeClarity) >= 4 && !manual.hasScopeDocs && (
-            <div className="flex items-center gap-2 sm:col-span-2">
+            <div className="flex items-start gap-2 sm:col-span-2">
               <Checkbox
                 id="secondRev"
+                className="mt-0.5"
                 checked={manual.secondReviewerConfirmed}
                 onCheckedChange={(c) => setManual({ secondReviewerConfirmed: c === true })}
               />
-              <Label htmlFor="secondRev" className="text-xs text-slate-700">
-                Second reviewer confirmed (needed for a Strong Go based mostly on your estimates)
-              </Label>
+
+              <div className="space-y-0.5">
+                <Label htmlFor="secondRev" className="text-xs text-slate-700">
+                  A second person reviewed this high scope score
+                </Label>
+                <p className="text-[11px] text-slate-500 leading-snug">
+                  Required before a strong go when documents are not attached.
+                </p>
+              </div>
             </div>
           )}
         </div>
@@ -493,16 +524,22 @@ function ScoreBody({
         {showElecMech && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[#E2E8F0]">
             <p className="sm:col-span-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-              {trade === "electrical" ? "Electrical" : "Mechanical"} extras
+              {trade === "electrical" ? "Electrical details" : "Mechanical / HVAC details"}
             </p>
             <YnSelect
               id="gear"
-              label="Gear / equipment already on order?"
+
+              label="Is long-lead equipment already ordered?"
+              hint="Switchgear, HVAC units, or other materials with long ship times."
               value={manual.gearPreOrdered}
               onChange={(v) => setManual({ gearPreOrdered: v })}
             />
             <div className="space-y-1">
-              <Label className="text-xs text-slate-600">Days the lead time runs past the schedule</Label>
+
+              <Label className="text-xs text-slate-600">How many days late could materials arrive?</Label>
+              <p className="text-[11px] text-slate-500 leading-snug">
+                Enter 0 if lead times fit the job schedule.
+              </p>
               <Input
                 type="number"
                 className="h-9"
@@ -513,7 +550,9 @@ function ScoreBody({
             </div>
             <YnSelect
               id="bms"
-              label="Controls / BMS scope defined?"
+
+              label="Is controls / BMS scope defined?"
+              hint="Building management system or controls work is clear enough to price."
               value={manual.controlsBmsScope}
               onChange={(v) => setManual({ controlsBmsScope: v })}
             />
@@ -523,23 +562,24 @@ function ScoreBody({
         {showRoof && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[#E2E8F0]">
             <p className="sm:col-span-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-              Roofing extras
+              Roofing details
             </p>
             <YnSelect
               id="occupied"
-              label="Occupied building"
+              label="Is the building occupied during the work?"
               value={manual.occupiedBuilding}
               onChange={(v) => setManual({ occupiedBuilding: v })}
             />
             <YnSelect
               id="leak"
-              label="Active leak"
+              label="Is there an active leak right now?"
               value={manual.activeLeak}
               onChange={(v) => setManual({ activeLeak: v })}
             />
             <YnSelect
               id="deck"
-              label="Deck condition known"
+              label="Do you know the deck condition?"
+              hint="Substrate under the roof membrane — sound, wet, or needs repair."
               value={manual.deckConditionKnown}
               onChange={(v) => setManual({ deckConditionKnown: v })}
             />
@@ -549,23 +589,24 @@ function ScoreBody({
         {showCivil && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[#E2E8F0]">
             <p className="sm:col-span-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-              Civil extras
+              Civil / site details
             </p>
             <YnSelect
               id="permit"
-              label="Permit secured"
+              label="Is the permit already secured?"
               value={manual.permitSecured}
               onChange={(v) => setManual({ permitSecured: v })}
             />
             <YnSelect
               id="utility"
-              label="Utility conflicts known"
+              label="Are utility conflicts known?"
+              hint="Buried or overhead utilities that could clash with the work."
               value={manual.utilityConflictsKnown}
               onChange={(v) => setManual({ utilityConflictsKnown: v })}
             />
             <YnSelect
               id="earth"
-              label="Earthwork balance known"
+              label="Is earthwork cut/fill balance known?"
               value={manual.earthworkBalanceKnown}
               onChange={(v) => setManual({ earthworkBalanceKnown: v })}
             />
@@ -575,16 +616,22 @@ function ScoreBody({
         {showGc && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[#E2E8F0]">
             <p className="sm:col-span-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-              GC extras
+              General contractor details
             </p>
             <YnSelect
               id="subcov"
+
               label="Subs lined up for the big trades?"
+              hint="Do you have subcontractors lined up for the critical scopes?"
               value={manual.keySubCoverage}
               onChange={(v) => setManual({ keySubCoverage: v })}
             />
             <div className="space-y-1">
-              <Label className="text-xs text-slate-600">% you&apos;ll self-perform</Label>
+
+              <Label className="text-xs text-slate-600">Self-perform %</Label>
+              <p className="text-[11px] text-slate-500 leading-snug">
+                Share of work your own crews will do (0–100).
+              </p>
               <Input
                 type="number"
                 min={0}
@@ -594,19 +641,23 @@ function ScoreBody({
                 onChange={(e) => setManual({ selfPerformPct: e.target.value })}
               />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs text-slate-600">How deep is your sub bench? (1 = thin, 5 = deep — your estimate)</Label>
+
+            <div className="space-y-1 sm:col-span-2">
+              <Label className="text-xs text-slate-600">How deep is your subcontractor bench?</Label>
+              <p className="text-[11px] text-slate-500 leading-snug">
+                1 = few backups; 5 = many qualified alternatives if someone drops out.
+              </p>
               <Select
                 value={manual.subBenchDepth || undefined}
                 onValueChange={(v) => setManual({ subBenchDepth: v })}
               >
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder="—" />
+                <SelectTrigger className="h-9 max-w-md">
+                  <SelectValue placeholder="Pick 1–5" />
                 </SelectTrigger>
                 <SelectContent>
-                  {[1, 2, 3, 4, 5].map((n) => (
-                    <SelectItem key={n} value={String(n)}>
-                      {n}
+                  {SUB_BENCH_DEPTH_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -626,6 +677,7 @@ function ScoreBody({
       </div>
 
       {!score ? (
+
         <p className="text-sm text-slate-600">
           No score yet. Hit “Score this bid” to see where it stands — you can add detail below to sharpen it, but it&apos;s not required.
         </p>
@@ -645,7 +697,7 @@ function ScoreBody({
               <span className="text-2xl font-bold text-slate-900">{Math.round(score.totalScore)}/100</span>
               {score.manualHeavyVerify && (
                 <Badge className="bg-amber-100 text-amber-950 border border-amber-300 gap-1">
-                  <ShieldAlert className="w-3 h-3" /> Manual-heavy — verify / second reviewer
+                  <ShieldAlert className="w-3 h-3" /> Needs a second person to verify
                 </Badge>
               )}
               {score.lockedAt && (
@@ -718,8 +770,8 @@ function ScoreBody({
               <p className="text-xs text-slate-500">
                 {score.pursuitRoi.awardOddsLabel ||
                   (score.pursuitRoi.winLikelihoodBasis === "calibrated-outcomes"
-                    ? "Calibrated award odds basis (separate from ROI recommendation)"
-                    : "Award odds not available in startup — relative index only")}
+                    ? "Based on past outcomes (separate from the ROI note above) — still not a win percentage"
+                    : "Win percentage not available yet — this index is relative bid quality only")}
               </p>
             </div>
           )}
@@ -842,6 +894,7 @@ function ScoreBody({
 
           {canOverride && score && (
             <div className="flex flex-col gap-2 pt-2 border-t border-[#E2E8F0]">
+
               <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Override history</p>
               {journal && journal.length > 0 ? (
                 <ul className="text-xs text-slate-600 space-y-1 max-h-28 overflow-auto">
@@ -939,7 +992,8 @@ export function BidIntelligencePanel(props: Props) {
       await computeScore.mutateAsync({ bidId, body });
       toast({
         title: "Bid score ready",
-        description: "Snapshot locked — awaiting reviewer approval. Not a win probability.",
+
+        description: "Score saved — awaiting reviewer approval. This is not a win percentage.",
       });
     } catch (e) {
       toast({
@@ -1065,7 +1119,8 @@ export function BidIntelligencePanel(props: Props) {
             </CardTitle>
             <CardDescription className="space-y-2">
               <span className="block">
-                Strong Go / Conditional / Executive Review / No-Go — a relative read on this job, not a win probability.
+
+                Strong Go / Conditional / Executive Review / No-Go — a relative read on this job, not a win percentage. A human reviews every score before client use.
               </span>
               <span className="block text-[10px] font-semibold uppercase tracking-widest text-slate-500">
                 {AI_REVIEW_LABEL}

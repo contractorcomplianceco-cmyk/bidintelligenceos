@@ -149,9 +149,9 @@ export async function persistBidScoreForBid(
 
   let honestyLabel = result.honestyLabel;
   if (learningApplied) {
-    honestyLabel = `Personalized from ${tradeStats.outcomeCount} recorded outcomes for ${trade} (as of ${new Date().toISOString().slice(0, 10)}). Option A past_perf weight active — calibrated award odds basis only; not a guaranteed win.`;
+    honestyLabel = `Personalized from ${tradeStats.outcomeCount} recorded outcomes for ${trade} (as of ${new Date().toISOString().slice(0, 10)}). Decision support only — not a guaranteed win.`;
   } else if (requestedLearning && tradeStats.learningEligible && !flipApproved) {
-    honestyLabel = `Learning requested for ${trade} but first flip is not approved yet (Rose #1). Staying in startup — Pursuit Confidence Index remains relative, not calibrated award odds.`;
+    honestyLabel = `Past outcomes are ready for ${trade}, but learning is not switched on yet. Pursuit Confidence Index stays relative — not a win percentage.`;
   }
   honestyLabel = `${honestyLabel} ${marketAnchors.label}.`;
 
@@ -170,11 +170,11 @@ export async function persistBidScoreForBid(
   });
 
   const roiLabel = learningApplied
-    ? "Calibrated pursuit ROI (EV vs pursuit cost from recorded outcomes)"
-    : "Pursuit ROI (relative heuristic — not calibrated award odds)";
+    ? "Pursuit ROI from recorded outcomes (expected return vs bid cost)"
+    : "Pursuit ROI (rough guide — not a win percentage)";
   const awardOddsLabel = learningApplied
-    ? `Calibrated award odds basis from ${tradeStats.outcomeCount} outcomes (decision-support, not a prediction)`
-    : "Award odds not available in startup — index is relative pursuit quality only";
+    ? `Award-odds basis from ${tradeStats.outcomeCount} outcomes (decision support, not a prediction)`
+    : "Win percentage not available yet — this index is relative bid quality only";
 
   const manualHeavyVerify = Boolean(
     opts.roseGates?.manualHeavy && !opts.roseGates?.secondReviewerConfirmed,

@@ -281,7 +281,7 @@ export default function BusinessProfile() {
               color: "#22C55E",
             },
             { label: "Avg Project Size", value: stats.avgProject ? `$${(stats.avgProject / 1000).toFixed(0)}K` : "—", note: live ? "From job deployments" : "Active portfolio", icon: DollarSign, color: "#38BDF8" },
-            { label: "On-Time Completion", value: live ? "—" : "91%", note: live ? "Ops module Phase 4" : "Trailing 24 jobs", icon: Clock, color: "#38BDF8" },
+            { label: "On-Time Completion", value: live ? "—" : "91%", note: live ? "Coming soon from job schedule" : "Trailing 24 jobs", icon: Clock, color: "#38BDF8" },
             { label: "Avg Projected ROI", value: stats.avgRoi ? `${stats.avgRoi.toFixed(1)}%` : "—", note: "Across deployments", icon: Target, color: "#22C55E" },
             { label: "Safety (EMR)", value: live ? "—" : "0.78", note: live ? "Add to org profile" : "Below industry avg", icon: HardHat, color: "#F59E0B" },
             { label: "Active Contracts", value: `${stats.activeContracts}`, note: live ? "Live job count" : "In deployment", icon: Briefcase, color: "#38BDF8" },

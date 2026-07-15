@@ -74,7 +74,23 @@ app.use("/api/v1", v1Routes);
 
 if (isProd) {
   const distPath = path.resolve(__dirnameBootstrap, "../../web/dist");
-  app.use(express.static(distPath, { index: false }));
+  // HTML shell must never be cached so soft deploys show new hashed assets without Ctrl+Shift+R.
+  // Content-hashed /assets/* may use long immutable cache because the URL changes each build.
+  app.use(
+    express.static(distPath, {
+      index: false,
+      setHeaders(res, filePath) {
+        const normalized = filePath.replace(/\\/g, "/");
+        if (normalized.endsWith(".html")) {
+          res.setHeader("Cache-Control", "no-store");
+          return;
+        }
+        if (normalized.includes("/assets/")) {
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        }
+      },
+    }),
+  );
   // Only treat real static asset extensions as missing files. A broad `\.[a-z0-9]+$`
   // match 404s Clerk/mis-routed paths like `/https://bidintelligence.cagteam.net`
   // because `.net` looks like a file extension.
@@ -85,6 +101,7 @@ if (isProd) {
     if (STATIC_ASSET_EXT.test(req.path)) {
       return res.status(404).type("text/plain").send("Not found");
     }
+    res.setHeader("Cache-Control", "no-store");
     res.sendFile(path.join(distPath, "index.html"), (err) => {
       if (err) next(err);
     });

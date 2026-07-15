@@ -23,7 +23,7 @@ export function OpsModuleEmpty({ module, description }: OpsModuleEmptyProps) {
         <EmptyTitle>{module}</EmptyTitle>
         <EmptyDescription>
           {description ??
-            "Ops module — API coming in Phase 4. Live job and bid data is available in Won Jobs and Deployment."}
+            "This screen lights up when you have live jobs and bids. Open Won Jobs or Deployment to add work."}
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>

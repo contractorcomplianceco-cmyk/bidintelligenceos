@@ -82,7 +82,7 @@ const PAIN_POINTS = [
   },
   {
     icon: TrendingUp,
-    title: "Guessing at pricing and win probability",
+    title: "Guessing at pricing and whether you’ll win",
     body: "Confidence scoring, market signals, and win/loss learning replace gut-feel with decision-support you can defend.",
   },
   {

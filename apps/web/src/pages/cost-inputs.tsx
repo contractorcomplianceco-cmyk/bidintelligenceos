@@ -225,7 +225,7 @@ export default function CostInputs() {
                     <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-slate-900">Margin Pressure Detected</p>
-                      <p className="text-xs text-slate-500 mt-1">Historical winning bids for this client average 15-18% margin. Your 20% target may reduce win probability.</p>
+                      <p className="text-xs text-slate-500 mt-1">Historical winning bids for this client average 15–18% margin. A 20% target may make this bid harder to win.</p>
                     </div>
                   </div>
                 </div>

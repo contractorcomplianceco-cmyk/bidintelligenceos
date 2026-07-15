@@ -22,6 +22,8 @@ type OpsModuleGateProps = {
   module: string;
   icon?: ReactNode;
   statusPath?: string;
+  /** Override default empty-state copy for authed team users. */
+  emptyDescription?: string;
   /** Live UI when integration status reports available (authed team users only). */
   connectedChildren?: ReactNode;
   children: ReactNode;
@@ -34,6 +36,7 @@ export function OpsModuleGate({
   module,
   icon,
   statusPath,
+  emptyDescription,
   connectedChildren,
   children,
 }: OpsModuleGateProps) {
@@ -69,6 +72,7 @@ export function OpsModuleGate({
 
     const description =
       status?.message ??
+      emptyDescription ??
       (isError
         ? "Could not reach the integration status endpoint. Try again or contact your administrator."
         : undefined);

@@ -39,7 +39,7 @@ export default function CompetitorWatch() {
   return (
     <OpsModuleGate
       title="CompetitorWatchOS"
-      subtitle="Competitive intelligence add-on — coming soon."
+      subtitle="Competitive intelligence — available soon."
       module="CompetitorWatchOS"
       icon={<Crosshair className="h-7 w-7 text-[#A855F7]" />}
     >
