@@ -75,11 +75,22 @@ function SmokeLoginForm({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
+const CLERK_READY_TIMEOUT_MS = 8_000;
+const AUTH_CONFIG_TIMEOUT_MS = 5_000;
+
 function ClerkLogin({ smokeLogin }: { smokeLogin: boolean }) {
   const [, navigate] = useLocation();
   const { isLoaded, isSignedIn } = useClerkAuth();
   const { isAuthenticated } = useAuth();
+  // Smoke path: show email/password first — never gate on Clerk bootstrap.
   const [showClerk, setShowClerk] = useState(!smokeLogin);
+  const [clerkTimedOut, setClerkTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (isLoaded || !showClerk) return;
+    const t = window.setTimeout(() => setClerkTimedOut(true), CLERK_READY_TIMEOUT_MS);
+    return () => window.clearTimeout(t);
+  }, [isLoaded, showClerk]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -94,16 +105,16 @@ function ClerkLogin({ smokeLogin }: { smokeLogin: boolean }) {
     window.location.replace(`${clerkSignInUrl()}?redirect_url=${returnUrl}`);
   }, [isLoaded, isSignedIn, isAuthenticated, navigate, smokeLogin]);
 
-  if (!isLoaded || isSignedIn || isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6 text-slate-300">
-        <Loader2 className="w-6 h-6 animate-spin mr-2" />
-        {isSignedIn || isAuthenticated ? "Opening Bid Intelligence…" : "Loading…"}
-      </div>
-    );
-  }
-
+  // Prefer team smoke form whenever enabled — do not wait for Clerk isLoaded.
   if (smokeLogin && !showClerk) {
+    if (isSignedIn || isAuthenticated) {
+      return (
+        <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6 text-slate-300">
+          <Loader2 className="w-6 h-6 animate-spin mr-2" />
+          Opening Bid Intelligence…
+        </div>
+      );
+    }
     return (
       <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6">
         <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0B1220] p-8 shadow-xl">
@@ -115,12 +126,71 @@ function ClerkLogin({ smokeLogin }: { smokeLogin: boolean }) {
           <SmokeLoginForm onSuccess={() => navigate(POST_AUTH_PATH)} />
           <button
             type="button"
-            onClick={() => setShowClerk(true)}
+            onClick={() => {
+              setClerkTimedOut(false);
+              setShowClerk(true);
+            }}
             className="mt-6 w-full text-center text-sm text-[#7dd3fc] hover:underline"
           >
             Use Clerk / CCA production sign in
           </button>
         </div>
+      </div>
+    );
+  }
+
+  // Clerk stuck: fail-open back to smoke (or show error) instead of spinning forever.
+  if (!isLoaded && clerkTimedOut) {
+    if (smokeLogin) {
+      return (
+        <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0B1220] p-8 shadow-xl">
+            <img src={logo} alt="BidIntelligenceOS" className="h-8 w-auto mb-6" />
+            <h1 className="text-2xl font-bold text-white">Team smoke login</h1>
+            <p className="mt-2 text-sm text-amber-300/90">
+              Clerk sign-in did not become ready. Use team smoke login below, or retry Clerk later.
+            </p>
+            <SmokeLoginForm onSuccess={() => navigate(POST_AUTH_PATH)} />
+            <button
+              type="button"
+              onClick={() => {
+                setClerkTimedOut(false);
+                setShowClerk(true);
+              }}
+              className="mt-6 w-full text-center text-sm text-[#7dd3fc] hover:underline"
+            >
+              Retry Clerk / CCA production sign in
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6">
+        <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0B1220] p-8 shadow-xl text-center">
+          <img src={logo} alt="BidIntelligenceOS" className="h-8 w-auto mb-6 mx-auto" />
+          <p className="text-amber-300">Sign-in is taking longer than expected.</p>
+          <p className="mt-2 text-sm text-slate-400">Check your network or refresh the page to try again.</p>
+          <Button
+            type="button"
+            className="mt-6 w-full bg-[#38BDF8] text-[#04121F] font-semibold"
+            onClick={() => {
+              setClerkTimedOut(false);
+              window.location.reload();
+            }}
+          >
+            Refresh
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isLoaded || isSignedIn || isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6 text-slate-300">
+        <Loader2 className="w-6 h-6 animate-spin mr-2" />
+        {isSignedIn || isAuthenticated ? "Opening Bid Intelligence…" : "Loading…"}
       </div>
     );
   }
@@ -229,18 +299,24 @@ export default function Login() {
 
   useEffect(() => {
     let cancelled = false;
+    const failOpen = (): AuthConfig => ({
+      clerk: isClerkFrontendEnabled(),
+      legacyLogin: !isClerkFrontendEnabled(),
+      // Fail-open to smoke when Clerk frontend is baked in — never block /login forever.
+      smokeLogin: isClerkFrontendEnabled(),
+    });
+
     void (async () => {
       try {
-        const data = await apiFetch<AuthConfig>("/api/v1/auth/config");
+        const data = await Promise.race([
+          apiFetch<AuthConfig>("/api/v1/auth/config"),
+          new Promise<never>((_, reject) =>
+            window.setTimeout(() => reject(new Error("auth config timeout")), AUTH_CONFIG_TIMEOUT_MS),
+          ),
+        ]);
         if (!cancelled) setConfig(data);
       } catch {
-        if (!cancelled) {
-          setConfig({
-            clerk: isClerkFrontendEnabled(),
-            legacyLogin: !isClerkFrontendEnabled(),
-            smokeLogin: false,
-          });
-        }
+        if (!cancelled) setConfig(failOpen());
       }
     })();
     return () => {

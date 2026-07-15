@@ -132,7 +132,18 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
   }, [getToken]);
 
   const refresh = useCallback(async () => {
-    if (!isLoaded) return;
+    // Clerk still bootstrapping: do not block legacy/smoke session cookie checks forever.
+    if (!isLoaded) {
+      try {
+        const data = await apiFetch<{ user: AuthUser; org: AuthOrg }>("/api/v1/auth/me");
+        setUser(data.user);
+        setOrg(data.org);
+        setLegacySession(true);
+      } catch {
+        // Keep loading=true until Clerk loads or a later refresh succeeds while signed out.
+      }
+      return;
+    }
 
     if (isSignedIn) {
       try {
@@ -169,6 +180,13 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
     void refresh();
   }, [refresh, clerkUser?.id]);
 
+  // Fail-open: if Clerk never reaches isLoaded, stop blocking the app shell / smoke path.
+  useEffect(() => {
+    if (isLoaded) return;
+    const t = window.setTimeout(() => setLoading(false), 8_000);
+    return () => window.clearTimeout(t);
+  }, [isLoaded]);
+
   const login = useCallback(
     async (email: string, password: string) => {
       await apiFetch("/api/v1/auth/login", {
@@ -176,7 +194,16 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
       clearDemoSession();
-      await refresh();
+      // Smoke login must apply session even if Clerk never reaches isLoaded.
+      try {
+        const data = await apiFetch<{ user: AuthUser; org: AuthOrg }>("/api/v1/auth/me");
+        setUser(data.user);
+        setOrg(data.org);
+        setLegacySession(true);
+        setLoading(false);
+      } catch {
+        await refresh();
+      }
     },
     [refresh],
   );
@@ -204,7 +231,8 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       org,
-      loading: !isLoaded || loading,
+      // Smoke/legacy cookie auth must not stay "loading" forever if Clerk never loads.
+      loading: legacySession ? loading : !isLoaded || loading,
       isAuthenticated: Boolean(user && (isSignedIn || legacySession)),
       clerkEnabled: true,
       refresh,
