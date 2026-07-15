@@ -367,6 +367,7 @@ function ScoreBody({
   const [competitorNotes, setCompetitorNotes] = useState("");
   const [overrideCode, setOverrideCode] = useState("verified-exception");
   const [overrideText, setOverrideText] = useState("");
+  const [showDetail, setShowDetail] = useState(false);
   const trade = manual.trade || "generic";
   const isGeneric = trade === "generic";
   const showElecMech = trade === "electrical" || trade === "mechanical";
@@ -377,7 +378,7 @@ function ScoreBody({
   return (
     <div className="space-y-5">
       <div className="rounded-lg border border-sky-200 bg-sky-50 p-3 space-y-1">
-        <p className="text-xs font-semibold text-sky-950">Startup mode</p>
+        <p className="text-xs font-semibold text-sky-950">How this score works</p>
         <p className="text-xs text-sky-900">{STARTUP_HONESTY_BANNER}</p>
       </div>
       {isGeneric && (
@@ -388,10 +389,10 @@ function ScoreBody({
 
       <div className="space-y-3 rounded-lg border border-[#E2E8F0] p-3">
         <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-          Pursuit inputs (G5)
+          About this bid
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="space-y-1 sm:col-span-2">
+        <div className="grid grid-cols-1 gap-3">
+          <div className="space-y-1">
             <Label className="text-xs text-slate-600">Trade</Label>
             <Select value={trade} onValueChange={(v) => setManual({ trade: v })}>
               <SelectTrigger className="h-9">
@@ -407,8 +408,21 @@ function ScoreBody({
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowDetail((v) => !v)}
+          className="text-xs font-medium text-[#2563EB] hover:underline"
+        >
+          {showDetail ? "Hide detail" : "Add detail to sharpen your score (optional)"}
+        </button>
+
+        {showDetail && (
+        <>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1">
-            <Label className="text-xs text-slate-600">Scope clarity (1–5, subjective)</Label>
+            <Label className="text-xs text-slate-600">How clear is the scope? (1 = vague, 5 = fully spec&apos;d — your estimate)</Label>
             <Select
               value={manual.scopeClarity || undefined}
               onValueChange={(v) => setManual({ scopeClarity: v })}
@@ -427,12 +441,12 @@ function ScoreBody({
           </div>
           <YnSelect
             id="escalation"
-            label="Escalation clause"
+            label="Price protection in contract? (locks material costs)"
             value={manual.escalation}
             onChange={(v) => setManual({ escalation: v })}
           />
           <div className="space-y-1">
-            <Label className="text-xs text-slate-600">Pursuit hours (optional)</Label>
+            <Label className="text-xs text-slate-600">Hours to chase this bid (optional)</Label>
             <Input
               type="number"
               min={0}
@@ -449,7 +463,7 @@ function ScoreBody({
               onCheckedChange={(c) => setManual({ bondingInfeasible: c === true })}
             />
             <Label htmlFor="bonding" className="text-xs text-slate-700">
-              Bonding capacity infeasible for this bid
+              Can&apos;t meet the bond requirement
             </Label>
           </div>
           <div className="flex items-center gap-2 pt-5">
@@ -459,7 +473,7 @@ function ScoreBody({
               onCheckedChange={(c) => setManual({ hasScopeDocs: c === true })}
             />
             <Label htmlFor="scopeDocs" className="text-xs text-slate-700">
-              Scope docs / checklist attached
+              Plans / specs uploaded
             </Label>
           </div>
           {Number(manual.scopeClarity) >= 4 && !manual.hasScopeDocs && (
@@ -470,7 +484,7 @@ function ScoreBody({
                 onCheckedChange={(c) => setManual({ secondReviewerConfirmed: c === true })}
               />
               <Label htmlFor="secondRev" className="text-xs text-slate-700">
-                Second reviewer confirmed (required for manual-heavy Strong Go)
+                Second reviewer confirmed (needed for a Strong Go based mostly on your estimates)
               </Label>
             </div>
           )}
@@ -483,12 +497,12 @@ function ScoreBody({
             </p>
             <YnSelect
               id="gear"
-              label="Gear / equipment pre-ordered"
+              label="Gear / equipment already on order?"
               value={manual.gearPreOrdered}
               onChange={(v) => setManual({ gearPreOrdered: v })}
             />
             <div className="space-y-1">
-              <Label className="text-xs text-slate-600">Lead-time vs schedule (days over)</Label>
+              <Label className="text-xs text-slate-600">Days the lead time runs past the schedule</Label>
               <Input
                 type="number"
                 className="h-9"
@@ -499,7 +513,7 @@ function ScoreBody({
             </div>
             <YnSelect
               id="bms"
-              label="Controls / BMS scope known"
+              label="Controls / BMS scope defined?"
               value={manual.controlsBmsScope}
               onChange={(v) => setManual({ controlsBmsScope: v })}
             />
@@ -565,12 +579,12 @@ function ScoreBody({
             </p>
             <YnSelect
               id="subcov"
-              label="Key-sub coverage"
+              label="Subs lined up for the big trades?"
               value={manual.keySubCoverage}
               onChange={(v) => setManual({ keySubCoverage: v })}
             />
             <div className="space-y-1">
-              <Label className="text-xs text-slate-600">Self-perform %</Label>
+              <Label className="text-xs text-slate-600">% you&apos;ll self-perform</Label>
               <Input
                 type="number"
                 min={0}
@@ -581,7 +595,7 @@ function ScoreBody({
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs text-slate-600">Sub-bench depth (1–5)</Label>
+              <Label className="text-xs text-slate-600">How deep is your sub bench? (1 = thin, 5 = deep — your estimate)</Label>
               <Select
                 value={manual.subBenchDepth || undefined}
                 onValueChange={(v) => setManual({ subBenchDepth: v })}
@@ -600,22 +614,26 @@ function ScoreBody({
             </div>
           </div>
         )}
+        </>
+        )}
 
         {canRun && (
           <Button type="button" onClick={onCompute} disabled={computing} className="bg-[#2563EB] hover:bg-[#1d4ed8] w-full sm:w-auto">
             {computing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-            {score ? "Recompute Pursuit Confidence Index" : "Compute Pursuit Confidence Index"}
+            {score ? "Re-score this bid" : "Score this bid"}
           </Button>
         )}
       </div>
 
       {!score ? (
-        <p className="text-sm text-slate-600">No score snapshot yet. Set trade + scope clarity, then compute.</p>
+        <p className="text-sm text-slate-600">
+          No score yet. Hit “Score this bid” to see where it stands — you can add detail below to sharpen it, but it&apos;s not required.
+        </p>
       ) : (
         <>
           <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
             <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">
-              Pursuit Confidence Index
+              Bid Score
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <span className={`inline-flex px-3 py-1 rounded-full text-xs font-black tracking-widest border ${verdictStyle(score.verdict)}`}>
@@ -824,7 +842,7 @@ function ScoreBody({
 
           {canOverride && score && (
             <div className="flex flex-col gap-2 pt-2 border-t border-[#E2E8F0]">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Override journal (G8)</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Override history</p>
               {journal && journal.length > 0 ? (
                 <ul className="text-xs text-slate-600 space-y-1 max-h-28 overflow-auto">
                   {journal.map((j) => (
@@ -920,7 +938,7 @@ export function BidIntelligencePanel(props: Props) {
       const body = buildScoreBody(manual);
       await computeScore.mutateAsync({ bidId, body });
       toast({
-        title: "Pursuit Confidence Index computed",
+        title: "Bid score ready",
         description: "Snapshot locked — awaiting reviewer approval. Not a win probability.",
       });
     } catch (e) {
@@ -1043,11 +1061,11 @@ export function BidIntelligencePanel(props: Props) {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-amber-600" />
-              Pursuit Confidence Index
+              Bid Score
             </CardTitle>
             <CardDescription className="space-y-2">
               <span className="block">
-                Rose trade-conditional model — Strong Go / Conditional / Executive Review / No-Go. Not win probability.
+                Strong Go / Conditional / Executive Review / No-Go — a relative read on this job, not a win probability.
               </span>
               <span className="block text-[10px] font-semibold uppercase tracking-widest text-slate-500">
                 {AI_REVIEW_LABEL}

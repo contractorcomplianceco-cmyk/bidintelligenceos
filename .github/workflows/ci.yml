@@ -15,22 +15,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: bidintelligenceos
 
       # Private sibling repo — unauthenticated clone fails (exit 128). Requires org/repo
       # secret GH_PAT (classic PAT or fine-grained token with read on Audit-Risk-Model).
+      # actions/checkout refuses paths outside the workspace root, so both repos are
+      # checked out as siblings *inside* the workspace, which matches the
+      # @workspace/cca-core relative resolution the app expects.
       - name: Checkout Audit-Risk-Model (sibling for @workspace/cca-core)
         uses: actions/checkout@v4
         with:
           repository: contractorcomplianceco-cmyk/Audit-Risk-Model
-          path: ../Audit-Risk-Model
+          path: Audit-Risk-Model
           token: ${{ secrets.GH_PAT }}
 
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
+          cache-dependency-path: bidintelligenceos/package-lock.json
 
       - run: npm ci
+        working-directory: bidintelligenceos
       - run: npm run typecheck
+        working-directory: bidintelligenceos
       - run: npm run check:security
+        working-directory: bidintelligenceos
       - run: npm run smoke:dry-run
+        working-directory: bidintelligenceos
