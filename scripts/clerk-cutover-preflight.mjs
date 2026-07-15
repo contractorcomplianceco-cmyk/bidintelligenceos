@@ -21,8 +21,10 @@ loadEnv({ path: envPath });
 const APP_ORIGIN = "https://bidintelligence.cagteam.net";
 const EXPECTED_CLERK_REDIRECTS = [
   APP_ORIGIN,
+  `${APP_ORIGIN}/bids`,
   `${APP_ORIGIN}/login`,
   `${APP_ORIGIN}/register`,
+  `${APP_ORIGIN}/sso-callback`,
   "https://accounts.docs.cagteam.net/sign-in",
   "https://accounts.docs.cagteam.net/sign-up",
 ];

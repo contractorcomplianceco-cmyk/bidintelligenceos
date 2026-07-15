@@ -8,6 +8,7 @@ import { DemoWalkthrough } from "@/components/demo-walkthrough";
 import { DemoChoiceHub } from "@/components/demo-choice-hub";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
+import SsoCallback from "@/pages/sso-callback";
 import { AuthProvider } from "@/lib/auth-context";
 import { ClerkRootProvider } from "@/lib/clerk-root";
 import { enterDemoSession } from "@/lib/data-mode";
@@ -98,12 +99,28 @@ function isDemoDomainLaunch(): boolean {
   return host === "demo.ccabidintelligence.com" && (path === "/" || path === "/demo");
 }
 
+/** Cold-load paths that must mount the app Router (not marketing lander). */
+function isAppEntryPath(): boolean {
+  if (typeof window === "undefined") return false;
+  const path = normalizePath(window.location.pathname);
+  if (path === "/login" || path.startsWith("/login/")) return true;
+  if (path === "/register" || path.startsWith("/register/")) return true;
+  if (path === "/sso-callback" || path.startsWith("/sso-callback/")) return true;
+  if (path === "/bids" || path.startsWith("/bids/")) return true;
+  if (path === "/dashboard") return true;
+  return false;
+}
+
 function Router() {
   return (
     <Switch>
       {/* Operations */}
       <Route path="/login" component={Login} />
+      <Route path="/login/*" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/register/*" component={Register} />
+      <Route path="/sso-callback" component={SsoCallback} />
+      <Route path="/sso-callback/*" component={SsoCallback} />
 
       <Route path="/" component={CommandCenter} />
       <Route path="/dashboard" component={CommandCenter} />
@@ -176,6 +193,8 @@ function App() {
     if (typeof window === "undefined") return "landing";
     if (isDemoDomainLaunch()) return "landing";
     if (isDemoHubPath()) return "hub";
+    // Clerk return / deep links must not fall through to marketing (looks like a dead end / 404).
+    if (isAppEntryPath()) return "app";
     if (sessionStorage.getItem("cca-demo-entered") === "1") return "app";
     return "landing";
   });
@@ -232,6 +251,8 @@ function App() {
     setShowRoseDemo(false);
     setView("app");
     syncUrl("/login");
+    // Full navigation so /login mounts outside any stale lander state.
+    window.location.assign("/login");
   };
 
   useEffect(() => {

@@ -1,13 +1,59 @@
-import { SignIn } from "@clerk/clerk-react";
+import { SignIn, useAuth as useClerkAuth } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth-context";
-import { clerkAppUrl, clerkSignInUrl, isClerkFrontendEnabled, usesHostedAccountPortal } from "@/lib/clerk-root";
+import {
+  clerkPostAuthUrl,
+  clerkSignInUrl,
+  isClerkFrontendEnabled,
+  POST_AUTH_PATH,
+  usesHostedAccountPortal,
+} from "@/lib/clerk-root";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import logo from "@/assets/bidintelligence-logo.png";
+
+function ClerkLogin() {
+  const [, navigate] = useLocation();
+  const { isLoaded, isSignedIn } = useClerkAuth();
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (isSignedIn) {
+      navigate(POST_AUTH_PATH);
+      return;
+    }
+    if (!usesHostedAccountPortal()) return;
+    const returnUrl = encodeURIComponent(clerkPostAuthUrl());
+    window.location.replace(`${clerkSignInUrl()}?redirect_url=${returnUrl}`);
+  }, [isLoaded, isSignedIn, navigate]);
+
+  if (!isLoaded || isSignedIn || usesHostedAccountPortal()) {
+    return (
+      <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6 text-slate-300">
+        <Loader2 className="w-6 h-6 animate-spin mr-2" />
+        {isSignedIn ? "Opening Bid Intelligence…" : "Redirecting to CCA sign in…"}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6">
+      <div className="w-full max-w-md">
+        <img src={logo} alt="BidIntelligenceOS" className="h-8 w-auto mb-6 mx-auto" />
+        <SignIn
+          routing="path"
+          path="/login"
+          signUpUrl="/register"
+          forceRedirectUrl={POST_AUTH_PATH}
+          fallbackRedirectUrl={POST_AUTH_PATH}
+        />
+      </div>
+    </div>
+  );
+}
 
 export default function Login() {
   const [, navigate] = useLocation();
@@ -17,29 +63,8 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!isClerkFrontendEnabled() || !usesHostedAccountPortal()) return;
-    const returnUrl = encodeURIComponent(clerkAppUrl() || window.location.origin);
-    window.location.replace(`${clerkSignInUrl()}?redirect_url=${returnUrl}`);
-  }, []);
-
-  if (isClerkFrontendEnabled() && usesHostedAccountPortal()) {
-    return (
-      <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6 text-slate-300">
-        <Loader2 className="w-6 h-6 animate-spin mr-2" /> Redirecting to CCA sign in…
-      </div>
-    );
-  }
-
   if (isClerkFrontendEnabled()) {
-    return (
-      <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
-          <img src={logo} alt="BidIntelligenceOS" className="h-8 w-auto mb-6 mx-auto" />
-          <SignIn routing="path" path="/login" signUpUrl="/register" afterSignInUrl="/" />
-        </div>
-      </div>
-    );
+    return <ClerkLogin />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,7 +73,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate("/");
+      navigate(POST_AUTH_PATH);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Sign in failed");
     } finally {

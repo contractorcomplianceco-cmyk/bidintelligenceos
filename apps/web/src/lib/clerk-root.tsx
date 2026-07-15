@@ -2,9 +2,17 @@ import { ClerkProvider } from "@clerk/clerk-react";
 import type { ReactNode } from "react";
 
 const publishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY?.trim();
-const appUrl = import.meta.env.VITE_APP_URL?.trim() || (typeof window !== "undefined" ? window.location.origin : "");
+/** Origin only (no path). Absolute URLs must NEVER be passed as afterSignInUrl — Clerk/router
+ *  may treat them as a path (`/https://…cagteam.net`), and Express then 404s because `.net`
+ *  looks like a static-asset extension. */
+const appOrigin =
+  import.meta.env.VITE_APP_URL?.trim().replace(/\/$/, "") ||
+  (typeof window !== "undefined" ? window.location.origin : "");
 const signInUrl = import.meta.env.VITE_CLERK_SIGN_IN_URL?.trim() || "/login";
 const signUpUrl = import.meta.env.VITE_CLERK_SIGN_UP_URL?.trim() || "/register";
+
+/** Prefer Bid Intelligence list after Clerk returns (Command Center `/` also works). */
+export const POST_AUTH_PATH = "/bids";
 
 export function isClerkFrontendEnabled() {
   return Boolean(publishableKey);
@@ -19,7 +27,12 @@ export function clerkSignUpUrl() {
 }
 
 export function clerkAppUrl() {
-  return appUrl;
+  return appOrigin;
+}
+
+/** Absolute return URL for hosted Accounts portal `redirect_url` (safe HTTP redirect). */
+export function clerkPostAuthUrl() {
+  return `${appOrigin || (typeof window !== "undefined" ? window.location.origin : "")}${POST_AUTH_PATH}`;
 }
 
 export function usesHostedAccountPortal() {
@@ -33,8 +46,10 @@ export function ClerkRootProvider({ children }: { children: ReactNode }) {
       publishableKey={publishableKey}
       signInUrl={signInUrl}
       signUpUrl={signUpUrl}
-      afterSignInUrl={appUrl || "/"}
-      afterSignUpUrl={appUrl || "/"}
+      afterSignInUrl={POST_AUTH_PATH}
+      afterSignUpUrl={POST_AUTH_PATH}
+      signInFallbackRedirectUrl={POST_AUTH_PATH}
+      signUpFallbackRedirectUrl={POST_AUTH_PATH}
       afterSignOutUrl={signInUrl.startsWith("http") ? signInUrl : "/login"}
     >
       {children}
