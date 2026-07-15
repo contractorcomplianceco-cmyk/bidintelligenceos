@@ -185,6 +185,17 @@ export type BidScoreCategory = {
   source: string;
 };
 
+export type BidScoreExplanation = {
+  headline: string;
+  rationale: string;
+  honestyLabel: string;
+  totalScore: number;
+  verdict: string;
+  topPositive: { key: string; label: string; contribution: number; citation?: string }[];
+  topNegative: { key: string; label: string; contribution: number; citation?: string }[];
+  levers: { signal: string; action: string; projectedGain: number; flipsBand: boolean }[];
+};
+
 export type BidScoreSnapshot = {
   id?: string;
   bidId?: string;
@@ -199,6 +210,25 @@ export type BidScoreSnapshot = {
   disclaimer?: string;
   lockedAt?: string;
   createdAt?: string;
+  honestyLabel?: string;
+  explanation?: BidScoreExplanation;
+  pursuitRoi?: {
+    recommendation: string;
+    roiRatio: number;
+    winLikelihoodBasis: string;
+    assumptions: string[];
+    summary: string;
+  };
+  evidenceCitations?: string[];
+  manualHeavyVerify?: boolean;
+};
+
+export type ComputeBidScoreBody = {
+  trade?: string;
+  mode?: "startup" | "learning";
+  signals?: Record<string, number | null>;
+  roseGates?: Record<string, boolean | string[] | undefined>;
+  pursuitHours?: number;
 };
 
 export function useComplianceEligibilityByState(state: string | null, enabled = true) {
@@ -234,9 +264,12 @@ export function useBidScore(bidId: string | undefined, enabled = true) {
 export function useComputeBidScore() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (bidId: string) =>
-      apiFetch<{ score: BidScoreSnapshot }>(`/api/v1/bids/${bidId}/score`, { method: "POST" }),
-    onSuccess: (_d, bidId) => {
+    mutationFn: ({ bidId, body }: { bidId: string; body?: ComputeBidScoreBody }) =>
+      apiFetch<{ score: BidScoreSnapshot }>(`/api/v1/bids/${bidId}/score`, {
+        method: "POST",
+        body: body ? JSON.stringify(body) : undefined,
+      }),
+    onSuccess: (_d, { bidId }) => {
       qc.invalidateQueries({ queryKey: ["bid-score", bidId] });
       qc.invalidateQueries({ queryKey: ["bid", bidId] });
       qc.invalidateQueries({ queryKey: ["bids"] });

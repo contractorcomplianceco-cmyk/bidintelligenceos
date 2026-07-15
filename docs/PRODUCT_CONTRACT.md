@@ -40,7 +40,7 @@ Public marketing surfaces (3) are **live** as static/demo-entry experiences — 
 
 | Module | Route | Status | Notes |
 |--------|-------|--------|-------|
-| Bid Intelligence | `/bids`, `/bids/:id` | **live** | API CRUD, Go/No-Go score workflow, outcome recording when authenticated; package-builder CTA disabled until bid score is human-reviewed (live authed only) |
+| Bid Intelligence | `/bids`, `/bids/:id` | **live** | API CRUD; **Pursuit Confidence Index** (Rose formula via cca-core) with G5 manual fields, trade selector, honesty banners; G6 P0 public intel pack (tag-filter RAG v1) on score compute; explainScore drivers + pursuit ROI stub; outcome recording when authenticated; package-builder CTA disabled until bid score is human-reviewed (live authed only). Never labeled “win probability” in startup. |
 | Bid Fit | `/bid-fit` | **partial live** | Live 12-category score when `?bidId=` + signed in; demo otherwise |
 | New bid intake | `/new-bid` | **live** | Draft + document upload + ROSEOS scope analysis (requires sign-in to persist) |
 | Package Builder | `/package-builder` | **live** | Section preview from uploaded bid documents + compliance gates via `/api/v1/ops/package-builder`; PDF/DOCX server-side export after human review (`POST /api/v1/bids/:id/export`); demo templates for anonymous sessions |

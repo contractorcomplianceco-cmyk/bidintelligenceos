@@ -21,7 +21,9 @@ BidOS owns (WOW / evidence):
 
 cca-core owns: `config.ts`, `computeConfidence.ts`, `evaluateKillGates.ts` (server-only).
 
-**Still next (product):** RAG cards / UX manual fields / merge+deploy when Carmen asks; `recordAutopsy()` learning loop.
+**Shipped (this slice):** G6 P0 RAG public pack (30 cards, tag-filter v1) + G5 manual field UX on Bid Intelligence panel + explainScore / pursuitRoi summary on score compute.
+
+**Still next (product):** vector RAG upgrade; `recordAutopsy()` learning loop.
 
 ## Locked (2026-07-14) — G11 ALL APPROVED · READY_LOCKED = YES
 

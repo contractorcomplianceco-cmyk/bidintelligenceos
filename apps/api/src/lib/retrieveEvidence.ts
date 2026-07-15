@@ -1,7 +1,10 @@
 /**
  * retrieveEvidence — BidOS evidence/RAG contract (Rose handoff).
  * Pluggable VectorStore. Never lives in cca-core.
+ * v1 default store: G6 P0 public intel pack (tag/keyword filter, no vector DB).
  */
+
+import { loadPublicIntelPack } from "./publicIntelPack.js";
 
 export type EvidenceLayer = "public" | "private";
 
@@ -52,13 +55,13 @@ const TOPIC_BY_SIGNAL: Record<string, string[]> = {
   labor_pressure: ["labor", "wages"],
   market_heat: ["market", "abi", "backlog"],
   competitive_intensity: ["awards", "competitors"],
-  schedule_risk: ["lead-times", "weather", "schedule"],
-  escalation_protection: ["contracts", "escalation"],
-  scope_clarity: ["scope-gaps"],
-  capacity_fit: ["capacity"],
-  strategy_fit: ["strategy"],
+  schedule_risk: ["lead-times", "lead-time", "weather", "schedule"],
+  escalation_protection: ["contracts", "escalation", "bidding-practice"],
+  scope_clarity: ["scope-gaps", "governance"],
+  capacity_fit: ["capacity", "vendor"],
+  strategy_fit: ["strategy", "delivery-method"],
   pursuit_cost_ratio: ["pursuit-economics"],
-  vendor_quality_proxy: ["vendors"],
+  vendor_quality_proxy: ["vendors", "vendor"],
   past_perf_winrate: ["outcomes"],
 };
 
@@ -70,6 +73,18 @@ export function citationFor(chunk: EvidenceChunk): string {
   return `[${chunk.trade}/${chunk.topic}] ${title}${asOf}${src}`;
 }
 
+/** FL pursuits may use SE regional cards; nationwide/all always match. */
+function regionMatches(chunkRegion: string, queryRegion: string): boolean {
+  if (!queryRegion) return true;
+  const q = queryRegion.toUpperCase();
+  const c = chunkRegion.toUpperCase();
+  if (c === "NATIONWIDE" || c === "ALL") return true;
+  if (c === q) return true;
+  if (q === "FL" && c === "SE") return true;
+  if (q === "SE" && c === "FL") return true;
+  return false;
+}
+
 function passesFilters(
   chunk: EvidenceChunk,
   trade: string,
@@ -78,11 +93,7 @@ function passesFilters(
   orgId?: string,
 ): boolean {
   const tradeOk = chunk.trade === trade || chunk.trade === "all";
-  const regionOk =
-    !region ||
-    chunk.region === region ||
-    chunk.region === "nationwide" ||
-    chunk.region === "all";
+  const regionOk = regionMatches(chunk.region, region);
   if (!tradeOk || !regionOk) return false;
   if (chunk.layer === "public") return true;
   // Private: learning mode only + strict org scope (defensive double-filter)
@@ -99,11 +110,7 @@ export function createMemoryVectorStore(chunks: EvidenceChunk[] = []): VectorSto
       return chunks
         .filter((c) => {
           const tradeOk = c.trade === query.trade || c.trade === "all";
-          const regionOk =
-            !query.region ||
-            c.region === query.region ||
-            c.region === "nationwide" ||
-            c.region === "all";
+          const regionOk = !query.region || regionMatches(c.region, query.region);
           const topicOk =
             !query.topics?.length ||
             query.topics.some((t) => c.topic === t || c.topic === "all");
@@ -123,11 +130,16 @@ export function createMemoryVectorStore(chunks: EvidenceChunk[] = []): VectorSto
  * Public: trade ∈ {trade, all}, region ∈ {region, nationwide}.
  * Private: learning mode only, org_id-scoped.
  */
+/** Default v1 store: G6 P0 public pack (tag filter). Override via params.store in tests. */
+export function createPublicIntelStore(): VectorStore {
+  return createMemoryVectorStore(loadPublicIntelPack());
+}
+
 export async function retrieveEvidence(params: RetrieveEvidenceParams): Promise<RetrievedEvidence> {
   const trade = params.trade.trim().toLowerCase() || "generic";
   const region = params.region ?? "nationwide";
   const mode = params.mode ?? "startup";
-  const store = params.store ?? createMemoryVectorStore([]);
+  const store = params.store ?? createPublicIntelStore();
 
   const bySignal: Record<string, EvidenceChunk[]> = {};
   const citations: string[] = [];

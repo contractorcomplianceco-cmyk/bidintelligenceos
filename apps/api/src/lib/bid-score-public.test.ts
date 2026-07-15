@@ -153,6 +153,45 @@ describe("Rose handoff WOW layer (BidOS)", () => {
     assert.equal(roi.recommendation, "No-Bid");
   });
 
+  it("G6 public pack: electrical vs roofing return different materials cards", async () => {
+    const elec = await retrieveEvidence({
+      bidId: "bid-elec",
+      trade: "electrical",
+      region: "nationwide",
+      signalIds: ["price_pressure"],
+      mode: "startup",
+    });
+    const roof = await retrieveEvidence({
+      bidId: "bid-roof",
+      trade: "roofing",
+      region: "nationwide",
+      signalIds: ["price_pressure"],
+      mode: "startup",
+    });
+    assert.ok(elec.bySignal.price_pressure.length >= 1);
+    assert.ok(roof.bySignal.price_pressure.length >= 1);
+    const elecIds = elec.bySignal.price_pressure.map((c) => c.id).join(" ");
+    const roofIds = roof.bySignal.price_pressure.map((c) => c.id).join(" ");
+    assert.match(elecIds, /MAT-ELEC-02|MAT-ALL-01/);
+    assert.match(roofIds, /MAT-ROOF-09|MAT-ALL-01/);
+    assert.ok(
+      elec.bySignal.price_pressure.some((c) => /copper/i.test(c.text + (c.title ?? ""))),
+      "electrical should cite copper materials card",
+    );
+    assert.ok(
+      roof.bySignal.price_pressure.some((c) => /asphalt|metal roofing/i.test(c.text + (c.title ?? ""))),
+      "roofing should cite asphalt/metal materials card",
+    );
+    assert.ok(
+      !elec.bySignal.price_pressure.some((c) => c.id.startsWith("MAT-ROOF-09")),
+      "electrical must not return roofing asphalt card",
+    );
+    assert.ok(
+      !roof.bySignal.price_pressure.some((c) => c.id.startsWith("MAT-ELEC-02")),
+      "roofing must not return copper electrical card",
+    );
+  });
+
   it("retrieveEvidence filters trade/region and blocks private in startup", async () => {
     const store = createMemoryVectorStore([
       {

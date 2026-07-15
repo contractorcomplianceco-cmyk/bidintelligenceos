@@ -137,8 +137,9 @@ const scoreBodySchema = z
   .object({
     trade: z.string().min(1).max(64).optional(),
     mode: z.enum(["startup", "learning"]).optional(),
-    /** Optional Rose signal overrides (0–1). Unset fields use startup defaults. */
+    /** Optional Rose signal overrides (0–1; scope_clarity also accepts 1–5). */
     signals: z.record(z.string(), z.number().min(0).max(5).nullable()).optional(),
+    pursuitHours: z.number().min(0).max(10_000).optional(),
     roseGates: z
       .object({
         hasScopeDocs: z.boolean().optional(),
@@ -182,6 +183,7 @@ router.post("/:id/score", async (req, res) => {
     mode: body?.mode,
     signals: body?.signals as RoseSignalInputs | undefined,
     roseGates: body?.roseGates,
+    pursuitHours: body?.pursuitHours,
   });
   res.status(201).json({ score });
 });

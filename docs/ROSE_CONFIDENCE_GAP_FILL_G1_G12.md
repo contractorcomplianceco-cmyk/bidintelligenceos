@@ -15,4 +15,6 @@ BidOS does **not** own weights. Gap-Fill locked trade tables, bands, `trade_requ
 - Score API accepts Gap-Fill `roseGates` including `manualHeavy` / `secondReviewerConfirmed`
 - WOW layer unchanged: `retrieveEvidence` / `explainScore` / `pursuitRoi`
 
-**Not deploy/merge to main until Carmen asks** — lock-in only on `feat/rose-confidence-formula-v1`.
+**RAG v1 (live with this branch):** `apps/api/src/data/public-intel-cards/p0-cards.json` — 30 G6 P0 cards, loaded by `retrieveEvidence` via tag/trade/topic filter (no vector DB). Electrical vs roofing materials cards diverge by design.
+
+**G5 UX (live):** Bid Intelligence panel trade selector + honesty banners + scope_clarity / escalation / bonding / pursuit hours + trade-conditional extras; signals posted to `POST /api/v1/bids/:id/score`.

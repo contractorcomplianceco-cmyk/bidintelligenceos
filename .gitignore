@@ -1,6 +1,9 @@
 node_modules/
 dist/
 data/
+# Keep G6 P0 public intel pack (tag-filter RAG v1) in git
+!apps/api/src/data/
+!apps/api/src/data/**
 .env
 .env.local
 *.tsbuildinfo
