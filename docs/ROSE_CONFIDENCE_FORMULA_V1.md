@@ -3,6 +3,8 @@
 **Canonical formula IP + code:**  
 [`Audit-Risk-Model/lib/cca-core/docs/ROSE_CONFIDENCE_FORMULA_V1.md`](../../Audit-Risk-Model/lib/cca-core/docs/ROSE_CONFIDENCE_FORMULA_V1.md)
 
+**Gap-Fill Pack (G1–G12):** [`ROSE_CONFIDENCE_GAP_FILL_G1_G12.md`](./ROSE_CONFIDENCE_GAP_FILL_G1_G12.md) → full text in cca-core docs.
+
 **Rollback:** [`ROLLBACK_ROSE_CONFIDENCE_V1.md`](./ROLLBACK_ROSE_CONFIDENCE_V1.md)
 
 BidOS **consumes** `@workspace/cca-core` (`computeBidScore` → `computeConfidence`). It does not own weights.
@@ -26,10 +28,12 @@ cca-core owns: `config.ts`, `computeConfidence.ts`, `evaluateKillGates.ts` (serv
 - Weighted sum; compliance = **GATE only**
 - Option A trade bands (Base/Roofing Go ≥ 72, Electrical ≥ 64)
 - Startup: `past_perf` + `vendor_quality` weight 0, renormalize
-- Weight tables: Base + Electrical + Roofing; other trades → Base until Rose locks
+- Weight tables: Base + Electrical + Roofing **LOCKED**; GC/Mech/Plumbing/Concrete/Civil/Specialty **PROVISIONAL** (Gap-Fill G1)
+- Mechanical band Go ≥ **68** PROVISIONAL; others base ≥ **72** (Electrical locked ≥ 64)
 - Evidence-quality cap: LOW on any ≥10%-weight signal → score capped at **71**
 - Soft/data holds demote Strong Go → Conditional; hard → No-Go
-- `LEARNING_MODE_MIN_OUTCOMES = 40`
+- `LEARNING_MODE_MIN_OUTCOMES = 40`; Learning Option A (`past_perf` 0.06) documented, not activated
+- Generic trade: honesty banner *"Trade not set — accuracy limited…"*
 
 ## BidOS wiring (v1)
 

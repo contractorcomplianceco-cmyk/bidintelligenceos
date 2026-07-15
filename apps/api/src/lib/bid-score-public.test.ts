@@ -6,10 +6,15 @@ import {
   evaluateKillGates,
   serializePublicBidScore,
   LEARNING_MODE_MIN_OUTCOMES,
+  GENERIC_TRADE_HONESTY_BANNER,
+  WEIGHT_TABLES,
+  applyModeWeights,
+  resolveWeights,
 } from "@workspace/cca-core";
 import { explainScore } from "./explainScore.js";
 import { pursuitRoi, relativeIndexToWinLikelihood } from "./pursuitRoi.js";
 import { citationFor, createMemoryVectorStore, retrieveEvidence } from "./retrieveEvidence.js";
+import { BIDOS_OPTIONAL_TRADES, listBidOsTradeIds } from "./trade-options.js";
 
 const compliance = {
   stateCode: "FL",
@@ -228,5 +233,33 @@ describe("Rose handoff WOW layer (BidOS)", () => {
     });
     assert.equal(gates.softHold, true);
     assert.equal(gates.hardKill, false);
+  });
+});
+
+describe("Gap-Fill Pack (BidOS consumers)", () => {
+  it("optional trade strings include provisional GC/Mech/Plumbing/Concrete/Civil/Specialty", () => {
+    const ids = listBidOsTradeIds();
+    for (const id of ["gc", "mechanical", "plumbing", "concrete", "civil", "specialty", "generic"]) {
+      assert.ok(ids.includes(id), `missing trade ${id}`);
+    }
+    assert.equal(BIDOS_OPTIONAL_TRADES.find((t) => t.id === "mechanical")?.status, "provisional");
+    assert.equal(BIDOS_OPTIONAL_TRADES.find((t) => t.id === "electrical")?.status, "locked");
+  });
+
+  it("generic honesty banner appears on disclaimer", () => {
+    const result = computePursuitConfidence(
+      { trade: "generic", amount: 250_000, daysRemaining: 21, signals: { scope_clarity: 0.55 } },
+      compliance,
+    );
+    assert.match(result.disclaimer, new RegExp(GENERIC_TRADE_HONESTY_BANNER.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  });
+
+  it("provisional trade weight tables sum ≈ 1", () => {
+    for (const trade of ["gc", "mechanical", "plumbing", "concrete", "civil", "specialty"]) {
+      const w = applyModeWeights(resolveWeights(trade), "startup");
+      const sum = Object.values(w).reduce((a, b) => a + b, 0);
+      assert.ok(Math.abs(sum - 1) < 1e-9, `${trade} sum=${sum}`);
+    }
+    assert.equal(WEIGHT_TABLES.mechanical.price_pressure, 0.167);
   });
 });
