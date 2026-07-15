@@ -117,6 +117,8 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [org, setOrg] = useState<AuthOrg | null>(null);
   const [loading, setLoading] = useState(true);
+  /** Legacy smoke session cookie while Clerk is also enabled. */
+  const [legacySession, setLegacySession] = useState(false);
 
   useEffect(() => {
     setApiAuthTokenGetter(async () => {
@@ -131,19 +133,33 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
 
   const refresh = useCallback(async () => {
     if (!isLoaded) return;
-    if (!isSignedIn) {
-      setUser(null);
-      setOrg(null);
-      setLoading(false);
+
+    if (isSignedIn) {
+      try {
+        const data = await apiFetch<{ user: AuthUser; org: AuthOrg }>("/api/v1/auth/me");
+        setUser(data.user);
+        setOrg(data.org);
+        setLegacySession(false);
+      } catch {
+        setUser(null);
+        setOrg(null);
+        setLegacySession(false);
+      } finally {
+        setLoading(false);
+      }
       return;
     }
+
+    // Dual mode: accept bios_token from smoke login when Clerk signed-out.
     try {
       const data = await apiFetch<{ user: AuthUser; org: AuthOrg }>("/api/v1/auth/me");
       setUser(data.user);
       setOrg(data.org);
+      setLegacySession(true);
     } catch {
       setUser(null);
       setOrg(null);
+      setLegacySession(false);
     } finally {
       setLoading(false);
     }
@@ -153,34 +169,50 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
     void refresh();
   }, [refresh, clerkUser?.id]);
 
-  const login = useCallback(async () => {
-    throw new Error("Use Clerk Sign in at /login");
-  }, []);
+  const login = useCallback(
+    async (email: string, password: string) => {
+      await apiFetch("/api/v1/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+      clearDemoSession();
+      await refresh();
+    },
+    [refresh],
+  );
 
   const register = useCallback(async () => {
-    throw new Error("Use Clerk Sign up at /register");
+    throw new Error("Use Clerk Sign up at /login");
   }, []);
 
   const logout = useCallback(async () => {
-    await signOut();
+    try {
+      await apiFetch("/api/v1/auth/logout", { method: "POST" });
+    } catch {
+      /* ignore */
+    }
+    if (isSignedIn) {
+      await signOut();
+    }
     setUser(null);
     setOrg(null);
+    setLegacySession(false);
     clearDemoSession();
-  }, [signOut]);
+  }, [isSignedIn, signOut]);
 
   const value = useMemo(
     () => ({
       user,
       org,
       loading: !isLoaded || loading,
-      isAuthenticated: Boolean(user && isSignedIn),
+      isAuthenticated: Boolean(user && (isSignedIn || legacySession)),
       clerkEnabled: true,
       refresh,
       login,
       register,
       logout,
     }),
-    [user, org, isLoaded, loading, isSignedIn, refresh, login, register, logout],
+    [user, org, isLoaded, loading, isSignedIn, legacySession, refresh, login, register, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

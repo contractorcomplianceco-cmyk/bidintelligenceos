@@ -4,7 +4,11 @@ import { z } from "zod";
 import { getDb, withPgOrgScope, withPgUserScope } from "../../db/client.js";
 import { users, organizations, organizationMembers } from "../../db/schema.js";
 import { hashPassword, verifyPassword, clearAuthCookie, setAuthCookie } from "../../lib/auth.js";
-import { isClerkAuthEnabled } from "../../lib/clerk-config.js";
+import {
+  isClerkAuthEnabled,
+  isSmokeAllowlistedEmail,
+  isSmokeLegacyLoginEnabled,
+} from "../../lib/clerk-config.js";
 import { nextId, nowIso } from "../../lib/ids.js";
 import { requireAuth, type AuthedRequest } from "../../middleware/auth.js";
 
@@ -78,19 +82,25 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  if (isClerkAuthEnabled()) {
-    res.status(400).json({ error: "Sign in with Clerk at /login." });
-    return;
-  }
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.flatten() });
     return;
   }
   const { email, password } = parsed.data;
+  const normalizedEmail = email.toLowerCase();
+
+  if (isClerkAuthEnabled()) {
+    const smokeOk = isSmokeLegacyLoginEnabled() && isSmokeAllowlistedEmail(normalizedEmail);
+    if (!smokeOk) {
+      res.status(400).json({ error: "Sign in with Clerk at /login." });
+      return;
+    }
+  }
+
   const db = getDb();
 
-  const rows = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
+  const rows = await db.select().from(users).where(eq(users.email, normalizedEmail)).limit(1);
   const user = rows[0];
   if (!user || !(await verifyPassword(password, user.passwordHash))) {
     res.status(401).json({ error: "Invalid email or password" });
@@ -129,9 +139,14 @@ router.post("/logout", (_req, res) => {
 });
 
 router.get("/config", (_req, res) => {
+  const clerk = isClerkAuthEnabled();
+  const smokeLogin = clerk && isSmokeLegacyLoginEnabled();
   res.json({
-    clerk: isClerkAuthEnabled(),
-    legacyLogin: !isClerkAuthEnabled(),
+    clerk,
+    /** True when email/password form works (pure legacy, or Clerk + smoke overlay). */
+    legacyLogin: !clerk || smokeLogin,
+    /** True when Clerk is on and BIOS_SMOKE_PASSWORD enables allowlisted smoke login. */
+    smokeLogin,
   });
 });
 

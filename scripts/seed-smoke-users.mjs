@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 /**
- * Idempotent smoke-test users for team QA before Clerk is re-enabled.
+ * Idempotent smoke-test users for team QA (legacy login and Clerk dual overlay).
  * Usage: node scripts/seed-smoke-users.mjs
  *
  * Password is read from BIOS_SMOKE_PASSWORD (default: teamwork).
  * Do not commit real passwords; this is temporary QA only.
+ * When AUTH_ENABLED=true and BIOS_SMOKE_PASSWORD is set, allowlisted emails
+ * may still POST /api/v1/auth/login (carmen@ / rose@).
  */
 import { config as loadEnv } from "dotenv";
 import bcrypt from "bcryptjs";

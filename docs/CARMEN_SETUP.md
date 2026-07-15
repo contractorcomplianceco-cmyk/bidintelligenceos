@@ -1,6 +1,6 @@
 # Carmen setup guide — click by click
 
-What **you** need to do outside the codebase to finish Rose plan Phase 3+. The team app is at **https://bidintelligence.cagteam.net** (auth: **Clerk**); demo stays at **https://demo.ccabidintelligence.com**.
+What **you** need to do outside the codebase to finish Rose plan Phase 3+. The team app is at **https://bidintelligence.cagteam.net** (auth: **Clerk**, with optional team smoke email/password when `BIOS_SMOKE_PASSWORD` is set); demo stays at **https://demo.ccabidintelligence.com**.
 
 ---
 
@@ -10,6 +10,26 @@ What **you** need to do outside the codebase to finish Rose plan Phase 3+. The t
 - PM2 `bid-intelligence-os` on port 5001
 - Health monitor emails on failure
 - Clerk shared auth live (`AUTH_ENABLED=true`; Sign in/up at `/login`)
+- Team smoke overlay when `BIOS_SMOKE_PASSWORD` is set — `/login` shows **Team smoke login** for `carmen@` / `rose@` (no Clerk redirect)
+
+---
+
+## Team smoke credentials (tell Rose)
+
+| Field | Value |
+|-------|--------|
+| URL | https://bidintelligence.cagteam.net/login |
+| Emails | `rose@ccacontact.com` or `carmen@ccacontact.com` |
+| Password | Same as teamwork / value of `BIOS_SMOKE_PASSWORD` on the BidOS server `.env` (never paste into chat or tickets) |
+
+After sign-in, you land on **/bids**. Clerk production sign-in remains available via the link on the login page.
+
+Seed/reset hashes (server only, does not print the password):
+
+```bash
+cd /home/ubuntu/projects/bid-intelligence-os
+node scripts/seed-smoke-users.mjs
+```
 
 ---
 
@@ -65,8 +85,9 @@ cd /home/ubuntu/projects/bid-intelligence-os
 
 9. Browser test:
    - Open **https://bidintelligence.cagteam.net/login**
-   - You should see **Clerk** Sign in (not email/password form).
-   - Sign up / sign in → Command Center loads your org data.
+   - With smoke overlay: **Team smoke login** form first; link to Clerk for production path.
+   - Without smoke (`BIOS_SMOKE_PASSWORD` unset): Clerk Sign in only.
+   - Sign up / sign in → lands on **/bids**.
 
 ---
 
@@ -158,7 +179,7 @@ Exit `0` = all checks passed; `1` = failure (no secrets in output). Smoke users:
 | # | Action | Expected |
 |---|--------|----------|
 | 1 | Visit https://bidintelligence.cagteam.net/api/health | `"status":"ok"`, `"database":{"driver":"postgres"}` |
-| 2 | `/login` → register or sign in | Lands on Command Center |
+| 2 | `/login` → team smoke or Clerk sign in | Lands on **/bids** |
 | 3 | **Bids** → **New bid** | Saves; appears in list |
 | 4 | Upload PDF or DOCX on bid | Extraction status `ready` or `metadata_only` |
 | 5 | **Compute bid score** | Pursuit Confidence Index + verdict (not “win probability”); market-anchors stamp shows `as of [date], manual` when FRED/BLS keys unset |

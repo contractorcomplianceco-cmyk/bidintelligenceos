@@ -42,8 +42,8 @@ const CLERK_CHECKS = [
   "GET /api/health (auth=clerk)",
   "GET /api/v1/auth/config",
   "GET /login",
-  "POST /api/v1/auth/login (expect 400 clerk gate)",
-  "SKIP authed API routes (manual browser test with Clerk)",
+  "POST /api/v1/auth/login (smoke allowlist or clerk gate)",
+  "Authed API routes when smokeLogin enabled",
 ];
 
 const DOCUMENTED_SMOKE_USERS = ["carmen@ccacontact.com", "rose@ccacontact.com"];
@@ -51,6 +51,7 @@ const DOCUMENTED_SMOKE_USERS = ["carmen@ccacontact.com", "rose@ccacontact.com"];
 const results = [];
 let failed = false;
 let resolvedAuthMode = AUTH_MODE_HINT === "clerk" || AUTH_MODE_HINT === "legacy" ? AUTH_MODE_HINT : null;
+let smokeLoginEnabled = false;
 
 function redactEmail(email) {
   const [local, domain] = email.split("@");
@@ -169,6 +170,15 @@ async function checkAuthConfig() {
     fail(`GET /api/v1/auth/config clerk=${String(json?.clerk)} expected true`);
     return;
   }
+  smokeLoginEnabled = Boolean(json?.smokeLogin);
+  if (smokeLoginEnabled) {
+    if (json?.legacyLogin !== true) {
+      fail(`GET /api/v1/auth/config legacyLogin=${String(json?.legacyLogin)} expected true when smokeLogin`);
+      return;
+    }
+    pass(`GET /api/v1/auth/config (${status}) clerk=true smokeLogin=true`);
+    return;
+  }
   if (json?.legacyLogin !== false) {
     fail(`GET /api/v1/auth/config legacyLogin=${String(json?.legacyLogin)} expected false`);
     return;
@@ -188,10 +198,10 @@ async function checkLoginPage() {
 
 async function checkClerkLoginGate() {
   const { status, json } = await fetchJson("POST", "/api/v1/auth/login", {
-    body: { email: SMOKE_EMAIL, password: "invalid-smoke-probe" },
+    body: { email: "not-allowlisted@example.com", password: "invalid-smoke-probe" },
   });
   if (status !== 400) {
-    fail(`POST /api/v1/auth/login (${status}) expected 400 clerk gate`);
+    fail(`POST /api/v1/auth/login non-allowlisted (${status}) expected 400 clerk gate`);
     return;
   }
   const err = String(json?.error ?? "");
@@ -199,7 +209,7 @@ async function checkClerkLoginGate() {
     fail(`POST /api/v1/auth/login error does not mention Clerk`);
     return;
   }
-  pass(`POST /api/v1/auth/login (${status}) clerk gate active`);
+  pass(`POST /api/v1/auth/login (${status}) clerk gate active for non-allowlisted`);
 }
 
 async function loginLegacy() {
@@ -250,7 +260,12 @@ async function runClerkSmoke() {
   await checkAuthConfig();
   await checkLoginPage();
   await checkClerkLoginGate();
-  skip("authed API routes — verify bids/jobs/ops in browser after Clerk sign-in");
+  if (smokeLoginEnabled) {
+    console.log("Smoke overlay: legacy login for allowlisted QA emails");
+    await runLegacySmoke();
+  } else {
+    skip("authed API routes — verify bids/jobs/ops in browser after Clerk sign-in");
+  }
 }
 
 async function runLegacySmoke() {
