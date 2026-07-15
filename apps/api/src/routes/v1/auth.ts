@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { eq } from "drizzle-orm";
+import { and, count, eq, isNull } from "drizzle-orm";
 import { z } from "zod";
 import { getDb, withPgOrgScope, withPgUserScope } from "../../db/client.js";
-import { users, organizations, organizationMembers } from "../../db/schema.js";
+import { users, organizations, organizationMembers, bids } from "../../db/schema.js";
 import { hashPassword, verifyPassword, clearAuthCookie, setAuthCookie } from "../../lib/auth.js";
 import {
   isClerkAuthEnabled,
@@ -108,16 +108,27 @@ router.post("/login", async (req, res) => {
   }
 
   const memberships = await withPgUserScope(user.id, async () =>
-    getDb()
-      .select()
-      .from(organizationMembers)
-      .where(eq(organizationMembers.userId, user.id))
-      .limit(1),
+    getDb().select().from(organizationMembers).where(eq(organizationMembers.userId, user.id)),
   );
-  const membership = memberships[0];
-  if (!membership) {
+  if (memberships.length === 0) {
     res.status(403).json({ error: "No organization membership" });
     return;
+  }
+  // Prefer the membership whose org has the most live bids (avoids empty duplicate orgs).
+  let membership = memberships[0]!;
+  if (memberships.length > 1) {
+    let bestCount = -1;
+    for (const m of memberships) {
+      const countRows = await db
+        .select({ n: count() })
+        .from(bids)
+        .where(and(eq(bids.orgId, m.orgId), isNull(bids.deletedAt)));
+      const n = Number(countRows[0]?.n ?? 0);
+      if (n > bestCount) {
+        bestCount = n;
+        membership = m;
+      }
+    }
   }
 
   setAuthCookie(res, {

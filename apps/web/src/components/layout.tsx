@@ -196,7 +196,7 @@ export function Layout({ children }: { children: ReactNode }) {
   const { mode, setMode } = useAppContext();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const live = useLiveData(isAuthenticated);
   const { data: org } = useOrgProfile();
   const brandName = live ? parseStringField(org?.profile?.brandName) : "";
@@ -204,6 +204,32 @@ export function Layout({ children }: { children: ReactNode }) {
   const logoUrl = live ? parseUrlField(org?.profile?.logoUrl) : "";
   const brandColor = live ? parseBrandColor(org?.profile?.brandColor, "#38BDF8") : "#38BDF8";
   const workspaceTitle = productName || brandName || "BidIntelligenceOS";
+  // Never show demo "Jordan P." when signed in — use session name, else email local-part.
+  const displayName = isAuthenticated
+    ? user?.name?.trim() ||
+      (user?.email ? user.email.split("@")[0] : "") ||
+      "Account"
+    : "Jordan P.";
+  const displayRole =
+    isAuthenticated && user
+      ? user.role === "owner"
+        ? "Owner"
+        : user.role.charAt(0).toUpperCase() + user.role.slice(1)
+      : "Estimator";
+  const displayInitials = (() => {
+    const parts = displayName.trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return `${parts[0]![0] ?? ""}${parts[1]![0] ?? ""}`.toUpperCase();
+    return (parts[0]?.slice(0, 2) || (isAuthenticated ? "—" : "JP")).toUpperCase();
+  })();
+  const dataAsOfLabel = live
+    ? `Data as of ${new Date().toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })}`
+    : "Data as of Jul 1, 2025 9:41 AM";
 
   useEffect(() => {
     document.documentElement.classList.remove("dark");
@@ -389,18 +415,18 @@ export function Layout({ children }: { children: ReactNode }) {
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8 rounded-md border border-[#1E293B]">
                   <AvatarFallback className="bg-[#111827] text-[#38BDF8] text-xs font-bold rounded-md">
-                    JP
+                    {displayInitials}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden sm:flex items-center gap-2">
                   <span className="text-sm font-medium text-white">
-                    Jordan P. <span className="text-[#8A96B0]">/ Estimator</span>
+                    {displayName} <span className="text-[#8A96B0]">/ {displayRole}</span>
                   </span>
                   <ChevronDown className="w-4 h-4 text-[#8A96B0] group-hover:text-white" />
                 </div>
               </div>
               <span className="hidden sm:block text-[10px] text-[#8A96B0] mt-0.5 tracking-wider">
-                Data as of Jul 1, 2025 9:41 AM
+                {live ? (user?.email ? user.email : dataAsOfLabel) : dataAsOfLabel}
               </span>
             </Link>
           </div>

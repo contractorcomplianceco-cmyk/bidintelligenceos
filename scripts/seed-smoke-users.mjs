@@ -104,6 +104,7 @@ try {
   }
 
   console.log("Smoke users ready (legacy email/password auth).");
+  console.log("Next: node scripts/seed-smoke-bids.mjs  # FL sample bids/jobs for QA org");
 } finally {
   await pool.end();
 }

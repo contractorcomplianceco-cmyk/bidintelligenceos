@@ -148,7 +148,7 @@ ADMIN_EMAILS=owner@example.com           # comma-separated → owner role
 - API: `@clerk/express` middleware + sync to local `users` / `organizations`
 - Web: `@clerk/clerk-react` Sign in/up at `/login` and `/register`
 - Legacy `/api/v1/auth/login` returns 400 when Clerk is enabled **unless** `BIOS_SMOKE_PASSWORD` is set and the email is allowlisted (`carmen@ccacontact.com`, `rose@ccacontact.com`) — dual overlay for team QA
-- Password for smoke users: `BIOS_SMOKE_PASSWORD` on server (default documented as teamwork); never log or commit the value. Reseed with `node scripts/seed-smoke-users.mjs`
+- Password for smoke users: `BIOS_SMOKE_PASSWORD` on server (default documented as teamwork); never log or commit the value. Reseed with `node scripts/seed-smoke-users.mjs`, then `node scripts/seed-smoke-bids.mjs` for FL sample bids/jobs
 
 ### Team URL (production)
 

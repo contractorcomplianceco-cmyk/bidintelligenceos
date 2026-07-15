@@ -102,7 +102,13 @@ export default function BusinessProfile() {
       : costRecords.reduce((sum, c) => sum + c.projectedRoi, 0) / costRecords.length;
     const activeCrew = live ? 0 : crewMembers.filter((c) => c.status !== "PTO").length;
     const activeSubs = live ? 0 : subcontractors.length;
-    const winRate = live && winLoss?.summary.winRate != null ? Math.round(winLoss.summary.winRate * 100) : live ? null : 63;
+    // API already returns winRate as 0–100 percentage (one decimal); never multiply by 100.
+    const winRate =
+      live && winLoss?.summary.winRate != null
+        ? Math.round(winLoss.summary.winRate)
+        : live
+          ? null
+          : 63;
     const activeContracts = jobs.length;
     return { wonValue, avgProject, avgRoi, activeCrew, activeSubs, winRate, activeContracts };
   }, [live, liveJobs, winLoss]);
@@ -314,12 +320,37 @@ export default function BusinessProfile() {
               </CardHeader>
               <CardContent className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <ProfileField label="Legal Name" value={companyName} editing={editing} />
-                <ProfileField label="DBA" value={live ? "" : "Cornerstone Builders"} editing={editing} />
-                <ProfileField label="Founded" value={live ? "" : "2007"} editing={editing} />
-                <ProfileField label="Entity Type" value={live ? "" : "Limited Liability Company"} editing={editing} />
-                <ProfileField label="Headquarters" value={live ? "" : "Austin, TX"} editing={editing} />
-                <ProfileField label="Company Size" value={live ? "" : "120 employees (48 field)"} editing={editing} />
-                <ProfileField label="Annual Revenue" value={live ? "" : "$42M (2024)"} editing={editing} accent />
+                <ProfileField
+                  label="DBA"
+                  value={live ? "Not set — add in Settings → Company Profile" : "Cornerstone Builders"}
+                  editing={editing}
+                />
+                <ProfileField
+                  label="Founded"
+                  value={live ? "Not set — add in Settings → Company Profile" : "2007"}
+                  editing={editing}
+                />
+                <ProfileField
+                  label="Entity Type"
+                  value={live ? "Not set — add in Settings → Company Profile" : "Limited Liability Company"}
+                  editing={editing}
+                />
+                <ProfileField
+                  label="Headquarters"
+                  value={live ? "Not set — add in Settings → Company Profile" : "Austin, TX"}
+                  editing={editing}
+                />
+                <ProfileField
+                  label="Company Size"
+                  value={live ? "Not set — add in Settings → Company Profile" : "120 employees (48 field)"}
+                  editing={editing}
+                />
+                <ProfileField
+                  label="Annual Revenue"
+                  value={live ? "Not set — add in Settings → Company Profile" : "$42M (2024)"}
+                  editing={editing}
+                  accent
+                />
                 <ProfileField label="Primary Vertical" value={verticalConfig.name} editing={editing} accent />
               </CardContent>
             </Card>
@@ -357,9 +388,9 @@ export default function BusinessProfile() {
                   })}
                 </div>
                 <p className="text-[11px] text-slate-500 mt-4 leading-relaxed">
-                  Cornerstone self-performs {verticalConfig.name.toLowerCase()} work with{" "}
-                  {verticalConfig.laborCategories.slice(0, 3).join(", ")} crews and partners on{" "}
-                  {verticalConfig.subCategories.slice(0, 3).join(", ")} scopes.
+                  {live
+                    ? `Primary workflow vertical is ${verticalConfig.name}. Add licensing and service areas in Settings so bid-fit can use them.`
+                    : `Cornerstone self-performs ${verticalConfig.name.toLowerCase()} work with ${verticalConfig.laborCategories.slice(0, 3).join(", ")} crews and partners on ${verticalConfig.subCategories.slice(0, 3).join(", ")} scopes.`}
                 </p>
               </CardContent>
             </Card>
@@ -375,10 +406,10 @@ export default function BusinessProfile() {
               <CardContent className="p-5">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   {[
-                    { label: "Field Crew", value: `${stats.activeCrew}`, sub: "Active personnel" },
-                    { label: "Sub Partners", value: `${stats.activeSubs}`, sub: "Vetted trades" },
-                    { label: "Concurrent Jobs", value: "6-8", sub: "Typical load" },
-                    { label: "Bonding Capacity", value: "$25M", sub: "Aggregate" },
+                    { label: "Field Crew", value: live ? "—" : `${stats.activeCrew}`, sub: live ? "Add in Ops" : "Active personnel" },
+                    { label: "Sub Partners", value: live ? "—" : `${stats.activeSubs}`, sub: live ? "Add in Ops" : "Vetted trades" },
+                    { label: "Concurrent Jobs", value: live ? "—" : "6-8", sub: live ? "From live jobs" : "Typical load" },
+                    { label: "Bonding Capacity", value: live ? "—" : "$25M", sub: live ? "Add in Settings" : "Aggregate" },
                   ].map((c) => (
                     <div key={c.label} className="rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-4">
                       <div className="text-2xl font-bold text-slate-900">{c.value}</div>
@@ -391,12 +422,14 @@ export default function BusinessProfile() {
                   <Landmark className="w-4 h-4 text-[#F59E0B] shrink-0 mt-0.5" />
                   <div>
                     <div className="text-xs font-semibold text-slate-900">
-                      Bonding capacity: $5M single / $25M aggregate
+                      {live
+                        ? "Bonding capacity not on file"
+                        : "Bonding capacity: $5M single / $25M aggregate"}
                     </div>
                     <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                      Surety line held through Meridian Surety Group. Figures indicative only and
-                      require broker verification per project; capacity does not imply any guaranteed
-                      bonding or award outcome.
+                      {live
+                        ? "Add surety / bonding figures in Settings → Company Profile when ready. Capacity is decision-support only and requires broker verification per project."
+                        : "Surety line held through Meridian Surety Group. Figures indicative only and require broker verification per project; capacity does not imply any guaranteed bonding or award outcome."}
                     </p>
                   </div>
                 </div>

@@ -89,10 +89,10 @@ export default function Settings() {
   const bondingValue = live ? (bonding || String(profile.bondingNotes ?? "")) : bonding || demoBonding;
   const licenseValue = live ? (license || String(profile.licenseNotes ?? "")) : license || demoLicense;
 
-  const userNameParts = (live ? user?.name ?? "" : "Jordan P.").trim().split(/\s+/);
-  const firstName = live ? userNameParts[0] ?? "" : "Jordan";
-  const lastName = live ? userNameParts.slice(1).join(" ") : "P.";
-  const email = live ? user?.email ?? "" : "jordan@acmetrades.com";
+  const userNameParts = (isAuthenticated ? user?.name ?? "" : "Jordan P.").trim().split(/\s+/);
+  const firstName = isAuthenticated ? userNameParts[0] ?? "" : "Jordan";
+  const lastName = isAuthenticated ? userNameParts.slice(1).join(" ") : "P.";
+  const email = isAuthenticated ? user?.email ?? "" : "jordan@acmetrades.com";
 
   const [licenses, setLicenses] = useState<LicenseEntry[]>([]);
   const [certifications, setCertifications] = useState<string[]>([]);

@@ -69,38 +69,43 @@ export default function RoseOs() {
   const [filter, setFilter] = useState<VerdictFilter>("all");
 
   const displayInsights = useMemo(
-    () => (live && liveRose ? mapRoseSummaryInsights(liveRose.insights ?? []) : roseInsights),
+    () => (live ? (liveRose ? mapRoseSummaryInsights(liveRose.insights ?? []) : []) : roseInsights),
     [live, liveRose],
   );
   const displayStats = useMemo(
-    () => (live && liveRose ? roseStatsFromInsights(displayInsights) : roseStats),
-    [live, liveRose, displayInsights],
+    () => (live ? roseStatsFromInsights(displayInsights) : roseStats),
+    [live, displayInsights],
   );
   const displayPriorities = useMemo(
     () =>
-      live && liveRose
+      live
         ? buildLiveExecutivePriorities(displayInsights)
         : executiveSummary.priorities,
-    [live, liveRose, displayInsights],
+    [live, displayInsights],
   );
-  const asOf =
-    live && liveRose
-      ? new Date().toLocaleString(undefined, {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-        })
-      : executiveSummary.asOf;
+  const asOf = live
+    ? new Date().toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : executiveSummary.asOf;
 
-  const headline = live && liveRose?.executiveBrief?.headline
-    ? liveRose.executiveBrief.headline
-    : live && liveRose
-      ? liveRose.insights[0]?.summary ?? executiveSummary.headline
-      : executiveSummary.headline;
-  const posture = (live && liveRose ? liveRose.verdict : executiveSummary.posture) as Verdict;
-  const brainNarrative = live && liveRose?.executiveBrief?.narrative;
+  const headline = live
+    ? liveRose?.executiveBrief?.headline ??
+      (liveRose
+        ? liveRose.insights[0]?.summary ?? "Pipeline clear — no active ROSEOS alerts"
+        : "Loading ROSEOS intelligence…")
+    : executiveSummary.headline;
+  const posture = (live ? (liveRose?.verdict ?? "green") : executiveSummary.posture) as Verdict;
+  const brainNarrative = live
+    ? liveRose?.executiveBrief?.narrative ??
+      (liveRose
+        ? "Live org has no yellow/red verdicts yet. Intake and score bids to populate executive alerts."
+        : "")
+    : undefined;
 
   const filtered = (items: RoseInsight[]) =>
     filter === "all" ? items : items.filter((i) => i.verdict === filter);
@@ -241,7 +246,7 @@ export default function RoseOs() {
               {headline}
             </h2>
             <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-4xl">
-              {brainNarrative ?? executiveSummary.narrative}
+              {brainNarrative ?? (live ? "" : executiveSummary.narrative)}
             </p>
             {live && liveRose?.roseBrain && (
               <p className="text-[10px] text-slate-400 mt-2">Rose Brain active — human review required before client use.</p>

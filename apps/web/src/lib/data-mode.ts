@@ -14,5 +14,6 @@ export function clearDemoSession(): void {
 
 /** Live API data when authenticated; demo fixtures otherwise. */
 export function useLiveData(isAuthenticated: boolean): boolean {
-  return isAuthenticated && !isDemoSession();
+  // Signed-in users always use org data — demo session flag is for anonymous walkthrough only.
+  return isAuthenticated;
 }

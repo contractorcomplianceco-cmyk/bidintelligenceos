@@ -178,21 +178,35 @@ export default function CommandCenter() {
     () => (live && liveRose ? mapRoseSummaryInsights(liveRose.insights ?? []) : []),
     [live, liveRose],
   );
-  const rosePosture = (live && liveRose ? liveRose.verdict : executiveSummary.posture) as Verdict;
-  const roseHeadline =
-    live && liveRose?.executiveBrief?.headline
-      ? liveRose.executiveBrief.headline
-      : executiveSummary.headline;
-  const roseNarrative =
-    live && liveRose?.executiveBrief?.narrative ? liveRose.executiveBrief.narrative : executiveSummary.narrative;
-  const liveInsightCards =
-    live && liveRose
-      ? liveRoseInsights.filter((i) => i.verdict !== "green").slice(0, 3)
-      : roseInsights.filter((i) => i.verdict !== "green").slice(0, 3);
-  const liveVerdictCounts =
-    live && liveRose
+  const rosePosture = (
+    live ? (liveRose?.verdict ?? "green") : executiveSummary.posture
+  ) as Verdict;
+  const roseHeadline = live
+    ? liveRose?.executiveBrief?.headline ??
+      (liveRose
+        ? "Pipeline clear — no active ROSEOS alerts"
+        : "Loading ROSEOS intelligence…")
+    : executiveSummary.headline;
+  const roseNarrative = live
+    ? liveRose?.executiveBrief?.narrative ??
+      (liveRose
+        ? "Live org has no yellow/red verdicts yet. Intake and score bids to populate executive alerts."
+        : "")
+    : executiveSummary.narrative;
+  const liveInsightCards = live
+    ? liveRoseInsights.filter((i) => i.verdict !== "green").slice(0, 3)
+    : roseInsights.filter((i) => i.verdict !== "green").slice(0, 3);
+  const liveVerdictCounts = live
+    ? liveRose
       ? roseStatsFromInsights(liveRoseInsights)
-      : { green: roseStats.green, yellow: roseStats.yellow, red: roseStats.red, total: roseStats.total, modulesMonitored: roseStats.modulesMonitored };
+      : { green: 0, yellow: 0, red: 0, total: 0, modulesMonitored: 0 }
+    : {
+        green: roseStats.green,
+        yellow: roseStats.yellow,
+        red: roseStats.red,
+        total: roseStats.total,
+        modulesMonitored: roseStats.modulesMonitored,
+      };
 
   const liveWonBids = allBids.filter((b) => b.status === "Won");
 
@@ -494,7 +508,15 @@ export default function CommandCenter() {
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-              {liveInsightCards.map((item) => (
+              {liveInsightCards.length === 0 && live ? (
+                <div className="md:col-span-3 rounded-lg border border-dashed border-[#E2E8F0] bg-[#F8FAFC] p-4 text-center">
+                  <p className="text-xs font-semibold text-slate-900">No active ROSEOS alerts</p>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Your live pipeline has no yellow/red verdicts yet. Score active bids to surface Bid Risk cards here.
+                  </p>
+                </div>
+              ) : (
+                liveInsightCards.map((item) => (
                 <Link key={item.id} href={"href" in item && item.href ? String(item.href) : "/roseos"}>
                   <div className="h-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-3 hover:border-[#FDA4AF] transition-colors cursor-pointer">
                     <div className="flex items-start justify-between gap-2 mb-1.5">
@@ -517,7 +539,8 @@ export default function CommandCenter() {
                     )}
                   </div>
                 </Link>
-              ))}
+                ))
+              )}
             </div>
             <p className="text-[10px] text-slate-500 mt-3 flex items-center gap-1.5">
               <ShieldCheck className="w-3 h-3 text-[#0284C7]" />

@@ -142,15 +142,19 @@ export default function BidDna() {
   const stats = live && liveView ? liveView.stats : dnaStats;
   const learnings = live && liveView ? liveView.learnings : dnaLearnings;
   const accuracySeries = live && liveView ? liveView.accuracySeries : estimateAccuracySeries;
+  const liveEmpty = live && (!liveView || !liveView.hasData || profiles.length === 0);
 
-  const [selected, setSelected] = useState<BidDnaProfile>(() => profiles[0]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<LearningStatus | "all">("all");
 
+  const selected: BidDnaProfile | null = useMemo(() => {
+    if (profiles.length === 0) return null;
+    return profiles.find((p) => p.id === selectedId) ?? profiles[0] ?? null;
+  }, [profiles, selectedId]);
+
   useEffect(() => {
-    if (profiles.length > 0 && !profiles.find((p) => p.id === selected.id)) {
-      setSelected(profiles[0]);
-    }
-  }, [profiles, selected.id]);
+    if (!selected && profiles[0]) setSelectedId(profiles[0].id);
+  }, [profiles, selected]);
 
   const barData = useMemo(
     () =>
@@ -165,7 +169,7 @@ export default function BidDna() {
 
   const trendData = useMemo(
     () =>
-      selected.accuracyTrend.map((a, i) => ({
+      (selected?.accuracyTrend ?? []).map((a, i) => ({
         quarter: accuracySeries[i]?.quarter ?? `Q${i + 1}`,
         accuracy: a,
       })),
@@ -180,7 +184,7 @@ export default function BidDna() {
     [learnings, statusFilter],
   );
 
-  if (live && liveView && !liveView.hasData) {
+  if (liveEmpty) {
     return (
       <Layout>
         <div className="space-y-6">
@@ -198,6 +202,17 @@ export default function BidDna() {
             description="Complete jobs in closeout or record scored bid outcomes to populate estimate-vs-actual profiles and learned adjustments."
           />
         </div>
+      </Layout>
+    );
+  }
+
+  if (!selected) {
+    return (
+      <Layout>
+        <OpsModuleEmpty
+          module="Bid DNA learning data"
+          description="No estimate-vs-actual profiles yet. Complete jobs in closeout to build Bid DNA."
+        />
       </Layout>
     );
   }
@@ -536,7 +551,7 @@ export default function BidDna() {
                 {profiles.map((p) => (
                   <tr
                     key={p.id}
-                    onClick={() => setSelected(p)}
+                    onClick={() => setSelectedId(p.id)}
                     className={`transition-colors cursor-pointer ${
                       p.id === selected.id ? "bg-[#F1F5F9]" : "hover:bg-[#F1F5F9]"
                     }`}

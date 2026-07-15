@@ -51,6 +51,7 @@ function LegacyAuthProvider({ children }: { children: ReactNode }) {
       const data = await apiFetch<{ user: AuthUser; org: AuthOrg }>("/api/v1/auth/me");
       setUser(data.user);
       setOrg(data.org);
+      clearDemoSession();
     } catch {
       setUser(null);
       setOrg(null);
@@ -139,6 +140,7 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
         setUser(data.user);
         setOrg(data.org);
         setLegacySession(true);
+        clearDemoSession();
       } catch {
         // Keep loading=true until Clerk loads or a later refresh succeeds while signed out.
       }
@@ -151,6 +153,7 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
         setUser(data.user);
         setOrg(data.org);
         setLegacySession(false);
+        clearDemoSession();
       } catch {
         setUser(null);
         setOrg(null);
@@ -167,6 +170,7 @@ function ClerkAuthProvider({ children }: { children: ReactNode }) {
       setUser(data.user);
       setOrg(data.org);
       setLegacySession(true);
+      clearDemoSession();
     } catch {
       setUser(null);
       setOrg(null);
