@@ -5,7 +5,11 @@ import { getDb } from "../../db/client.js";
 import { bidScores, bids } from "../../db/schema.js";
 import { rowToBid } from "../../lib/bid-mapper.js";
 import { persistBidScoreForBid } from "../../lib/bid-score-service.js";
-import { serializePublicBidScore, type BidScoreResult } from "@workspace/cca-core";
+import {
+  serializePublicBidScore,
+  type BidScoreResult,
+  type RoseSignalInputs,
+} from "@workspace/cca-core";
 import bidDocumentsRoutes from "./bid-documents.js";
 import { computeComplianceEligibility } from "../../lib/compliance-eligibility.js";
 import { nextId, nowIso } from "../../lib/ids.js";
@@ -129,6 +133,25 @@ router.get("/:id/score", async (req, res) => {
   });
 });
 
+const scoreBodySchema = z
+  .object({
+    trade: z.string().min(1).max(64).optional(),
+    mode: z.enum(["startup", "learning"]).optional(),
+    /** Optional Rose signal overrides (0–1). Unset fields use startup defaults. */
+    signals: z.record(z.string(), z.number().min(0).max(5).nullable()).optional(),
+    roseGates: z
+      .object({
+        hasScopeDocs: z.boolean().optional(),
+        bondingInfeasible: z.boolean().optional(),
+        roofingWeatherWindowFail: z.boolean().optional(),
+        roofingActiveLeakOccupied: z.boolean().optional(),
+        electricalGearLeadFail: z.boolean().optional(),
+        licensedTrades: z.array(z.string()).optional(),
+      })
+      .optional(),
+  })
+  .optional();
+
 router.post("/:id/score", async (req, res) => {
   const { orgId, userId } = (req as unknown as AuthedRequest).auth;
   const bid = await loadBidForOrg(req.params.id, orgId);
@@ -136,13 +159,19 @@ router.post("/:id/score", async (req, res) => {
     res.status(404).json({ error: "Bid not found" });
     return;
   }
+  const body = scoreBodySchema.parse(req.body ?? {});
   logScoreAccess({
     userId,
     orgId,
     bidId: bid.id,
     inputHash: hashBidScoreInputs(bid),
   });
-  const score = await persistBidScoreForBid(bid, orgId);
+  const score = await persistBidScoreForBid(bid, orgId, {
+    trade: body?.trade,
+    mode: body?.mode,
+    signals: body?.signals as RoseSignalInputs | undefined,
+    roseGates: body?.roseGates,
+  });
   res.status(201).json({ score });
 });
 

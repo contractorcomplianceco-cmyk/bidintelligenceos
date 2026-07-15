@@ -1,5 +1,10 @@
 import { eq } from "drizzle-orm";
-import { computeBidScore, serializePublicBidScore } from "@workspace/cca-core";
+import {
+  computeBidScore,
+  serializePublicBidScore,
+  type RoseGateFlags,
+  type RoseSignalInputs,
+} from "@workspace/cca-core";
 import { getDb } from "../db/client.js";
 import { bidScores, bids } from "../db/schema.js";
 import { computeComplianceEligibility } from "./compliance-eligibility.js";
@@ -8,9 +13,26 @@ import { parseStateFromLocation } from "./state-parse.js";
 
 type BidRow = typeof bids.$inferSelect;
 
-export async function persistBidScoreForBid(bid: BidRow, orgId: string) {
+export type ScoreRequestOptions = {
+  /** Override bid.type; defaults to bid.type or "generic". */
+  trade?: string;
+  signals?: RoseSignalInputs;
+  roseGates?: RoseGateFlags;
+  mode?: "startup" | "learning";
+};
+
+export async function persistBidScoreForBid(
+  bid: BidRow,
+  orgId: string,
+  opts: ScoreRequestOptions = {},
+) {
+  const trade = opts.trade?.trim() || bid.type?.trim() || "generic";
   const state = parseStateFromLocation(bid.location);
-  const compliance = await computeComplianceEligibility(state, { trade: bid.type, projectType: bid.publicPrivate });
+  const compliance = await computeComplianceEligibility(state, {
+    trade,
+    projectType: bid.publicPrivate,
+  });
+
   const result = computeBidScore(
     {
       amount: bid.amount,
@@ -20,6 +42,10 @@ export async function persistBidScoreForBid(bid: BidRow, orgId: string) {
       daysRemaining: bid.daysRemaining ?? undefined,
       margin: bid.margin ?? undefined,
       publicPrivate: bid.publicPrivate ?? undefined,
+      trade,
+      mode: opts.mode ?? "startup",
+      signals: opts.signals,
+      roseGates: opts.roseGates,
     },
     compliance,
   );
