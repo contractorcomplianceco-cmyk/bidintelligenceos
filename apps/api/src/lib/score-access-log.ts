@@ -39,14 +39,34 @@ export function logScoreAccess(params: {
   orgId: string;
   bidId: string;
   inputHash: string;
+  event?: "bid_score_compute" | "confidence_compute" | "verdict_override";
+  trade?: string;
+  mode?: string;
+  totalScore?: number;
+  verdict?: string;
+  hardKill?: boolean;
+  evidenceCapApplied?: boolean;
+  from?: string;
+  to?: string;
+  gateId?: string;
 }) {
+  const event = params.event ?? "bid_score_compute";
   console.log(
     JSON.stringify({
-      event: "bid_score_compute",
+      event,
       userId: params.userId,
       orgId: params.orgId,
       bidId: params.bidId,
       inputHash: params.inputHash,
+      trade: params.trade,
+      mode: params.mode,
+      totalScore: params.totalScore,
+      verdict: params.verdict,
+      hardKill: params.hardKill,
+      evidenceCapApplied: params.evidenceCapApplied,
+      gateId: params.gateId,
+      from: params.from,
+      to: params.to,
       timestamp: new Date().toISOString(),
     }),
   );

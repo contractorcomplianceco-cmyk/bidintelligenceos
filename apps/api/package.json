@@ -7,7 +7,8 @@
     "dev": "tsx watch --tsconfig tsconfig.json src/index.ts",
     "start": "tsx --tsconfig tsconfig.json src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:security": "tsx --tsconfig tsconfig.json --test src/lib/bid-score-public.test.ts"
+    "test:security": "tsx --tsconfig tsconfig.json --test src/lib/bid-score-public.test.ts",
+    "test:confidence": "tsx --tsconfig tsconfig.json --test src/lib/bid-score-public.test.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1081.0",
