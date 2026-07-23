@@ -14,6 +14,11 @@ import { requireAuth, type AuthedRequest } from "../../middleware/auth.js";
 
 const router = Router();
 
+/** Rose 2026-07-23: invitation-only. Open self-register only if explicitly re-enabled. */
+export function isOpenRegistrationEnabled(): boolean {
+  return process.env.OPEN_REGISTRATION_ENABLED === "true";
+}
+
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -27,6 +32,15 @@ const loginSchema = z.object({
 });
 
 router.post("/register", async (req, res) => {
+  if (!isOpenRegistrationEnabled()) {
+    res.status(403).json({
+      error: "Forbidden",
+      reason: "invitation_only",
+      message:
+        "Bid Intelligence is invitation-only. Open self-registration is disabled. Contact CCA for access.",
+    });
+    return;
+  }
   if (isClerkAuthEnabled()) {
     res.status(400).json({ error: "Registration is managed by Clerk. Use Sign in." });
     return;
@@ -158,6 +172,9 @@ router.get("/config", (_req, res) => {
     legacyLogin: !clerk || smokeLogin,
     /** True when Clerk is on and BIOS_SMOKE_PASSWORD enables allowlisted smoke login. */
     smokeLogin,
+    /** Rose 2026-07-23: open self-register off unless OPEN_REGISTRATION_ENABLED=true. */
+    openRegistration: isOpenRegistrationEnabled(),
+    invitationOnly: !isOpenRegistrationEnabled(),
   });
 });
 

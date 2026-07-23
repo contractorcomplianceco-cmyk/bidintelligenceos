@@ -284,9 +284,9 @@ function LegacyLogin() {
           </Button>
         </form>
         <p className="mt-6 text-center text-sm text-slate-500">
-          No account?{" "}
+          Access is invitation-only.{" "}
           <Link href="/register" className="text-[#7dd3fc] hover:underline">
-            Create one
+            Learn more
           </Link>
         </p>
       </div>
