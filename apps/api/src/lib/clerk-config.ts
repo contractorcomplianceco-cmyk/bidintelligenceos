@@ -24,6 +24,11 @@ export function adminEmailSet(): Set<string> {
   );
 }
 
+/**
+ * @deprecated Do not use for Bid customer authorization.
+ * Rose 2026-07-23: Clerk access is invitation/membership only — never ADMIN_EMAILS auto-org.
+ * Kept only for scripts/docs that still reference the helper; clerk-sync no longer calls this.
+ */
 export function mapClerkRole(email: string | null | undefined): string {
   if (!email) return "reviewer";
   return adminEmailSet().has(email.toLowerCase()) ? "owner" : "reviewer";

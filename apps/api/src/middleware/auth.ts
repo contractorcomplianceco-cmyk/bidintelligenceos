@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import type { AuthPayload } from "../lib/auth.js";
+import { ClerkNotProvisionedError } from "../lib/clerk-sync.js";
 import { resolveAuthFromRequest } from "../lib/resolve-auth.js";
 
 export type AuthedRequest = Request & { auth: AuthPayload };
@@ -15,6 +16,14 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
       (req as AuthedRequest).auth = auth;
       next();
     } catch (error) {
+      if (error instanceof ClerkNotProvisionedError) {
+        res.status(error.status).json({
+          error: "Forbidden",
+          reason: error.reason,
+          message: error.message,
+        });
+        return;
+      }
       next(error);
     }
   })();

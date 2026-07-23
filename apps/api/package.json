@@ -7,7 +7,7 @@
     "dev": "tsx watch --tsconfig tsconfig.json src/index.ts",
     "start": "tsx --tsconfig tsconfig.json src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:security": "tsx --tsconfig tsconfig.json --test src/lib/bid-score-public.test.ts src/lib/confidence-ops.test.ts",
+    "test:security": "tsx --tsconfig tsconfig.json --test src/lib/bid-score-public.test.ts src/lib/confidence-ops.test.ts src/lib/clerk-sync.test.ts src/middleware/requireAuth.clerk.test.ts",
     "test:confidence": "tsx --tsconfig tsconfig.json --test src/lib/bid-score-public.test.ts src/lib/confidence-ops.test.ts"
   },
   "dependencies": {
